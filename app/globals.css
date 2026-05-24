@@ -1,26 +1,266 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Border radius used everywhere */
+  --radius: 0.625rem;
+
+  /* ==================================================
+     MAIN BACKGROUND COLORS
+  ================================================== */
+
+  /* Main dark background */
+  --background: oklch(0.16 0.012 250);
+
+  /* Slightly lighter panels/cards */
+  --surface: oklch(0.2 0.014 250);
+
+  /* Elevated cards/modals/navbar */
+  --surface-elevated: oklch(0.235 0.016 250);
+
+  /* Main text color (white-ish) */
+  --foreground: oklch(0.96 0.005 250);
+
+  /* Muted/secondary text */
+  --muted-foreground: oklch(0.66 0.02 250);
+
+  /* ==================================================
+     BRAND GREEN / MINT
+  ================================================== */
+
+  /*
+    Main mint/green brand color
+    Used for:
+    - buttons
+    - highlights
+    - active states
+    - glows
+  */
+  --mint: oklch(0.82 0.16 168);
+
+  /*
+    Brighter mint used in gradients/glows
+  */
+  --mint-glow: oklch(0.85 0.18 168);
+
+  /*
+    Text color on green buttons
+  */
+  --mint-foreground: oklch(0.18 0.02 168);
+
+  /* ==================================================
+     GOLD / YELLOW ACCENT
+  ================================================== */
+
+  /*
+    Premium yellow/gold accent
+    Used for:
+    - rankings
+    - trophies
+    - premium UI
+  */
+  --gold: oklch(0.9 0.135 95);
+
+  /*
+    Text on gold backgrounds
+  */
+  --gold-foreground: oklch(0.22 0.04 95);
+
+  /* ==================================================
+     BORDERS & INPUTS
+  ================================================== */
+
+  /* Subtle borders */
+  --border: oklch(0.3 0.014 250 / 60%);
+
+  /* Inputs */
+  --input: oklch(0.3 0.014 250 / 70%);
+
+  /* Focus rings */
+  --ring: oklch(0.82 0.16 168 / 60%);
+
+  /* ==================================================
+     STATUS COLORS
+  ================================================== */
+
+  --success: oklch(0.78 0.16 162);
+  --warning: oklch(0.85 0.14 80);
+  --danger: oklch(0.65 0.22 25);
+
+  /* ==================================================
+     GRADIENTS
+  ================================================== */
+
+  /*
+    Main page background gradient
+  */
+  --gradient-hero:
+    radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      color-mix(in oklab, var(--mint) 18%, transparent) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      var(--background) 0%,
+      var(--surface) 100%
+    );
+
+  /*
+    Green gradient
+  */
+  --gradient-mint:
+    linear-gradient(
+      135deg,
+      var(--mint) 0%,
+      var(--mint-glow) 100%
+    );
+
+  /*
+    Gold gradient
+  */
+  --gradient-gold:
+    linear-gradient(
+      135deg,
+      var(--gold) 0%,
+      oklch(0.78 0.14 60) 100%
+    );
+
+  /*
+    Glassmorphism card background
+  */
+  --gradient-card:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--surface) 90%, transparent) 0%,
+      color-mix(
+        in oklab,
+        var(--surface-elevated) 95%,
+        transparent
+      ) 100%
+    );
+
+  /* ==================================================
+     SHADOWS
+  ================================================== */
+
+  /*
+    Green glow shadow
+  */
+  --shadow-mint:
+    0 8px 30px -8px
+    color-mix(in oklab, var(--mint) 35%, transparent);
+
+  /*
+    Elevated card shadow
+  */
+  --shadow-elevated:
+    0 12px 40px -12px oklch(0 0 0 / 0.6);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ======================================================
+   BASE STYLES
+====================================================== */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    min-height: 100vh;
+
+    background-color: var(--background);
+    background-image: var(--gradient-hero);
+    background-attachment: fixed;
+
+    color: var(--foreground);
+
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background:
+      color-mix(in oklab, var(--mint) 35%, transparent);
+
+    color: var(--foreground);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ======================================================
+   CUSTOM UTILITIES
+====================================================== */
+
+@layer utilities {
+  /*
+    Frosted glass effect
+  */
+  .glass-card {
+    background: var(--gradient-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-elevated);
+  }
+
+  /*
+    Green gradient text
+  */
+  .text-gradient-mint {
+    background: var(--gradient-mint);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+  }
+
+  /*
+    Gold gradient text
+  */
+  .text-gradient-gold {
+    background: var(--gradient-gold);
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+  }
+
+  /*
+    Cyber grid background
+  */
+  .grid-bg {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(
+          in oklab,
+          var(--mint) 6%,
+          transparent
+        ) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(
+          in oklab,
+          var(--mint) 6%,
+          transparent
+        ) 1px,
+        transparent 1px
+      );
+
+    background-size: 48px 48px;
+  }
+
+  /*
+    Pixel-art image rendering
+  */
+  .pixelated {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
 }

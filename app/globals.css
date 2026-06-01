@@ -1,266 +1,357 @@
 @import "tailwindcss";
 
-:root {
-  /* Border radius used everywhere */
-  --radius: 0.625rem;
+@theme {
+  --color-bg: #0D0D0D;
+  --color-surface: #111111;
+  --color-surface-2: #161616;
+  --color-border: #222222;
+  --color-border-hi: #2E2E2E;
 
-  /* ==================================================
-     MAIN BACKGROUND COLORS
-  ================================================== */
+  --color-lime: #E8FF00;
+  --color-cyan: #4BE2C4;
+  --color-burn: #FF4D00;
+  --color-ice: #A8D8FF;
+  --color-ghost: rgba(240, 237, 230, 0.03);
 
-  /* Main dark background */
-  --background: oklch(0.16 0.012 250);
+  --color-text-hi: #F0EDE6;
+  --color-text-mid: #8A8880;
+  --color-text-lo: #3E3E3C;
 
-  /* Slightly lighter panels/cards */
-  --surface: oklch(0.2 0.014 250);
-
-  /* Elevated cards/modals/navbar */
-  --surface-elevated: oklch(0.235 0.016 250);
-
-  /* Main text color (white-ish) */
-  --foreground: oklch(0.96 0.005 250);
-
-  /* Muted/secondary text */
-  --muted-foreground: oklch(0.66 0.02 250);
-
-  /* ==================================================
-     BRAND GREEN / MINT
-  ================================================== */
-
-  /*
-    Main mint/green brand color
-    Used for:
-    - buttons
-    - highlights
-    - active states
-    - glows
-  */
-  --mint: oklch(0.82 0.16 168);
-
-  /*
-    Brighter mint used in gradients/glows
-  */
-  --mint-glow: oklch(0.85 0.18 168);
-
-  /*
-    Text color on green buttons
-  */
-  --mint-foreground: oklch(0.18 0.02 168);
-
-  /* ==================================================
-     GOLD / YELLOW ACCENT
-  ================================================== */
-
-  /*
-    Premium yellow/gold accent
-    Used for:
-    - rankings
-    - trophies
-    - premium UI
-  */
-  --gold: oklch(0.9 0.135 95);
-
-  /*
-    Text on gold backgrounds
-  */
-  --gold-foreground: oklch(0.22 0.04 95);
-
-  /* ==================================================
-     BORDERS & INPUTS
-  ================================================== */
-
-  /* Subtle borders */
-  --border: oklch(0.3 0.014 250 / 60%);
-
-  /* Inputs */
-  --input: oklch(0.3 0.014 250 / 70%);
-
-  /* Focus rings */
-  --ring: oklch(0.82 0.16 168 / 60%);
-
-  /* ==================================================
-     STATUS COLORS
-  ================================================== */
-
-  --success: oklch(0.78 0.16 162);
-  --warning: oklch(0.85 0.14 80);
-  --danger: oklch(0.65 0.22 25);
-
-  /* ==================================================
-     GRADIENTS
-  ================================================== */
-
-  /*
-    Main page background gradient
-  */
-  --gradient-hero:
-    radial-gradient(
-      ellipse 80% 60% at 50% 0%,
-      color-mix(in oklab, var(--mint) 18%, transparent) 0%,
-      transparent 60%
-    ),
-    linear-gradient(
-      180deg,
-      var(--background) 0%,
-      var(--surface) 100%
-    );
-
-  /*
-    Green gradient
-  */
-  --gradient-mint:
-    linear-gradient(
-      135deg,
-      var(--mint) 0%,
-      var(--mint-glow) 100%
-    );
-
-  /*
-    Gold gradient
-  */
-  --gradient-gold:
-    linear-gradient(
-      135deg,
-      var(--gold) 0%,
-      oklch(0.78 0.14 60) 100%
-    );
-
-  /*
-    Glassmorphism card background
-  */
-  --gradient-card:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--surface) 90%, transparent) 0%,
-      color-mix(
-        in oklab,
-        var(--surface-elevated) 95%,
-        transparent
-      ) 100%
-    );
-
-  /* ==================================================
-     SHADOWS
-  ================================================== */
-
-  /*
-    Green glow shadow
-  */
-  --shadow-mint:
-    0 8px 30px -8px
-    color-mix(in oklab, var(--mint) 35%, transparent);
-
-  /*
-    Elevated card shadow
-  */
-  --shadow-elevated:
-    0 12px 40px -12px oklch(0 0 0 / 0.6);
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-display: var(--font-space-grotesk), sans-serif;
 }
-
-/* ======================================================
-   BASE STYLES
-====================================================== */
 
 @layer base {
-  html {
-    color-scheme: dark;
-  }
-
-  * {
-    border-color: var(--border);
-  }
-
   body {
-    min-height: 100vh;
-
-    background-color: var(--background);
-    background-image: var(--gradient-hero);
-    background-attachment: fixed;
-
-    color: var(--foreground);
-
-    -webkit-font-smoothing: antialiased;
+    background-color: var(--color-bg);
+    color: var(--color-text-hi);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
   }
 
-  ::selection {
-    background:
-      color-mix(in oklab, var(--mint) 35%, transparent);
+  /* Disable default cursor on desktops for custom cursor */
+  @media (pointer: fine) {
+    a, button, input, textarea, select, [role="button"], iframe, .interactive-hover {
+      cursor: none !important;
+    }
+    body {
+      cursor: none;
+    }
+  }
 
-    color: var(--foreground);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
   }
 }
 
-/* ======================================================
-   CUSTOM UTILITIES
-====================================================== */
+/* ========================================================
+   TYPOGRAPHIC SCALE CONTRACT UTILITIES
+   ======================================================== */
 
-@layer utilities {
-  /*
-    Frosted glass effect
-  */
-  .glass-card {
-    background: var(--gradient-card);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-elevated);
+.text-display-scale {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 12vw, 11rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+}
+
+.text-h1-scale {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.text-h2-scale {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.text-label-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.text-mono-body {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+.text-body-scale {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.7;
+}
+
+.text-caption-scale {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+/* ========================================================
+   CODIFIED PAGE GRID SYSTEM
+   ======================================================== */
+
+.page-grid {
+  display: grid;
+  grid-template-columns: 
+    [bleed-start] 1.5rem 
+    [content-start] 1fr 
+    [mid] 1fr 
+    [content-end] 1.5rem 
+    [bleed-end];
+}
+
+@media (min-width: 768px) {
+  .page-grid {
+    grid-template-columns:
+      [bleed-start] 4vw
+      [content-start] repeat(12, 1fr)
+      [content-end] 4vw
+      [bleed-end];
   }
+}
 
-  /*
-    Green gradient text
-  */
-  .text-gradient-mint {
-    background: var(--gradient-mint);
+.col-bleed {
+  grid-column: bleed-start / bleed-end;
+}
 
-    -webkit-background-clip: text;
-    background-clip: text;
+.col-content {
+  grid-column: content-start / content-end;
+}
 
-    color: transparent;
+.col-narrow {
+  grid-column: content-start / content-end;
+}
+
+@media (min-width: 768px) {
+  .col-narrow {
+    grid-column: 3 / 13;
   }
+}
 
-  /*
-    Gold gradient text
-  */
-  .text-gradient-gold {
-    background: var(--gradient-gold);
+/* ========================================================
+   Surgical Outline Stroke (Only 2-3 spots used)
+   ======================================================== */
+.text-stroke-editorial {
+  -webkit-text-stroke: 1.5px var(--color-text-hi);
+  color: transparent;
+}
 
-    -webkit-background-clip: text;
-    background-clip: text;
+.text-stroke-lime-editorial {
+  -webkit-text-stroke: 1.5px var(--color-lime);
+  color: transparent;
+}
 
-    color: transparent;
+.text-stroke-cyan-editorial {
+  -webkit-text-stroke: 1.5px var(--color-cyan);
+  color: transparent;
+}
+
+/* ========================================================
+   MICRO-INTERACTIONS
+   ======================================================== */
+
+/* Button sweep (Lime version) */
+.btn-sweep {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 30ms ease-out;
+}
+
+.btn-sweep::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-lime);
+  z-index: -1;
+  clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+  transition: clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-sweep:hover {
+  color: var(--color-bg) !important;
+  border-color: var(--color-lime) !important;
+}
+
+.btn-sweep:hover::before {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.btn-sweep:active {
+  transform: scale(0.97);
+}
+
+/* Button sweep (Cyan version) */
+.btn-sweep-cyan {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 30ms ease-out;
+}
+
+.btn-sweep-cyan::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-cyan);
+  z-index: -1;
+  clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+  transition: clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-sweep-cyan:hover {
+  color: var(--color-bg) !important;
+  border-color: var(--color-cyan) !important;
+}
+
+.btn-sweep-cyan:hover::before {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.btn-sweep-cyan:active {
+  transform: scale(0.97);
+}
+
+/* physical compression */
+.btn-compress {
+  transition: transform 30ms ease-out;
+}
+
+.btn-compress:active {
+  transform: scale(0.97) !important;
+}
+
+/* Ticker marquee slow loop */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee-slow {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused;
+}
+
+/* Terminal Cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.terminal-cursor::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
+
+/* Hide scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-lime);
+}
+
+/* Custom Selection */
+::selection {
+  background-color: var(--color-lime);
+  color: var(--color-bg);
+}
+
+/* ========================================================
+   CARD SCANNER LASER ANIME
+   ======================================================== */
+.card-scanner {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-scanner::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-lime), transparent);
+  box-shadow: 0 0 10px var(--color-lime), 0 0 20px var(--color-lime);
+  opacity: 0;
+  top: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.card-scanner:hover::before {
+  animation: scan-sweeper 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.card-scanner-cyan::before {
+  background: linear-gradient(90deg, transparent, var(--color-cyan), transparent);
+  box-shadow: 0 0 10px var(--color-cyan), 0 0 20px var(--color-cyan);
+}
+
+@keyframes scan-sweeper {
+  0% {
+    top: 0%;
+    opacity: 0;
   }
-
-  /*
-    Cyber grid background
-  */
-  .grid-bg {
-    background-image:
-      linear-gradient(
-        to right,
-        color-mix(
-          in oklab,
-          var(--mint) 6%,
-          transparent
-        ) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to bottom,
-        color-mix(
-          in oklab,
-          var(--mint) 6%,
-          transparent
-        ) 1px,
-        transparent 1px
-      );
-
-    background-size: 48px 48px;
+  15% {
+    opacity: 1;
   }
-
-  /*
-    Pixel-art image rendering
-  */
-  .pixelated {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
   }
 }

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 export default function InteractiveGrid() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -37,8 +39,16 @@ export default function InteractiveGrid() {
         backgroundImage: `
           radial-gradient(
             circle 300px at var(--mouse-x, -500px) var(--mouse-y, -500px),
-            rgba(75, 226, 196, 0.08) 0%,
-            rgba(232, 255, 0, 0.03) 50%,
+            ${
+              pathname.startsWith("/events") || 
+              pathname.startsWith("/challenges") || 
+              pathname.startsWith("/leaderboard") ||
+              pathname.startsWith("/tsec-hacks") ||
+              pathname.startsWith("/dive-to-code") ||
+              pathname.startsWith("/brain2win")
+                ? "rgba(212, 175, 55, 0.08) 0%, rgba(245, 230, 163, 0.03) 50%," // Gold theme
+                : "rgba(75, 226, 196, 0.08) 0%, rgba(232, 255, 0, 0.03) 50%," // Teal/Yellow theme
+            }
             transparent 100%
           ),
           linear-gradient(to right, rgba(34, 34, 34, 0.4) 1px, transparent 1px),

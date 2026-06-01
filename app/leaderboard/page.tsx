@@ -1,312 +1,260 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { Search, Trophy, Terminal, Award } from "lucide-react";
+import Link from "next/link";
+import { Search, Crown, Terminal, ChevronLeft, Flame, TrendingUp, TrendingDown, Minus, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
-const topThree = [
-  {
-    rank: 2,
-    name: "Rohan Chawla",
-    points: "2,740 pts",
-    accuracy: "98%",
-    solved: "148 solved",
-    height: "h-[180px] sm:h-[220px]",
-    borderColor: "border-[#4BE2C4]",
-    badgeColor: "bg-[#4BE2C4] text-[#0D0D0D]",
-    textColor: "text-[#4BE2C4]",
-    accentColor: "#4BE2C4",
-  },
-  {
-    rank: 1,
-    name: "Ayush Mehrotra",
-    points: "2,850 pts",
-    accuracy: "100%",
-    solved: "151 solved",
-    height: "h-[220px] sm:h-[270px]",
-    borderColor: "border-[#E8FF00]",
-    badgeColor: "bg-[#E8FF00] text-[#0D0D0D]",
-    textColor: "text-[#E8FF00]",
-    accentColor: "#E8FF00",
-    crown: true,
-  },
-  {
-    rank: 3,
-    name: "Sneha Kulkarni",
-    points: "2,610 pts",
-    accuracy: "95%",
-    solved: "142 solved",
-    height: "h-[150px] sm:h-[180px]",
-    borderColor: "border-[#A8D8FF]",
-    badgeColor: "bg-[#A8D8FF] text-[#0D0D0D]",
-    textColor: "text-[#A8D8FF]",
-    accentColor: "#A8D8FF",
-  },
+const rankings = [
+  { rank: 1, name: "Ayush Mehrotra", points: 2850, solved: 151, accuracy: "100%", trend: "up", handle: "@ayush_m", streak: 28 },
+  { rank: 2, name: "Rohan Chawla", points: 2740, solved: 148, accuracy: "98%", trend: "up", handle: "@rohan_c", streak: 21 },
+  { rank: 3, name: "Sneha Kulkarni", points: 2610, solved: 142, accuracy: "95%", trend: "same", handle: "@sneha_k", streak: 14 },
+  { rank: 4, name: "Kabir Mehta", points: 2550, solved: 139, accuracy: "93%", trend: "down", handle: "@kabir_m", streak: 9 },
+  { rank: 5, name: "Divya Shah", points: 2495, solved: 135, accuracy: "91%", trend: "up", handle: "@divya_s", streak: 12 },
+  { rank: 6, name: "Pranav Iyer", points: 2380, solved: 128, accuracy: "89%", trend: "same", handle: "@pranav_i", streak: 7 },
+  { rank: 7, name: "Ananya Sharma", points: 2310, solved: 125, accuracy: "88%", trend: "down", handle: "@ananya_s", streak: 5 },
+  { rank: 8, name: "Vikram Malhotra", points: 2250, solved: 121, accuracy: "85%", trend: "up", handle: "@vikram_m", streak: 11 },
+  { rank: 9, name: "Riya Sen", points: 2180, solved: 118, accuracy: "84%", trend: "up", handle: "@riya_s", streak: 8 },
+  { rank: 10, name: "Aditya Roy", points: 2100, solved: 114, accuracy: "81%", trend: "down", handle: "@aditya_r", streak: 3 },
+  { rank: 11, name: "Meera Nair", points: 2020, solved: 109, accuracy: "79%", trend: "same", handle: "@meera_n", streak: 6 },
+  { rank: 12, name: "Siddharth Jain", points: 1950, solved: 105, accuracy: "78%", trend: "up", handle: "@siddharth_j", streak: 4 },
 ];
-
-const allRankings = [
-  { rank: 4, name: "Kabir Mehta", points: 2550, solved: 139, accuracy: "93%", status: "ONLINE" },
-  { rank: 5, name: "Divya Shah", points: 2495, solved: 135, accuracy: "91%", status: "ONLINE" },
-  { rank: 6, name: "Pranav Iyer", points: 2380, solved: 128, accuracy: "89%", status: "OFFLINE" },
-  { rank: 7, name: "Ananya Sharma", points: 2310, solved: 125, accuracy: "88%", status: "ONLINE" },
-  { rank: 8, name: "Vikram Malhotra", points: 2250, solved: 121, accuracy: "85%", status: "OFFLINE" },
-  { rank: 9, name: "Riya Sen", points: 2180, solved: 118, accuracy: "84%", status: "ONLINE" },
-  { rank: 10, name: "Aditya Roy", points: 2100, solved: 114, accuracy: "81%", status: "ONLINE" },
-  { rank: 11, name: "Meera Nair", points: 2020, solved: 109, accuracy: "79%", status: "OFFLINE" },
-  { rank: 12, name: "Siddharth Jain", points: 1950, solved: 105, accuracy: "78%", status: "ONLINE" },
-];
-
-interface HologramTrophyProps {
-  color: string;
-  hasCrown?: boolean;
-}
-
-function HologramTrophy({ color, hasCrown }: HologramTrophyProps) {
-  return (
-    <div className="relative w-20 h-20 flex items-center justify-center [perspective:800px] mb-4 select-none">
-      <motion.div
-        className="w-full h-full"
-        animate={{ rotateY: 360 }}
-        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
-          {/* Inner vertical core axis */}
-          <line x1="50" y1="10" x2="50" y2="85" stroke={color} strokeWidth="1" strokeDasharray="2,2" className="opacity-40" />
-          
-          {hasCrown ? (
-            // Holographic Crown
-            <polygon 
-              points="20,70 20,40 35,55 50,30 65,55 80,40 80,70" 
-              stroke={color} 
-              strokeWidth="1.5" 
-              className="opacity-90"
-            />
-          ) : (
-            // Holographic Polyhedron Trophy
-            <polygon 
-              points="50,15 80,35 80,65 50,85 20,65 20,35" 
-              stroke={color} 
-              strokeWidth="1.5" 
-              className="opacity-90"
-            />
-          )}
-          {/* Cross lines to simulate 3D wiring */}
-          <line x1="20" y1="35" x2="80" y2="65" stroke={color} strokeWidth="0.8" className="opacity-30" />
-          <line x1="80" y1="35" x2="20" y2="65" stroke={color} strokeWidth="0.8" className="opacity-30" />
-          <line x1="20" y1="35" x2="80" y2="35" stroke={color} strokeWidth="0.8" className="opacity-30" />
-          <line x1="20" y1="65" x2="80" y2="65" stroke={color} strokeWidth="0.8" className="opacity-30" />
-
-          {/* Inner core energy bubble */}
-          <circle cx="50" cy="52" r="6" fill={color} className="animate-pulse opacity-40" />
-        </svg>
-      </motion.div>
-    </div>
-  );
-}
 
 export default function LeaderboardPage() {
   const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<"global" | "contest">("global");
 
-  const filteredRankings = allRankings.filter((coder) =>
-    coder.name.toLowerCase().includes(search.toLowerCase())
+  const filteredRankings = rankings.filter(
+    (coder) =>
+      coder.name.toLowerCase().includes(search.toLowerCase()) ||
+      coder.handle.toLowerCase().includes(search.toLowerCase())
   );
 
+  const top3 = rankings.slice(0, 3);
+  const rest = filteredRankings.filter((r) => r.rank > 3 || search.length > 0);
+
   return (
-    <div className="min-h-screen bg-transparent px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#0A0A0A] px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto flex flex-col">
+      {/* Back to Challenges */}
+      <div className="mb-8">
+        <Link href="/challenges">
+          <button className="flex items-center gap-2 text-xs font-mono text-[#8A8880] hover:text-[#D4AF37] transition-colors">
+            <ChevronLeft size={14} />
+            RETURN TO THE BOARD
+          </button>
+        </Link>
+      </div>
+
       {/* Header */}
-      <div className="mb-12 border-b border-[#2A2A2A] pb-8 select-none">
-        <span className="font-mono text-xs text-[#E8FF00] tracking-[0.2em]">03 — SCOREBOARD</span>
-        <h1 className="text-4xl md:text-7xl font-bold uppercase tracking-tight text-[#F0EDE6] mt-2">
-          LEADERBOARD
-        </h1>
-        <p className="font-mono text-xs text-[#4A4A4A] mt-3 tracking-wider">
-          // Official rankings of TSEC CodeCell competitive coders. Solves and logs computed in near real-time.
-        </p>
-      </div>
-
-      {/* Podium Grid for Top 3 */}
-      <div className="flex flex-col md:flex-row items-end justify-center gap-8 mb-20 mt-12">
-        {/* Render Rohan (2nd) first on desktop/tablet, then Ayush (1st), then Sneha (3rd) */}
-        
-        {/* 2nd Place */}
-        <div className="w-full md:w-1/3 order-2 md:order-1 flex flex-col items-center relative">
-          <HologramTrophy color={topThree[0].accentColor} />
-          
-          <div className={`w-full ${topThree[0].height} border border-[#222222] border-t-4 ${topThree[0].borderColor} bg-[#111111]/80 backdrop-blur-sm p-6 flex flex-col justify-between text-center shadow-lg relative overflow-hidden`}>
-            {/* CRT scanline simulation */}
-            <div 
-              className="absolute inset-0 pointer-events-none opacity-4"
-              style={{
-                backgroundImage: "repeating-linear-gradient(0deg, rgba(240, 237, 230, 0.08), rgba(240, 237, 230, 0.08) 1px, transparent 1px, transparent 3px)"
-              }}
-            />
-            
-            <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 font-mono text-[10px] font-bold px-3 py-0.5 rounded-none ${topThree[0].badgeColor}`}>
-              RANK 02
-            </div>
-            <div className="mt-4">
-              <h3 className="font-display text-lg font-bold uppercase text-[#F0EDE6]">
-                {topThree[0].name}
-              </h3>
-              <p className="font-mono text-xs text-[#8A8880] mt-1">{topThree[0].solved}</p>
-            </div>
-            <div>
-              <span className={`font-mono text-xl font-extrabold ${topThree[0].textColor}`}>{topThree[0].points}</span>
-              <p className="font-mono text-[9px] text-[#4A4A4A] uppercase mt-1">ACCURACY: {topThree[0].accuracy}</p>
-            </div>
-          </div>
-          {/* Glowing Base Rings */}
-          <div 
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-28 h-5 bg-transparent border border-dashed rounded-full pointer-events-none animate-[ping_4s_infinite] opacity-40" 
-            style={{ borderColor: topThree[0].accentColor, boxShadow: `0 0 12px ${topThree[0].accentColor}` }} 
-          />
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#2A2A2A] pb-8 select-none">
+        <div>
+          <span className="font-mono text-[10px] text-[#D4AF37] tracking-[0.2em] block mb-2">
+            // GRANDMASTER_ARENA.RANKINGS
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold uppercase tracking-tight text-[#F0EDE6] drop-shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+            HALL OF KINGS
+          </h1>
+          <p className="font-sans text-sm text-[#8A8880] mt-3 max-w-lg leading-relaxed">
+            Track top grandmasters across all Weekly Trials. Rankings update after each match based on difficulty, execution speed, and tactical accuracy.
+          </p>
         </div>
 
-        {/* 1st Place */}
-        <div className="w-full md:w-1/3 order-1 md:order-2 flex flex-col items-center relative z-10">
-          <HologramTrophy color={topThree[1].accentColor} hasCrown />
-          
-          <div className={`w-full ${topThree[1].height} border border-[#2A2A2A] border-t-4 ${topThree[1].borderColor} bg-[#141414]/90 backdrop-blur-sm p-6 flex flex-col justify-between text-center shadow-2xl relative overflow-hidden`}>
-            {/* CRT scanline simulation */}
-            <div 
-              className="absolute inset-0 pointer-events-none opacity-4"
-              style={{
-                backgroundImage: "repeating-linear-gradient(0deg, rgba(240, 237, 230, 0.08), rgba(240, 237, 230, 0.08) 1px, transparent 1px, transparent 3px)"
-              }}
-            />
-            
-            <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 font-mono text-[10px] font-bold px-3 py-0.5 rounded-none ${topThree[1].badgeColor}`}>
-              CHAMPION 01
-            </div>
-            <div className="mt-4">
-              <h3 className={`font-display text-xl font-bold uppercase ${topThree[1].textColor}`}>
-                {topThree[1].name}
-              </h3>
-              <p className="font-mono text-xs text-[#8A8880] mt-1">{topThree[1].solved}</p>
-            </div>
-            <div>
-              <span className={`font-mono text-2xl font-extrabold ${topThree[1].textColor}`}>{topThree[1].points}</span>
-              <p className="font-mono text-[9px] text-[#4A4A4A] uppercase mt-1">ACCURACY: {topThree[1].accuracy}</p>
-            </div>
+        {/* Summary Stats */}
+        <div className="flex gap-8 font-mono text-xs">
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] text-[#4A4A4A] uppercase mb-1">OPERATIVES</span>
+            <span className="text-[#F0EDE6] font-bold text-xl">500+</span>
           </div>
-          {/* Glowing Base Rings */}
-          <div 
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-32 h-6 bg-transparent border border-dashed rounded-full pointer-events-none animate-[ping_3.5s_infinite] opacity-60" 
-            style={{ borderColor: topThree[1].accentColor, boxShadow: `0 0 16px ${topThree[1].accentColor}` }} 
-          />
-        </div>
-
-        {/* 3rd Place */}
-        <div className="w-full md:w-1/3 order-3 md:order-3 flex flex-col items-center relative">
-          <HologramTrophy color={topThree[2].accentColor} />
-          
-          <div className={`w-full ${topThree[2].height} border border-[#222222] border-t-4 ${topThree[2].borderColor} bg-[#111111]/80 backdrop-blur-sm p-6 flex flex-col justify-between text-center shadow-lg relative overflow-hidden`}>
-            {/* CRT scanline simulation */}
-            <div 
-              className="absolute inset-0 pointer-events-none opacity-4"
-              style={{
-                backgroundImage: "repeating-linear-gradient(0deg, rgba(240, 237, 230, 0.08), rgba(240, 237, 230, 0.08) 1px, transparent 1px, transparent 3px)"
-              }}
-            />
-            
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 font-mono text-[10px] font-bold px-3 py-0.5 rounded-none bg-[#2E2E2E] text-[#F0EDE6]">
-              RANK 03
-            </div>
-            <div className="mt-4">
-              <h3 className="font-display text-lg font-bold uppercase text-[#F0EDE6]">
-                {topThree[2].name}
-              </h3>
-              <p className="font-mono text-xs text-[#8A8880] mt-1">{topThree[2].solved}</p>
-            </div>
-            <div>
-              <span className="font-mono text-lg font-extrabold text-[#F0EDE6]">{topThree[2].points}</span>
-              <p className="font-mono text-[9px] text-[#4A4A4A] uppercase mt-1">ACCURACY: {topThree[2].accuracy}</p>
-            </div>
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] text-[#4A4A4A] uppercase mb-1">AVG ACCURACY</span>
+            <span className="text-[#D4AF37] font-bold text-xl">84.2%</span>
           </div>
-          {/* Glowing Base Rings */}
-          <div 
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-28 h-5 bg-transparent border border-dashed rounded-full pointer-events-none animate-[ping_4.5s_infinite] opacity-30" 
-            style={{ borderColor: topThree[2].accentColor, boxShadow: `0 0 10px ${topThree[2].accentColor}` }} 
-          />
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] text-[#4A4A4A] uppercase mb-1">TRIALS</span>
+            <span className="text-[#D4AF37] font-bold text-xl">48</span>
+          </div>
         </div>
       </div>
 
-      {/* Complete Rankings List */}
-      <div className="border border-[#2A2A2A] bg-[#111111] p-6 sm:p-8 font-mono shadow-2xl relative">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#2A2A2A] pb-6 mb-6 gap-4 select-none">
-          <span className="text-[11px] text-[#4A4A4A] uppercase tracking-wider">// ROOT_DIRECTORY_CODER_DUMP</span>
-          {/* Search bar inside terminal box */}
-          <div className="relative w-full sm:w-64">
-            <input
-              type="text"
-              placeholder="Search contestant..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="
-                w-full
-                bg-[#0D0D0D]
-                border
-                border-[#2A2A2A]
-                px-4
-                py-2
-                pl-9
-                text-xs
-                text-[#F0EDE6]
-                focus:outline-none
-                focus:border-[#4BE2C4]
-              "
-            />
-            <Search size={12} className="absolute left-3 top-3 text-[#4A4A4A]" />
+      {/* Podium — Top 3 */}
+      {search.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <div className="grid grid-cols-3 gap-4 md:gap-6 items-end max-w-2xl mx-auto">
+            {/* 2nd Place (Silver) */}
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-[#C0C0C0]/20 to-[#C0C0C0]/5 border border-[#C0C0C0]/50 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(192,192,192,0.15)]">
+                <span className="font-serif text-xl font-bold text-[#C0C0C0]">♕</span>
+              </div>
+              <span className="font-sans text-sm font-bold text-[#F0EDE6] text-center">{top3[1].name.split(" ")[0]}</span>
+              <span className="font-mono text-[10px] text-[#4A4A4A] mt-0.5">{top3[1].handle}</span>
+              <div className="mt-3 w-full bg-[#0A0A0A] border border-[#C0C0C0]/30 py-4 md:py-6 flex flex-col items-center">
+                <span className="font-mono text-lg font-bold text-[#C0C0C0]">{top3[1].points}</span>
+                <span className="font-mono text-[9px] text-[#4A4A4A] mt-1">ELO RATING</span>
+              </div>
+            </div>
+
+            {/* 1st Place (Gold) */}
+            <div className="flex flex-col items-center -mt-6">
+              <Crown size={24} className="text-[#D4AF37] mb-2 drop-shadow-[0_0_8px_rgba(212,175,55,0.8)]" />
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#D4AF37]/25 to-[#D4AF37]/5 border-2 border-[#D4AF37]/70 flex items-center justify-center mb-3 relative shadow-[0_0_25px_rgba(212,175,55,0.3)]">
+                <span className="font-serif text-2xl font-bold text-[#D4AF37]">♚</span>
+                <div className="absolute inset-0 rounded-full animate-ping bg-[#D4AF37]/10" />
+              </div>
+              <span className="font-sans text-sm font-bold text-[#D4AF37] text-center">{top3[0].name.split(" ")[0]}</span>
+              <span className="font-mono text-[10px] text-[#D4AF37]/60 mt-0.5">{top3[0].handle}</span>
+              <div className="mt-3 w-full bg-[#0A0A0A] border border-[#D4AF37]/50 py-6 md:py-8 flex flex-col items-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#D4AF37]/10 to-transparent pointer-events-none" />
+                <span className="font-mono text-xl font-bold text-[#D4AF37] relative z-10">{top3[0].points}</span>
+                <span className="font-mono text-[9px] text-[#D4AF37]/60 mt-1 relative z-10">ELO RATING</span>
+              </div>
+            </div>
+
+            {/* 3rd Place (Bronze) */}
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-[#CD7F32]/20 to-[#CD7F32]/5 border border-[#CD7F32]/50 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(205,127,50,0.15)]">
+                <span className="font-serif text-xl font-bold text-[#CD7F32]">♘</span>
+              </div>
+              <span className="font-sans text-sm font-bold text-[#F0EDE6] text-center">{top3[2].name.split(" ")[0]}</span>
+              <span className="font-mono text-[10px] text-[#4A4A4A] mt-0.5">{top3[2].handle}</span>
+              <div className="mt-3 w-full bg-[#0A0A0A] border border-[#CD7F32]/30 py-3 md:py-5 flex flex-col items-center">
+                <span className="font-mono text-lg font-bold text-[#CD7F32]">{top3[2].points}</span>
+                <span className="font-mono text-[9px] text-[#4A4A4A] mt-1">ELO RATING</span>
+              </div>
+            </div>
           </div>
+        </motion.div>
+      )}
+
+      {/* Controls: Tabs & Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 select-none">
+        {/* Tabs */}
+        <div className="flex gap-2 font-mono text-xs">
+          <button
+            onClick={() => setActiveTab("global")}
+            className={`px-5 py-2.5 font-bold tracking-widest transition-colors shadow-[0_0_10px_rgba(212,175,55,0.1)] ${
+              activeTab === "global"
+                ? "bg-[#D4AF37] text-[#0A0A0A] border-[#D4AF37]"
+                : "bg-[#0A0A0A] text-[#8A8880] border border-[#2A2A2A] hover:text-[#D4AF37] hover:border-[#D4AF37]/50"
+            }`}
+          >
+            GLOBAL ELO
+          </button>
+          <button
+            onClick={() => setActiveTab("contest")}
+            className={`px-5 py-2.5 font-bold tracking-widest transition-colors shadow-[0_0_10px_rgba(212,175,55,0.1)] ${
+              activeTab === "contest"
+                ? "bg-[#D4AF37] text-[#0A0A0A] border-[#D4AF37]"
+                : "bg-[#0A0A0A] text-[#8A8880] border border-[#2A2A2A] hover:text-[#D4AF37] hover:border-[#D4AF37]/50"
+            }`}
+          >
+            TRIAL #48
+          </button>
         </div>
 
-        {/* Leaderboard list */}
+        {/* Search */}
+        <div className="relative w-full sm:w-72">
+          <input
+            type="text"
+            placeholder="Search grandmaster..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-2.5 pl-10 text-xs text-[#F0EDE6] focus:outline-none focus:border-[#D4AF37] font-mono shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
+          />
+          <Search size={14} className="absolute left-3.5 top-3 text-[#8A8880]" />
+        </div>
+      </div>
+
+      {/* Rankings Table */}
+      <div className="bg-[#0A0A0A] border border-[#2A2A2A] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-mono text-xs sm:text-sm">
+          <table className="w-full text-left font-sans text-sm">
             <thead>
-              <tr className="border-b border-[#2A2A2A] text-[#4A4A4A] text-[10px] tracking-wider uppercase select-none">
-                <th className="py-3 pr-4 pl-4">Rank</th>
-                <th className="py-3 px-4">Contestant</th>
-                <th className="py-3 px-4 text-center">Solved</th>
-                <th className="py-3 px-4 text-right">Accuracy</th>
-                <th className="py-3 pl-4 text-right pr-4">Score</th>
+              <tr className="border-b border-[#2A2A2A] bg-[#111111] text-[#8A8880] text-[11px] font-mono tracking-wider uppercase select-none">
+                <th className="py-4 pl-6 pr-4 font-normal w-16">Rank</th>
+                <th className="py-4 px-4 font-normal">Contestant</th>
+                <th className="py-4 px-4 font-normal text-right">Rating</th>
+                <th className="py-4 px-4 font-normal text-center hidden md:table-cell">Solved</th>
+                <th className="py-4 px-4 font-normal text-center hidden lg:table-cell">Streak</th>
+                <th className="py-4 px-4 font-normal text-center hidden sm:table-cell">Trend</th>
+                <th className="py-4 px-4 font-normal text-right pr-6 hidden sm:table-cell">Accuracy</th>
               </tr>
             </thead>
             <tbody>
-              {filteredRankings.map((coder) => (
-                <tr
-                  key={coder.rank}
-                  className="
-                    group/row
-                    border-b
-                    border-[#1A1A1A]
-                    hover:bg-[#161616]
-                    transition-all
-                    duration-200
-                  "
-                >
-                  <td className="py-3 pr-4 pl-4 font-bold text-[#4A4A4A] relative transition-all group-hover/row:pl-6 group-hover/row:text-[#E8FF00]">
-                    <span className="absolute left-1 opacity-0 group-hover/row:opacity-100 transition-all text-[#E8FF00]">&gt;</span>
-                    {coder.rank.toString().padStart(2, "0")}
-                  </td>
-                  <td className="py-3 px-4 font-semibold text-[#F0EDE6] transition-all group-hover/row:text-[#4BE2C4]">
-                    {coder.name}
-                  </td>
-                  <td className="py-3 px-4 text-center text-[#4BE2C4]">{coder.solved}</td>
-                  <td className="py-3 px-4 text-right text-[#8A8880]">{coder.accuracy}</td>
-                  <td className="py-3 pl-4 text-right text-[#E8FF00] font-bold pr-4">{coder.points} pts</td>
-                </tr>
-              ))}
+              {(search.length > 0 ? filteredRankings : rest.length > 0 ? rest : filteredRankings).map((coder) => {
+                let rankColor = "text-[#8A8880]";
+                if (coder.rank === 1) rankColor = "text-[#D4AF37]";
+                else if (coder.rank === 2) rankColor = "text-[#C0C0C0]";
+                else if (coder.rank === 3) rankColor = "text-[#CD7F32]";
+
+                return (
+                  <tr
+                    key={coder.rank}
+                    className="border-b border-[#1A1A1A] hover:bg-[#111111] hover:border-[#D4AF37]/30 transition-colors duration-200 group"
+                  >
+                    <td className={`py-4 pl-6 pr-4 font-mono text-xs font-bold ${rankColor}`}>
+                      <div className="flex items-center gap-2">
+                        {coder.rank <= 3 ? <Crown size={12} /> : null}
+                        #{coder.rank}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-3">
+                        {/* Avatar circle */}
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-bold shrink-0"
+                          style={{
+                            backgroundColor: coder.rank === 1 ? "rgba(212,175,55,0.1)" : coder.rank === 2 ? "rgba(192,192,192,0.1)" : coder.rank === 3 ? "rgba(205,127,50,0.1)" : "rgba(255,255,255,0.05)",
+                            color: coder.rank === 1 ? "#D4AF37" : coder.rank === 2 ? "#C0C0C0" : coder.rank === 3 ? "#CD7F32" : "#8A8880",
+                          }}
+                        >
+                          {coder.name.charAt(0)}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-[#F0EDE6] group-hover:text-[#D4AF37] transition-colors">
+                            {coder.name}
+                          </span>
+                          <span className="font-mono text-[10px] text-[#4A4A4A]">{coder.handle}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-right">
+                      <span className="font-mono text-sm font-bold text-[#F0EDE6]">{coder.points}</span>
+                    </td>
+                    <td className="py-4 px-4 text-center hidden md:table-cell">
+                      <span className="font-mono text-xs text-[#8A8880]">{coder.solved}</span>
+                    </td>
+                    <td className="py-4 px-4 text-center hidden lg:table-cell">
+                      <div className="flex items-center justify-center gap-1">
+                        <Flame size={12} className={coder.streak >= 14 ? "text-[#FF4D00]" : coder.streak >= 7 ? "text-[#D4AF37]" : "text-[#4A4A4A]"} />
+                        <span className={`font-mono text-xs font-bold ${coder.streak >= 14 ? "text-[#FF4D00]" : coder.streak >= 7 ? "text-[#D4AF37]" : "text-[#8A8880]"}`}>
+                          {coder.streak}d
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-center hidden sm:table-cell">
+                      {coder.trend === "up" && <TrendingUp size={14} className="text-[#D4AF37] mx-auto" />}
+                      {coder.trend === "down" && <TrendingDown size={14} className="text-[#FF4D00] mx-auto" />}
+                      {coder.trend === "same" && <Minus size={14} className="text-[#4A4A4A] mx-auto" />}
+                    </td>
+                    <td className="py-4 px-4 text-right pr-6 hidden sm:table-cell">
+                      <span className="font-mono text-xs text-[#8A8880]">{coder.accuracy}</span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
         {filteredRankings.length === 0 && (
-          <div className="py-12 flex flex-col items-center justify-center text-center font-mono select-none">
-            <Terminal className="text-[#FF4D00] mb-3" size={24} />
-            <span className="text-xs text-[#4A4A4A]">NO CONTESTANT MATCHES DUMP INDEX.</span>
+          <div className="py-24 flex flex-col items-center justify-center text-center font-mono select-none">
+            <Shield className="text-[#4A4A4A] mb-4" size={32} />
+            <span className="text-xs text-[#8A8880]">NO GRANDMASTER FOUND.</span>
           </div>
         )}
       </div>

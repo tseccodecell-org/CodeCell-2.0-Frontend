@@ -3,6 +3,7 @@ import { Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import Loader from "@/components/layout/Loader";
 import CustomCursor from "@/components/layout/CustomCursor";
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
@@ -47,9 +48,10 @@ export default function RootLayout({
         <Navbar />
 
         {/* Prevent navbar overlap */}
-        <main className="min-h-screen pt-20">
+        <main className="relative z-10 min-h-screen">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );

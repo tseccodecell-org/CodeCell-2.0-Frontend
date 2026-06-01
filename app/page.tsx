@@ -8,24 +8,12 @@ import {
   ArrowRight,
   Terminal,
   Award,
-  BookOpen,
-  Send,
-  Github,
-  Instagram,
-  Code,
-  ExternalLink,
   MessageSquare,
-  ChevronDown,
-  HelpCircle,
   Users,
   Sparkles,
   Laptop,
-  Heart,
-  Globe,
   Plus,
   Minus,
-  MessageCircle,
-  FileText
 } from "lucide-react";
 import CodeConsole from "@/components/sections/CodeConsole";
 import GlitchText from "@/components/sections/GlitchText";
@@ -82,7 +70,7 @@ const teamMembers = [
   { name: "Heena Kotwani", role: "Event Chair / Vice Chair", handle: "@heena_k", photo: "/team_event.png", teams: ["core", "social"] },
   { name: "Kabir Mehta", role: "Technical Head", handle: "@kabir_m", photo: "/team_tech.png", teams: ["core", "tech"] },
   { name: "Rhea Malhotra", role: "PR Manager", handle: "@rhea_m", photo: "/team_pr.png", teams: ["core", "social"] },
-  
+
   // Tech
   { name: "Rohan Kalra", role: "Senior Developer", handle: "@rohan_k", photo: "/team_tech.png", teams: ["tech"] },
   { name: "Priya Sharma", role: "Fullstack Dev", handle: "@priya_codes", photo: "/team_lead.png", teams: ["tech"] },
@@ -217,7 +205,7 @@ function AnimatedNumber({ value }: { value: number }) {
       if (!startTime) startTime = timestamp;
       const progress = timestamp - startTime;
       const progressPercentage = Math.min(progress / duration, 1);
-      
+
       const easeProgress = progressPercentage * (2 - progressPercentage);
       const currentVal = Math.floor(easeProgress * value);
       setDisplayValue(currentVal);
@@ -284,12 +272,12 @@ export default function Home() {
 
   return (
     <div className="relative w-full overflow-hidden bg-transparent">
-      
+
       {/* ========================================================
           1. HERO SECTION
           ======================================================== */}
       <section className="page-grid min-h-[calc(100vh-80px)] py-12 relative items-center">
-        <div className="col-content grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full z-10">
+        <div className="col-content grid grid-cols-1 lg:grid-cols-12 gap-12 items-start w-full z-10">
           {/* Left Column: Headline & Action */}
           <motion.div
             variants={heroContainerVariants}
@@ -316,7 +304,7 @@ export default function Home() {
               <br />
               &nbsp;&nbsp;&nbsp;Thadomal Shahani Engineering College, Mumbai.
             </motion.p>
-
+            <br />
             {/* CTAs */}
             <motion.div variants={heroItemVariants} className="flex flex-col sm:flex-row gap-4 mt-8">
               <a href="https://forms.gle/... [Placeholder]" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
@@ -458,7 +446,7 @@ export default function Home() {
 
         {/* Bento Grid layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           {/* Card 1: Guild Mission (Large: spans 2 cols) */}
           <div className="md:col-span-2 bg-[#111111] border border-[#222222] p-8 flex flex-col justify-between hover:border-[#E8FF00] transition-colors duration-300 relative overflow-hidden card-scanner group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#E8FF00]/5 to-transparent pointer-events-none" />
@@ -654,10 +642,9 @@ export default function Home() {
                   uppercase
                   transition-all
                   duration-200
-                  ${
-                    activeTeamTab === tab
-                      ? "bg-[#E8FF00] text-[#0D0D0D] border-[#E8FF00]"
-                      : "bg-transparent text-[#8A8880] border-[#222222] hover:border-[#4BE2C4] hover:text-[#4BE2C4]"
+                  ${activeTeamTab === tab
+                    ? "bg-[#E8FF00] text-[#0D0D0D] border-[#E8FF00]"
+                    : "bg-transparent text-[#8A8880] border-[#222222] hover:border-[#4BE2C4] hover:text-[#4BE2C4]"
                   }
                 `}
               >
@@ -889,140 +876,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========================================================
-          FOOTER SECTION (4 Columns Spec)
-          ======================================================== */}
-      <div className="h-1 bg-gradient-to-r from-[#4BE2C4] to-[#E8FF00] max-w-7xl mx-auto" />
-      <footer className="w-full bg-[#0D0D0D] pt-20 pb-8 px-6 md:px-12 lg:px-24 max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 pb-16 border-b border-[#222222] items-start">
-          {/* Column 1: TSEC CODECELL */}
-          <div className="flex flex-col justify-between h-full min-h-[140px]">
-            <div>
-              <div className="relative w-8 h-8 mb-4">
-                <Image
-                  src="/logo.png"
-                  alt="TSEC CodeCell Logo"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <h3 className="font-mono text-[11px] font-bold text-[#3E3E3C] uppercase tracking-[0.2em] mb-4">
-                TSEC CODECELL
-              </h3>
-              <p className="font-mono text-[11px] text-[#8A8880] leading-relaxed">
-                // where tsec students
-                <br />
-                ship production code
-              </p>
-            </div>
-            <div className="font-mono text-[9px] text-[#3E3E3C] mt-6 select-none uppercase tracking-wider">
-              [ SECURE SHELL v2.0 ]
-            </div>
-          </div>
-
-          {/* Column 2: EXPLORE */}
-          <div>
-            <h3 className="text-label-tag text-[#3E3E3C] font-bold uppercase mb-4">
-              EXPLORE
-            </h3>
-            <ul className="flex flex-col gap-3 font-sans text-[13px] text-[#8A8880]">
-              <li>
-                <Link href="/challenges" className="hover:text-[#F0EDE6] transition-colors duration-200">
-                  Challenges
-                </Link>
-              </li>
-              <li>
-                <Link href="/events" className="hover:text-[#F0EDE6] transition-colors duration-200">
-                  Events
-                </Link>
-              </li>
-              <li>
-                <Link href="/about-us" className="hover:text-[#F0EDE6] transition-colors duration-200">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/tsec-hacks" className="hover:text-[#F0EDE6] transition-colors duration-200">
-                  TSEC Hacks
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: CONNECT */}
-          <div>
-            <h3 className="text-label-tag text-[#3E3E3C] font-bold uppercase mb-4">
-              CONNECT
-            </h3>
-            <div className="flex flex-wrap gap-3 items-center">
-              <a
-                href="https://chat.whatsapp.com/G5qE... [Placeholder]"
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#4BE2C4] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="WhatsApp Channel"
-              >
-                <MessageCircle size={18} className="text-[#8A8880] group-hover:text-[#4BE2C4] transition-colors" />
-              </a>
-              <a
-                href="https://discord.gg/... [Placeholder]"
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#FF4D00] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="Discord Server"
-              >
-                <MessageSquare size={18} className="text-[#8A8880] group-hover:text-[#FF4D00] transition-colors" />
-              </a>
-              <a
-                href="https://instagram.com/tseccodecell"
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#4BE2C4] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="Instagram Feed"
-              >
-                <Instagram size={18} className="text-[#8A8880] group-hover:text-[#4BE2C4] transition-colors" />
-              </a>
-              <a
-                href="https://forms.gle/... [Placeholder]"
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#E8FF00] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="Membership Form"
-              >
-                <FileText size={18} className="text-[#8A8880] group-hover:text-[#E8FF00] transition-colors" />
-              </a>
-            </div>
-          </div>
-
-          {/* Column 4: LEGAL */}
-          <div>
-            <h3 className="text-label-tag text-[#3E3E3C] font-bold uppercase mb-4">
-              LEGAL
-            </h3>
-            <ul className="flex flex-col gap-3 font-sans text-[13px] text-[#8A8880]">
-              <li>
-                <Link href="/privacy" className="hover:text-[#F0EDE6] transition-colors duration-200">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-[#F0EDE6] transition-colors duration-200">
-                  Terms of Sandbox
-                </Link>
-              </li>
-              <li className="text-[11px] font-mono text-[#3E3E3C] mt-2 select-none uppercase tracking-widest">
-                VER: 2026.05.31
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Footer base strip */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mt-8 text-[10px] text-[#3E3E3C] font-mono tracking-wider select-none">
-          <div>TSEC CODECELL © 2026</div>
-          <div className="mt-2 sm:mt-0">BUILT WITH ❤️ + {"{}"}</div>
-        </div>
-      </footer>
     </div>
   );
 }
+

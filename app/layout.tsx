@@ -5,7 +5,6 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Loader from "@/components/layout/Loader";
-import CustomCursor from "@/components/layout/CustomCursor";
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
 
 const spaceGrotesk = Space_Grotesk({
@@ -44,7 +43,6 @@ export default function RootLayout({
       <body className="antialiased">
         <InteractiveGrid />
         <Loader />
-        <CustomCursor />
         <Navbar />
 
         {/* Prevent navbar overlap */}

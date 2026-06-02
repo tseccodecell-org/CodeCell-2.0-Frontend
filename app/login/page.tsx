@@ -155,7 +155,7 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-between text-[10px] text-[#4A4A4A] pt-2">
-              <label className="flex items-center gap-2 cursor-none">
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   className="bg-transparent border border-[#2A2A2A] checked:bg-[#4BE2C4] rounded-none focus:ring-0"

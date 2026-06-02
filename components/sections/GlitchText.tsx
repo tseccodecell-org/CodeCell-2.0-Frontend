@@ -60,7 +60,7 @@ export default function GlitchText({ text, className = "", triggerOnMount = fals
 
   return (
     <span
-      className={`cursor-none select-none ${className}`}
+      className={`select-none ${className}`}
       onMouseEnter={startGlitch}
     >
       {displayText}

@@ -1,246 +1,277 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { Users, Shield, Terminal, Code, Plus, Minus } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Code, Users, Shield, Github, Linkedin } from "lucide-react";
+import AboutHero from "@/components/sections/AboutHero";
+import {
+  SectionHeader,
+  SectionWrap,
+  GlassCard,
+  HexButton,
+  PremiumFaq,
+  BentoMotion,
+  AnimatedNumber,
+  type FaqItem,
+} from "@/components/sections/SectionKit";
 
 const teamCrew = [
-  { name: "Aryan Shah", role: "Lead Dev", handle: "@aryan_s", photo: "/team_lead.png" },
+  { name: "Aryan Shah", role: "Lead Dev / Chairperson", handle: "@aryan_s", photo: "/team_lead.png" },
   { name: "Heena Kotwani", role: "Event Chair", handle: "@heena_k", photo: "/team_event.png" },
   { name: "Kabir Mehta", role: "Technical Head", handle: "@kabir_m", photo: "/team_tech.png" },
   { name: "Rhea Malhotra", role: "PR Manager", handle: "@rhea_m", photo: "/team_pr.png" },
+  { name: "Rohan Kalra", role: "Senior Developer", handle: "@rohan_k", photo: "/team_tech.png" },
+  { name: "Priya Sharma", role: "Fullstack Dev", handle: "@priya_codes", photo: "/team_lead.png" },
 ];
 
 const values = [
-  { 
-    icon: Code, 
-    title: "Engineering Craft", 
-    desc: "We focus on clean coding, micro-animations, and production-ready architectures. Slides don't build projects, code does." 
+  {
+    icon: Code,
+    title: "Engineering Craft",
+    desc: "We focus on clean coding, micro-animations, and production-ready architectures. Slides don't build projects, code does.",
   },
-  { 
-    icon: Users, 
-    title: "Community First", 
-    desc: "A collaborative hub designed to accelerate learning, mentorship, and peer-to-peer code review workflows." 
+  {
+    icon: Users,
+    title: "Community First",
+    desc: "A collaborative hub designed to accelerate learning, mentorship, and peer-to-peer code review workflows.",
   },
-  { 
-    icon: Shield, 
-    title: "Algorithmic Integrity", 
-    desc: "From Weekly Sandboxes to 48-Hour Hackathons, we evaluate raw engineering skills and competitive capabilities." 
+  {
+    icon: Shield,
+    title: "Algorithmic Integrity",
+    desc: "From Weekly Sandboxes to 48-Hour Hackathons, we evaluate raw engineering skills and competitive capabilities.",
   },
 ];
 
-const faqs = [
+const timeline = [
+  { year: "2023", title: "SYSTEM INIT", desc: "CodeCell kernel booted. First set of competitive challenges deployed." },
+  { year: "2024", title: "V1.0 RELEASE", desc: "100+ students on the leaderboard. Hosted the first Git & Docker bootcamp." },
+  { year: "2025", title: "TSEC HACKS", desc: "Flagship hackathon scaling to 500+ builders across the nation." },
+  { year: "2026", title: "PROD STAGE", desc: "Current iteration. Building advanced systems and open-source contributions." },
+];
+
+const metrics = [
+  { value: 500, suffix: "+", label: "Active Students", sub: "Guild members enrolled" },
+  { value: 20, suffix: "+", label: "Events Hosted", sub: "Hackathons & workshops" },
+  { value: 50, suffix: "+", label: "Challenges", sub: "Weekly problem sets" },
+  { value: 94.8, suffix: "%", label: "Compile Success", sub: "Sandbox pass rate", isDecimal: true },
+];
+
+const faqs: FaqItem[] = [
   {
     q: "Who can join CodeCell?",
-    a: "CodeCell is open to all students of Thadomal Shahani Engineering College (TSEC), Mumbai. Whether you are a beginner writing your first loop or an experienced dev shipping production apps, we have a place for you."
+    a: "CodeCell is open to all students of Thadomal Shahani Engineering College (TSEC), Mumbai. Whether you are a beginner writing your first loop or an experienced dev shipping production apps, we have a place for you.",
   },
   {
     q: "How do I participate in weekly challenges?",
-    a: "Simply navigate to our /challenges portal, sign in with your student credentials, and solve the open problems inside our web compiler. Your points will be automatically added to the global leaderboard."
+    a: "Simply navigate to our /challenges portal, sign in with your student credentials, and solve the open problems inside our web compiler. Your points will be automatically added to the global leaderboard.",
   },
   {
     q: "What technologies does CodeCell focus on?",
-    a: "We focus on a wide range of modern technologies including Frontend (React, Next.js), Backend (FastAPI, Node.js), DevOps & infrastructure (Docker, Git), and Competitive Programming using C++, Python, and Java."
+    a: "We focus on a wide range of modern technologies including Frontend (React, Next.js), Backend (FastAPI, Node.js), DevOps & infrastructure (Docker, Git), and Competitive Programming using C++, Python, and Java.",
   },
   {
     q: "How can I join the core committee?",
-    a: "Recruitment drives for the junior and senior committee take place at the start of the academic year. Stay tuned to our Instagram, WhatsApp, and Discord channels for announcements and application forms."
+    a: "Recruitment drives for the junior and senior committee take place at the start of the academic year. Stay tuned to our Instagram, WhatsApp, and Discord channels for announcements and application forms.",
   },
   {
     q: "Is prior programming experience required?",
-    a: "Not at all! We structure our workshops and coding sandboxes to accommodate all skill levels. We start from basic logic building and guide you up to systems design and competitive coding algorithms."
-  }
+    a: "Not at all! We structure our workshops and coding sandboxes to accommodate all skill levels. We start from basic logic building and guide you up to systems design and competitive coding algorithms.",
+  },
 ];
 
-
 export default function AboutUsPage() {
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-
   return (
-    <div className="min-h-screen bg-[#0D0D0D] px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto select-none">
-      {/* Header */}
-      <div className="mb-12 border-b border-[#2A2A2A] pb-8">
-        <span className="font-mono text-xs text-[#E8FF00] tracking-[0.2em]">05 — ABOUT_DOSSIER</span>
-        <h1 className="text-4xl sm:text-7xl lg:text-8xl font-bold uppercase leading-none tracking-tighter mt-2 text-[#F0EDE6]">
-          WHO WE ARE
-        </h1>
-        <p className="font-mono text-xs text-[#4A4A4A] mt-4 tracking-wider">
-          // The official development and competitive programming guild of TSEC, Mumbai.
-        </p>
-      </div>
+    <div className="bg-[#0D0D0D] min-h-screen">
+      <AboutHero />
 
-      {/* Main Grid: 60/40 layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-20">
-        {/* Left Column: Mission (60%) */}
-        <div className="lg:col-span-7 space-y-8">
-          <div>
-            <h3 className="font-mono text-xs text-[#4BE2C4] tracking-widest uppercase mb-4">// GUILD_MISSION</h3>
-            <h2 className="text-2xl sm:text-3xl font-bold uppercase text-[#F0EDE6] tracking-tight mb-4 leading-snug">
-              ACCELERATING STUDENT ENGINEERING CAPABILITIES
+      {/* MISSION / VISION */}
+      <SectionWrap id="mission">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          <BentoMotion className="lg:col-span-7">
+            <span className="text-label-tag text-[#E8FF00] block mb-4">// GUILD_MISSION</span>
+            <h2 className="text-h1-scale font-bold uppercase text-[#F0EDE6] tracking-tight leading-[1.05] mb-8">
+              Accelerating Student Engineering Capabilities
             </h2>
-            <p className="font-sans text-sm text-[#4A4A4A] leading-relaxed mb-4">
-              TSEC CodeCell serves as the primary technical nucleus for Thadomal Shahani Engineering College. We bridge the gap between academic guidelines and the fluid requirements of modern software engineering.
-            </p>
-            <p className="font-sans text-sm text-[#4A4A4A] leading-relaxed">
-              We design sandboxes, organize workshops, compile programming directories, and host TSEC Hacks—our flagship hackathon. Every line of code written on our sandbox compiler represents a step towards mastering systems, UI, and computational algorithms.
-            </p>
-          </div>
+            <div className="space-y-6 text-body-scale text-[#8A8880] leading-relaxed max-w-2xl">
+              <p>
+                TSEC CodeCell serves as the primary technical nucleus for Thadomal Shahani Engineering College. We bridge the gap between academic guidelines and the fluid requirements of modern software engineering.
+              </p>
+              <p>
+                We design sandboxes, organize workshops, compile programming directories, and host TSEC Hacks—our flagship hackathon. Every line of code written on our sandbox compiler represents a step towards mastering systems, UI, and computational algorithms.
+              </p>
+            </div>
+            <Link
+              href="/challenges"
+              className="inline-flex items-center gap-2 mt-10 font-mono text-xs tracking-widest text-[#4BE2C4] hover:text-[#E8FF00] transition-colors"
+            >
+              ENTER SANDBOX →
+            </Link>
+          </BentoMotion>
 
-          <hr className="border-[#2A2A2A]" />
-
-          {/* Section 2: Values */}
-          <div className="space-y-6">
-            <h3 className="font-mono text-xs text-[#FF4D00] tracking-widest uppercase">// CORE_VALS</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <BentoMotion className="lg:col-span-5" delay={0.12}>
+            <div className="grid grid-cols-1 gap-4">
               {values.map((val, idx) => {
-                const IconComponent = val.icon;
+                const Icon = val.icon;
                 return (
-                  <div key={idx} className="bg-[#141414] border border-[#2A2A2A] p-5 hover:border-[#E8FF00] transition-colors duration-300">
-                    <IconComponent size={18} className="text-[#FF4D00] mb-3" />
-                    <h4 className="font-mono font-bold uppercase text-xs text-[#F0EDE6] tracking-wider mb-2">{val.title}</h4>
-                    <p className="font-sans text-[11px] text-[#4A4A4A] leading-relaxed">{val.desc}</p>
-                  </div>
+                  <GlassCard key={val.title} className="p-6 flex gap-5 glass-card-glow">
+                    <div className="w-11 h-11 shrink-0 rounded-xl bg-[#161616] border border-[#2E2E2E] flex items-center justify-center">
+                      <Icon size={20} className={idx === 0 ? "text-[#4BE2C4]" : idx === 1 ? "text-[#E8FF00]" : "text-[#FF4D00]"} />
+                    </div>
+                    <div>
+                      <h4 className="font-display text-base font-semibold text-[#F0EDE6] uppercase tracking-tight">
+                        {val.title}
+                      </h4>
+                      <p className="text-sm text-[#8A8880] mt-2 leading-relaxed">{val.desc}</p>
+                    </div>
+                  </GlassCard>
                 );
               })}
             </div>
-          </div>
+          </BentoMotion>
         </div>
+      </SectionWrap>
 
-        {/* Right Column: Code Stats & Portal info (40%) */}
-        <div className="lg:col-span-5 space-y-8">
-          <div className="border border-[#2A2A2A] bg-[#141414] p-6 font-mono relative overflow-hidden">
-            {/* Cybersecurity overlay accent */}
-            <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-[#E8FF00]/10 to-transparent pointer-events-none" />
-            <h3 className="text-[10px] text-[#4A4A4A] uppercase tracking-wider mb-4 border-b border-[#2A2A2A] pb-2">// SYSTEM_DUMP.sh</h3>
-            <div className="space-y-3.5 text-xs text-[#F0EDE6]">
-              <div className="flex justify-between">
-                <span className="text-[#4A4A4A]">GUILD LEVEL:</span>
-                <span className="text-[#E8FF00] font-bold">PRODUCTION</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#4A4A4A]">ACTIVE USERS:</span>
-                <span>500+ SYSTEMS</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#4A4A4A]">COMPILATION RATIO:</span>
-                <span className="text-[#4BE2C4]">94.8% SUCCESS</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#4A4A4A]">LOCATIONS:</span>
-                <span>BANDRA, SECURE CLOUD</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Crew Section */}
-      <div className="border-t border-[#2A2A2A] pt-16">
-        <div className="mb-10">
-          <h3 className="font-mono text-xs text-[#E8FF00] tracking-widest uppercase mb-2">// COMMAND_REGISTRY</h3>
-          <h2 className="text-2xl sm:text-4xl font-bold uppercase text-[#F0EDE6] tracking-tight">
-            MEET THE CREW
-          </h2>
-        </div>
-
-        {/* Grid for crew */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {teamCrew.map((member, idx) => (
-            <div
-              key={idx}
-              className={`
-                bg-[#111111]
-                border
-                border-[#222222]
-                p-6
-                flex
-                flex-col
-                items-center
-                group
-                transition-all
-                duration-300
-                ${idx % 2 === 0 ? "hover:border-[#E8FF00]" : "hover:border-[#4BE2C4]"}
-                card-scanner
-              `}
-            >
-              <div className="relative w-36 h-36 border border-[#2E2E2E] overflow-hidden bg-[#161616]">
-                <Image
-                  src={member.photo}
-                  alt={member.name}
-                  fill
-                  className="
-                    object-cover
-                    filter
-                    grayscale
-                    group-hover:grayscale-0
-                    transition-all
-                    duration-300
-                    ease-in-out
-                  "
-                />
-              </div>
-              <h4 className="mt-4 font-sans text-sm font-semibold text-[#F0EDE6] tracking-wide">
-                {member.name}
-              </h4>
-              <span className={`font-mono text-xs tracking-wider mt-1 ${idx % 2 === 0 ? "text-[#E8FF00]" : "text-[#4BE2C4]"}`}>
-                {member.role}
-              </span>
-              <span className="font-mono text-[10px] text-[#8A8880] tracking-wider mt-0.5">
-                {member.handle}
-              </span>
-            </div>
+      {/* METRICS BENTO */}
+      <SectionWrap>
+        <SectionHeader
+          index="01 — IMPACT"
+          title="By The Numbers"
+          subtitle="// past achievements and live guild metrics"
+        />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {metrics.map((m, idx) => (
+            <BentoMotion key={m.label} delay={idx * 0.06}>
+              <GlassCard
+                className={`p-6 md:p-8 h-full glass-card-glow ${idx < 2 ? (idx === 0 ? "metric-podium-1" : "metric-podium-2") : ""}`}
+              >
+                <p
+                  className={`font-display text-4xl md:text-5xl font-bold tracking-tight ${
+                    idx === 0 ? "text-[#E8FF00]" : idx === 1 ? "text-[#4BE2C4]" : "text-[#F0EDE6]"
+                  }`}
+                >
+                  {m.isDecimal ? (
+                    m.value
+                  ) : (
+                    <AnimatedNumber value={m.value as number} />
+                  )}
+                  {m.suffix}
+                </p>
+                <p className="font-mono text-[10px] text-[#F0EDE6] mt-4 tracking-wider uppercase">{m.label}</p>
+                <p className="text-label-tag text-[#8A8880] mt-2">{m.sub}</p>
+              </GlassCard>
+            </BentoMotion>
           ))}
         </div>
-      </div>
+      </SectionWrap>
 
-      {/* FAQ Section */}
-      <div className="border-t border-[#2A2A2A] pt-16 mt-16 pb-12">
-        <div className="mb-10">
-          <h3 className="font-mono text-xs text-[#E8FF00] tracking-widest uppercase mb-2">// FAQ_REGISTRY</h3>
-          <h2 className="text-2xl sm:text-4xl font-bold uppercase text-[#F0EDE6] tracking-tight">
-            FREQUENTLY ASKED QUESTIONS
-          </h2>
+      {/* TIMELINE */}
+      <SectionWrap>
+        <SectionHeader
+          index="02 — EVOLUTION"
+          title="System History"
+          subtitle="// boot sequence from kernel init to production"
+        />
+        <div className="relative max-w-3xl mx-auto pl-8 md:pl-10">
+          <div className="timeline-rail" />
+          <div className="space-y-12">
+            {timeline.map((item, idx) => (
+              <BentoMotion key={item.year} delay={idx * 0.1}>
+                <div className="relative group pl-2">
+                  <div className="absolute -left-8 md:-left-10 top-1 timeline-node-dot" />
+                  <GlassCard className="p-6 md:p-8 glass-card-glow">
+                    <span className="font-display text-3xl font-bold text-[#E8FF00]">{item.year}</span>
+                    <h4 className="font-mono text-sm font-bold text-[#F0EDE6] uppercase mt-2 tracking-wide">
+                      {item.title}
+                    </h4>
+                    <p className="text-sm text-[#8A8880] mt-3 leading-relaxed">{item.desc}</p>
+                  </GlassCard>
+                </div>
+              </BentoMotion>
+            ))}
+          </div>
         </div>
+      </SectionWrap>
 
-        <div className="max-w-3xl flex flex-col divide-y divide-[#222222] border-t border-b border-[#222222]">
-          {faqs.map((faq, index) => {
-            const isOpen = openFaqIndex === index;
-            return (
-              <div key={index} className="py-4 select-none">
-                <button
-                  onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                  className="w-full flex items-center justify-between py-2 text-left hover:text-[#E8FF00] transition-colors"
-                >
-                  <span className="font-sans text-sm font-bold uppercase tracking-tight text-[#F0EDE6] hover:text-[#E8FF00] transition-colors">
-                    {faq.q}
-                  </span>
-                  <span className="font-mono text-xs ml-4 text-[#8A8880]">
-                    {isOpen ? <Minus size={14} className="text-[#E8FF00]" /> : <Plus size={14} />}
-                  </span>
-                </button>
-
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <p className="font-sans text-xs text-[#8A8880] leading-relaxed pt-2 pb-4">
-                        {faq.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+      {/* TEAM */}
+      <SectionWrap>
+        <SectionHeader
+          index="03 — COMMAND REGISTRY"
+          title="Meet The Crew"
+          subtitle="// core operators running the guild systems"
+          align="center"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+          {teamCrew.map((member, idx) => (
+            <BentoMotion key={member.name} delay={idx * 0.08}>
+              <GlassCard className="overflow-hidden p-0 group glass-card-glow">
+                <div className="relative aspect-[5/6]">
+                  <Image
+                    src={member.photo}
+                    alt={member.name}
+                    fill
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
+                  />
+                  <div className="team-card-overlay absolute inset-0 flex flex-col justify-end p-5">
+                    <div className="flex gap-2">
+                      <a
+                        href={`https://github.com/${member.handle.replace("@", "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 font-mono text-[9px] px-3 py-1.5 rounded-sm bg-[#0D0D0D]/90 border border-[#2E2E2E] text-[#4BE2C4] hover:border-[#4BE2C4] transition-colors"
+                      >
+                        <Github size={12} /> GitHub
+                      </a>
+                      <a
+                        href="#"
+                        className="flex items-center gap-1.5 font-mono text-[9px] px-3 py-1.5 rounded-sm bg-[#0D0D0D]/90 border border-[#2E2E2E] text-[#E8FF00] hover:border-[#E8FF00] transition-colors"
+                      >
+                        <Linkedin size={12} /> LinkedIn
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 border-t border-[#222222]/60">
+                  <h4 className="font-sans text-base font-semibold text-[#F0EDE6]">{member.name}</h4>
+                  <p className={`font-mono text-[10px] mt-1 ${idx % 2 === 0 ? "text-[#E8FF00]" : "text-[#4BE2C4]"}`}>
+                    {member.role}
+                  </p>
+                  <p className="font-mono text-[10px] text-[#8A8880] mt-0.5">{member.handle}</p>
+                </div>
+              </GlassCard>
+            </BentoMotion>
+          ))}
         </div>
-      </div>
+      </SectionWrap>
 
+      {/* FAQ */}
+      <SectionWrap narrow>
+        <SectionHeader
+          index="04 — FAQ"
+          title="Frequently Asked Questions"
+          subtitle="// everything you need before your first commit"
+          align="center"
+        />
+        <PremiumFaq faqs={faqs} />
+      </SectionWrap>
+
+      {/* CTA */}
+      <section className="relative py-28 md:py-36 overflow-hidden">
+        <div className="absolute inset-0 cta-gradient-bg pointer-events-none" />
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="relative z-10 text-center max-w-xl mx-auto px-6"
+        >
+          <span className="text-label-tag text-[#4BE2C4] block mb-5">// READY TO COMPILE?</span>
+          <h2 className="text-h1-scale font-bold uppercase text-[#F0EDE6] mb-6">Join The Guild</h2>
+          <p className="text-body-scale text-[#8A8880] mb-8">
+            Your first commit starts here.
+          </p>
+          <HexButton href="/challenges" label="START CODING" />
+        </motion.div>
+      </section>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono, Inter, Orbitron } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -25,6 +25,12 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
 export const metadata: Metadata = {
   title: "TSEC CodeCell | Terminal Meets Gallery",
   description: "The official coding committee of Thadomal Shahani Engineering College",
@@ -38,7 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable}`}
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable} ${orbitron.variable}`}
     >
       <body className="antialiased">
         <InteractiveGrid />

@@ -91,29 +91,24 @@ const pastEvents = [
     stat: "150+ Submissions",
   },
 ];
-
-const teamMembers = [
-  { name: "Aryan Shah", role: "Lead Dev / Chairperson", handle: "@aryan_s", photo: "/team_lead.png", teams: ["core", "tech"] },
-  { name: "Heena Kotwani", role: "Event Chair / Vice Chair", handle: "@heena_k", photo: "/team_event.png", teams: ["core", "social"] },
-  { name: "Kabir Mehta", role: "Technical Head", handle: "@kabir_m", photo: "/team_tech.png", teams: ["core", "tech"] },
-  { name: "Rhea Malhotra", role: "PR Manager", handle: "@rhea_m", photo: "/team_pr.png", teams: ["core", "social"] },
-  { name: "Rohan Kalra", role: "Senior Developer", handle: "@rohan_k", photo: "/team_tech.png", teams: ["tech"] },
-  { name: "Priya Sharma", role: "Fullstack Dev", handle: "@priya_codes", photo: "/team_lead.png", teams: ["tech"] },
-  { name: "Devansh Mehta", role: "Competitive Exec", handle: "@devansh_m", photo: "/team_event.png", teams: ["tech"] },
-  { name: "Tanmay Shah", role: "UI/UX Lead", handle: "@tanmay_s", photo: "/team_pr.png", teams: ["design"] },
-  { name: "Ishita Desai", role: "Visual Designer", handle: "@ishita_d", photo: "/team_event.png", teams: ["design"] },
-  { name: "Neil D'Souza", role: "Illustrator", handle: "@neil_dsouza", photo: "/team_tech.png", teams: ["design"] },
-  { name: "Sana Khan", role: "Social Media Head", handle: "@sana_k", photo: "/team_pr.png", teams: ["social"] },
-  { name: "Armaan Roy", role: "Outreach Lead", handle: "@armaan_r", photo: "/team_lead.png", teams: ["social"] },
-];
-
-const sponsors = [
-  { name: "GitHub", info: "Official Hub" },
-  { name: "Devfolio", info: "Hacking Partner" },
-  { name: "Polygon", info: "Web3 Infrastructure" },
-  { name: "Solana", info: "Decentralized Partner" },
-  { name: "Vercel", info: "Deployment Engine" },
-  { name: "Postman", info: "API Platform" },
+const sponsorLogos = [
+  { src: "/sponsors/appwrite.png", alt: "Appwrite", scale: 1.6 },
+  { src: "/sponsors/crosscope.png", alt: "Crosscope", scale: 2.6 },
+  { src: "/sponsors/devfolio.png", alt: "Devfolio", scale: 1.5 },
+  { src: "/sponsors/ethindia.png", alt: "ETHIndia", scale: 1.5 },
+  { src: "/sponsors/foss.png", alt: "FOSS United", scale: 1.5 },
+  { src: "/sponsors/github.png", alt: "GitHub", scale: 1.5 },
+  { src: "/sponsors/hindustan.png", alt: "Hindustan", scale: 1.6 },
+  { src: "/sponsors/jdoodle.png", alt: "JDoodle" },
+  { src: "/sponsors/orkes.png", alt: "Orkes" },
+  { src: "/sponsors/patilkaki.png", alt: "Patilkaki" },
+  { src: "/sponsors/polygon.png", alt: "Polygon", scale: 1.6 },
+  { src: "/sponsors/postman.png", alt: "Postman" },
+  { src: "/sponsors/replit.png", alt: "Replit" },
+  { src: "/sponsors/scrollconnect.png", alt: "ScrollConnect", scale: 2.1 },
+  { src: "/sponsors/smaaash.png", alt: "Smaaash", scale: 2.2 },
+  { src: "/sponsors/visionx.png", alt: "VisionX" },
+  { src: "/sponsors/wolfram-language-text-logo.png", alt: "Wolfram Language", scale: 1.6 },
 ];
 
 const swagPerks = [
@@ -125,46 +120,7 @@ const swagPerks = [
   { label: "Hackathon Swag", icon: Award },
 ];
 
-const testimonials = [
-  {
-    text: "CodeCell's weekly challenges completely changed the way I write code. I learned how to optimize algorithms and handle edge cases that aren't taught in class.",
-    author: "Rohan Kalra",
-    role: "Senior Student / SDE Intern",
-  },
-  {
-    text: "Organizing TSEC Hacks with the team was an incredible experience. We built platforms that scaled to hundreds of concurrent users under intense pressure.",
-    author: "Heena Kotwani",
-    role: "Event Chair & Core Organizer",
-  },
-  {
-    text: "CodeCell isn't just a committee; it's a developer launchpad. The mentorship, systems focus, and peer review workflows helped me land my first SDE role.",
-    author: "Aditya Hegde",
-    role: "Alumnus, SDE at Amazon",
-  },
-];
 
-const faqs: FaqItem[] = [
-  {
-    q: "Who can join CodeCell?",
-    a: "CodeCell is open to all students of Thadomal Shahani Engineering College (TSEC), Mumbai. Whether you are a beginner writing your first loop or an experienced dev shipping production apps, we have a place for you.",
-  },
-  {
-    q: "How do I participate in weekly challenges?",
-    a: "Simply navigate to our /challenges portal, sign in with your student credentials, and solve the open problems inside our web compiler. Your points will be automatically added to the global leaderboard.",
-  },
-  {
-    q: "What technologies does CodeCell focus on?",
-    a: "We focus on a wide range of modern technologies including Frontend (React, Next.js), Backend (FastAPI, Node.js), DevOps & infrastructure (Docker, Git), and Competitive Programming using C++, Python, and Java.",
-  },
-  {
-    q: "How can I join the core committee?",
-    a: "Recruitment drives for the junior and senior committee take place at the start of the academic year. Stay tuned to our Instagram, WhatsApp, and Discord channels for announcements and application forms.",
-  },
-  {
-    q: "Is prior programming experience required?",
-    a: "Not at all! We structure our workshops and coding sandboxes to accommodate all skill levels. We start from basic logic building and guide you up to systems design and competitive coding algorithms.",
-  },
-];
 
 
 const stats = [
@@ -174,16 +130,7 @@ const stats = [
   { value: 1000, suffix: "+", label: "Submissions", sub: "Compiler runs logged", podium: "" },
 ];
 
-const techStack = [
-  { name: "React", tag: "FRONTEND" },
-  { name: "Next.js", tag: "FRAMEWORK" },
-  { name: "Python", tag: "BACKEND" },
-  { name: "C++", tag: "COMPETITIVE" },
-  { name: "Docker", tag: "DEVOPS" },
-  { name: "Git", tag: "VERSION CTL" },
-];
 
-type TeamTab = "all" | "core" | "tech" | "design" | "social";
 
 const ideFiles = [
   {
@@ -381,43 +328,91 @@ deploy_workshops --mode=inclusive`,
     )
   },
   {
-    id: "rankings",
-    name: "leaderboard.json",
+    id: "dive_to_code",
+    name: "dive_to_code.js",
     icon: Sparkles,
-    content: `{
-  "system": "CodeCell Rankings",
-  "beginner_friendly": true,
-  "features": [
-    "Earn XP for every problem solved",
-    "Claim weekly streaks",
-    "Track real-time scores"
-  ],
-  "goal": "Gamify your learning journey from Noob to Pro"
+    content: `// Dive to Code Event
+// ------------------
+// A comprehensive coding challenge designed for students to plunge into the depths of programming.
+// Test your logical thinking and problem-solving skills against the best minds.
+
+function initiateDive() {
+  console.log("Preparing deployment environment...");
+  console.log("Loading problem sets...");
+  console.log("Connecting participants...");
+  
+  return {
+    status: "READY",
+    message: "Welcome to Dive to Code. Let the coding begin!"
+  };
 }`,
     accent: "#E8FF00",
     colorClass: "text-[#E8FF00]",
     sequence: [
-      "Fetching leaderboard data...",
-      "Calculating XP...",
-      "Updating weekly streaks...",
-      "Compiling global ranks...",
-      "SUCCESS: Leaderboard synchronized.",
+      "Initializing Dive to Code engine...",
+      "Connecting to participant pool...",
+      "Loading algorithmic challenges...",
+      "Validating test cases...",
+      "SUCCESS: Environment ready.",
       "ACCESS GRANTED."
     ],
     output: (
       <>
-        <h2 className="text-[#E8FF00] text-xl md:text-2xl font-bold mb-6">== GLOBAL LEADERBOARD SYNC ==</h2>
+        <h2 className="text-[#E8FF00] text-xl md:text-2xl font-bold mb-6">== DIVE TO CODE ACTIVE ==</h2>
         <div className="mb-6 text-[#888] font-mono">
-          Last Sync: <span className="text-[#e5e5e5]">Just now</span><br />
-          Active Players: <span className="text-[#e5e5e5]">1,204</span>
+          Status: <span className="text-[#27c93f]">ONLINE</span><br />
+          Participants: <span className="text-[#e5e5e5]">200+ Enrolled</span>
         </div>
         <div className="mb-6 border-l-2 border-[#4BE2C4] pl-4">
-          <strong className="text-[#4BE2C4] text-base block mb-1">&gt;&gt; YOUR STATUS:</strong>
-          You have successfully logged your compilation hits and claimed your weekly streak.
+          <strong className="text-[#4BE2C4] text-base block mb-1">&gt;&gt; EVENT DETAILS:</strong>
+          Dive to Code is an immersive coding competition tailored for logic building and algorithmic thinking. Participants face increasingly difficult problems that test their mettle.
         </div>
         <div className="mb-8 border-l-2 border-[#FF4D00] pl-4">
-          <strong className="text-[#FF4D00] text-base block mb-1">&gt;&gt; CURRENT TARGET:</strong>
-          You are 420 XP away from the "Elite Hacker" rank. Keep solving problems in the Competitive Sandbox.
+          <strong className="text-[#FF4D00] text-base block mb-1">&gt;&gt; MISSION:</strong>
+          Solve all the challenges within the time limit. May the best coder win.
+        </div>
+      </>
+    )
+  },
+  {
+    id: "brain_2_win",
+    name: "brain2win.py",
+    icon: Trophy,
+    content: `# Brain 2 Win Competition
+# -----------------------
+# A fast-paced coding relay where speed and accuracy are paramount.
+# Teams battle it out to solve problems in real-time.
+
+def start_competition():
+    print("Initializing Brain 2 Win servers...")
+    print("Allocating problem queues...")
+    print("Ready for team submissions!")
+
+    while True:
+        process_submissions()`,
+    accent: "#00B4D8",
+    colorClass: "text-[#00B4D8]",
+    sequence: [
+      "Booting Brain 2 Win sequence...",
+      "Generating problem queue...",
+      "Activating real-time leaderboard...",
+      "SUCCESS: Servers operational.",
+      "ACCESS GRANTED."
+    ],
+    output: (
+      <>
+        <h2 className="text-[#00B4D8] text-xl md:text-2xl font-bold mb-6">== BRAIN 2 WIN DASHBOARD ==</h2>
+        <div className="mb-6 text-[#888] font-mono">
+          System: <span className="text-[#27c93f]">STABLE</span><br />
+          Mode: <span className="text-[#e5e5e5]">High-Speed Relay</span>
+        </div>
+        <div className="mb-6 border-l-2 border-[#E8FF00] pl-4">
+          <strong className="text-[#E8FF00] text-base block mb-1">&gt;&gt; COMPETITION OVERVIEW:</strong>
+          Brain 2 Win is a high-octane coding contest focusing on speed and accuracy. Teams must quickly decipher and solve problems before the clock runs out.
+        </div>
+        <div className="mb-8 border-l-2 border-[#FF4D00] pl-4">
+          <strong className="text-[#FF4D00] text-base block mb-1">&gt;&gt; CURRENT LEADER:</strong>
+          Team Alpha is currently dominating the leaderboard. Will your team rise to the challenge?
         </div>
       </>
     )
@@ -608,10 +603,10 @@ function InteractiveIde() {
           {activeFile && (
             <button
               onClick={() => setIsRunning(true)}
-              className="flex items-center gap-2 px-4 py-3 font-mono text-xs bg-[#4BE2C4]/10 text-[#4BE2C4] hover:bg-[#4BE2C4]/20 transition-colors border-l border-[#222] shrink-0 group"
+              className="flex items-center gap-2 px-4 py-3 font-mono text-xs bg-[#4BE2C4]/20 text-[#4BE2C4] hover:bg-[#4BE2C4]/30 transition-all duration-300 border-l border-[#222] shrink-0 group animate-pulse shadow-[0_0_15px_rgba(75,226,196,0.6)] ring-1 ring-[#4BE2C4]"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="group-hover:scale-110 transition-transform"><path d="M8 5v14l11-7z" /></svg>
-              <span className="hidden sm:inline">RUN CODE</span>
+              <span className="hidden sm:inline font-bold tracking-widest text-[#E8FF00]">RUN CODE</span>
             </button>
           )}
         </div>
@@ -681,12 +676,17 @@ function InteractiveIde() {
 
 
 export default function HomeSections() {
-  const [activeTeamTab, setActiveTeamTab] = useState<TeamTab>("all");
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
 
-  const filteredTeam = teamMembers.filter((m) =>
-    activeTeamTab === "all" ? true : m.teams.includes(activeTeamTab)
-  );
+  const SPEED = 48; // Pixels per second
+  const PERK_ITEM_WIDTH = 228;
+  const SPONSOR_ITEM_WIDTH = 280;
+
+  const perksRepeats = 4;
+  const sponsorsRepeats = 4;
+
+  const perkDuration = (swagPerks.length * perksRepeats * PERK_ITEM_WIDTH) / (2 * SPEED);
+  const sponsorDuration = (sponsorLogos.length * sponsorsRepeats * SPONSOR_ITEM_WIDTH) / (2 * SPEED);
 
   return (
     <div className="bg-[#0D0D0D]">
@@ -745,50 +745,50 @@ export default function HomeSections() {
             return (
               <BentoMotion key={evt.title} delay={idx * 0.1} className={cardClasses}>
                 <GlassCard className="w-full h-full p-0 overflow-hidden group border border-[#222] hover:border-[#4BE2C4]/50 transition-all duration-500 relative flex flex-col justify-end bg-[#050505]">
-                   {/* Background Image */}
-                   <div className="absolute inset-0 w-full h-full">
-                     <Image src={evt.image} alt={evt.title} fill className="object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700 mix-blend-screen" />
-                   </div>
-                   
-                   {/* Gradient Overlay */}
-                   <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-[#050505]/20 transition-all duration-500 group-hover:via-[#050505]/60" />
-                   
-                   {/* Content */}
-                   <div className="relative z-10 p-6 md:p-8 w-full flex flex-col h-full">
-                     <div className="flex justify-between items-start mb-auto">
-                        <span className="font-mono text-[10px] px-2 py-1 bg-[#111]/80 backdrop-blur border border-[#333] text-[#4BE2C4] uppercase tracking-widest rounded-sm group-hover:border-[#4BE2C4]/50 transition-colors shadow-[0_0_10px_rgba(75,226,196,0)] group-hover:shadow-[0_0_10px_rgba(75,226,196,0.2)]">
-                          {evt.type}
-                        </span>
-                        <span className="font-mono text-[10px] text-[#888] bg-[#000]/50 px-2 py-1 rounded border border-transparent group-hover:border-[#333] transition-colors">{evt.date}</span>
-                     </div>
-                     
-                     <div className="mt-auto">
-                       <h3 className={`font-display font-bold text-[#e5e5e5] uppercase tracking-wide group-hover:text-[#E8FF00] transition-colors ${idx === 0 ? 'text-3xl md:text-5xl' : 'text-xl md:text-2xl'}`}>
-                          {evt.title}
-                       </h3>
-                       
-                       {/* Collapsible/Animated Description & Stats */}
-                       <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-in-out">
-                         <div className="overflow-hidden">
-                           <p className="text-sm text-[#aaa] font-sans leading-relaxed max-w-xl mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                             {evt.desc}
-                           </p>
-                           <div className="mt-4 flex items-center justify-between border-t border-[#333] pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
-                              <span className="font-mono text-xs text-[#4BE2C4] flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#E8FF00] animate-pulse" />
-                                {evt.stat}
-                              </span>
-                              <div className="w-8 h-8 rounded-full bg-[#111] border border-[#333] flex items-center justify-center group-hover:bg-[#E8FF00] group-hover:text-black transition-colors">
-                                 <ArrowRight size={14} />
-                              </div>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                   
-                   {/* Scanner Line Effect */}
-                   <div className="absolute left-0 right-0 h-[2px] bg-transparent group-hover:bg-[#4BE2C4]/70 group-hover:shadow-[0_0_15px_#4BE2C4] top-0 -translate-y-full group-hover:translate-y-[600px] transition-all duration-[1.5s] ease-in-out z-20 pointer-events-none" />
+                  {/* Background Image */}
+                  <div className="absolute inset-0 w-full h-full">
+                    <Image src={evt.image} alt={evt.title} fill className="object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700 mix-blend-screen" />
+                  </div>
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-[#050505]/20 transition-all duration-500 group-hover:via-[#050505]/60" />
+
+                  {/* Content */}
+                  <div className="relative z-10 p-6 md:p-8 w-full flex flex-col h-full">
+                    <div className="flex justify-between items-start mb-auto">
+                      <span className="font-mono text-[10px] px-2 py-1 bg-[#111]/80 backdrop-blur border border-[#333] text-[#4BE2C4] uppercase tracking-widest rounded-sm group-hover:border-[#4BE2C4]/50 transition-colors shadow-[0_0_10px_rgba(75,226,196,0)] group-hover:shadow-[0_0_10px_rgba(75,226,196,0.2)]">
+                        {evt.type}
+                      </span>
+                      <span className="font-mono text-[10px] text-[#888] bg-[#000]/50 px-2 py-1 rounded border border-transparent group-hover:border-[#333] transition-colors">{evt.date}</span>
+                    </div>
+
+                    <div className="mt-auto">
+                      <h3 className={`font-display font-bold text-[#e5e5e5] uppercase tracking-wide group-hover:text-[#E8FF00] transition-colors ${idx === 0 ? 'text-3xl md:text-5xl' : 'text-xl md:text-2xl'}`}>
+                        {evt.title}
+                      </h3>
+
+                      {/* Collapsible/Animated Description & Stats */}
+                      <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-in-out">
+                        <div className="overflow-hidden">
+                          <p className="text-sm text-[#aaa] font-sans leading-relaxed max-w-xl mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                            {evt.desc}
+                          </p>
+                          <div className="mt-4 flex items-center justify-between border-t border-[#333] pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
+                            <span className="font-mono text-xs text-[#4BE2C4] flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#E8FF00] animate-pulse" />
+                              {evt.stat}
+                            </span>
+                            <div className="w-8 h-8 rounded-full bg-[#111] border border-[#333] flex items-center justify-center group-hover:bg-[#E8FF00] group-hover:text-black transition-colors">
+                              <ArrowRight size={14} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Scanner Line Effect */}
+                  <div className="absolute left-0 right-0 h-[2px] bg-transparent group-hover:bg-[#4BE2C4]/70 group-hover:shadow-[0_0_15px_#4BE2C4] top-0 -translate-y-full group-hover:translate-y-[600px] transition-all duration-[1.5s] ease-in-out z-20 pointer-events-none" />
                 </GlassCard>
               </BentoMotion>
             )
@@ -832,8 +832,8 @@ export default function HomeSections() {
         </div>
 
         <GlassCard hover={false} className="py-6 overflow-hidden mb-6">
-          <div className="premium-marquee px-6">
-            {[...swagPerks, ...swagPerks].map((perk, i) => {
+          <div className="premium-marquee px-6" style={{ animationDuration: `${perkDuration}s` }}>
+            {[...swagPerks, ...swagPerks, ...swagPerks, ...swagPerks].map((perk, i) => {
               const Icon = perk.icon;
               return (
                 <div key={`${perk.label}-${i}`} className="flex items-center gap-3 shrink-0 px-4">
@@ -848,170 +848,25 @@ export default function HomeSections() {
         </GlassCard>
 
         <GlassCard hover={false} className="py-8 overflow-hidden">
-          <div className="premium-marquee px-8">
-            {[...sponsors, ...sponsors, ...sponsors].map((brand, idx) => (
-              <div key={`${brand.name}-${idx}`} className="flex flex-col items-center shrink-0 min-w-[120px]">
-                <span className="font-display text-lg font-bold text-[#8A8880] hover:text-[#F0EDE6] transition-colors">
-                  {brand.name}
-                </span>
-                <span className="text-label-tag text-[#3E3E3C] mt-1">// {brand.info}</span>
+          <div className="premium-marquee flex items-center h-20" style={{ animationDuration: `${sponsorDuration}s` }}>
+            {[...sponsorLogos, ...sponsorLogos, ...sponsorLogos, ...sponsorLogos].map((logo, idx) => (
+              <div key={idx} className="shrink-0 flex items-center justify-center px-6 md:px-10 min-w-[120px]">
+                <Image
+                  src={`${logo.src}?v=2`}
+                  alt={logo.alt}
+                  width={150}
+                  height={80}
+                  className="w-32 md:w-44 h-auto max-h-16 object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  style={{ transform: logo.scale ? `scale(${logo.scale})` : "none" }}
+                  unoptimized
+                />
               </div>
             ))}
           </div>
         </GlassCard>
       </SectionWrap>
 
-      {/* TECH STACK */}
-      <SectionWrap>
-        <SectionHeader
-          index="04 — TECH STACK"
-          title="Engineering Arsenal"
-          subtitle="// the weapons in our engineering stack"
-        />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-          {techStack.map((tech, idx) => (
-            <BentoMotion key={tech.name} delay={idx * 0.04}>
-              <GlassCard className="p-5 md:p-6 text-center glass-card-glow">
-                <p className="font-display text-lg font-bold text-[#F0EDE6]">{tech.name}</p>
-                <p className="text-label-tag text-[#3E3E3C] mt-2">// {tech.tag}</p>
-              </GlassCard>
-            </BentoMotion>
-          ))}
-        </div>
-      </SectionWrap>
 
-      {/* TEAM */}
-      <SectionWrap>
-        <SectionHeader
-          index="05 — COMMITTEE"
-          title="Committee Crew"
-          subtitle="// the active developers, designers, and organizers shaping the guild"
-        />
-        <div className="flex flex-wrap gap-2 font-mono text-[10px] mb-10 -mt-6">
-          {(["all", "core", "tech", "design", "social"] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTeamTab(tab)}
-              className={`px-3 py-1.5 uppercase tracking-wider transition-all duration-200 rounded-sm ${activeTeamTab === tab ? "filter-pill-active" : "filter-pill-idle"
-                }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
-          <AnimatePresence mode="popLayout">
-            {filteredTeam.map((member) => (
-              <motion.div
-                layout
-                key={member.name}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.25 }}
-              >
-                <GlassCard className="overflow-hidden p-0 group glass-card-glow">
-                  <div className="relative aspect-[4/5]">
-                    <Image
-                      src={member.photo}
-                      alt={member.name}
-                      fill
-                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    />
-                    <div className="team-card-overlay absolute inset-0 flex flex-col justify-end p-4">
-                      <div className="flex gap-2">
-                        <a
-                          href={`https://github.com/${member.handle.replace("@", "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-mono text-[9px] px-2 py-1 bg-[#161616]/90 border border-[#2E2E2E] text-[#4BE2C4] hover:border-[#4BE2C4] transition-colors"
-                        >
-                          GitHub
-                        </a>
-                        <a
-                          href="#"
-                          className="font-mono text-[9px] px-2 py-1 bg-[#161616]/90 border border-[#2E2E2E] text-[#E8FF00] hover:border-[#E8FF00] transition-colors"
-                        >
-                          LinkedIn
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 border-t border-[#222222]/60">
-                    <h4 className="font-sans text-sm font-semibold text-[#F0EDE6]">{member.name}</h4>
-                    <p className="font-mono text-[9px] text-[#4BE2C4] mt-1">{member.role}</p>
-                    <p className="font-mono text-[9px] text-[#8A8880] mt-0.5">{member.handle}</p>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </SectionWrap>
-
-      {/* TESTIMONIALS */}
-      <SectionWrap>
-        <SectionHeader
-          index="06 — GUILD VOICE"
-          title="What Builders Say"
-          subtitle="// reviews from students and alumni in engineering"
-        />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {testimonials.map((t, idx) => (
-            <BentoMotion key={t.author} delay={idx * 0.1}>
-              <GlassCard className="p-8 h-full flex flex-col justify-between glass-card-glow">
-                <p className="text-body-scale text-[#8A8880] leading-relaxed italic">&ldquo;{t.text}&rdquo;</p>
-                <div className="mt-8 pt-6 border-t border-[#222222]/50">
-                  <h4 className="font-sans text-sm font-bold text-[#F0EDE6]">{t.author}</h4>
-                  <span className="text-label-tag text-[#4BE2C4] mt-1 block">{t.role}</span>
-                </div>
-              </GlassCard>
-            </BentoMotion>
-          ))}
-        </div>
-      </SectionWrap>
-
-      {/* FAQ */}
-      <SectionWrap narrow>
-        <SectionHeader
-          index="07 — FAQ"
-          title="Questions"
-          subtitle="// system queries and compiler configuration parameters"
-          align="center"
-        />
-        <PremiumFaq faqs={faqs} />
-      </SectionWrap>
-
-      {/* CTA */}
-      <section className="relative py-32 md:py-40 overflow-hidden border-b border-[#222222]/80">
-        <div className="absolute inset-0 cta-gradient-bg pointer-events-none" />
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="relative z-10 text-center max-w-2xl mx-auto px-6"
-        >
-          <span className="text-label-tag text-[#4BE2C4] block mb-6">// READY TO COMPILE?</span>
-          <SpotlightText text="Join The CodeCell Guild" />
-          <p className="text-body-scale text-[#8A8880] mb-10">
-            Whether you write your first{" "}
-            <span className="font-mono text-sm text-[#4BE2C4]">hello_world()</span> or deploy
-            production microservices, there&apos;s a seat for you.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <HexButton href="/challenges" />
-            <Link
-              href="/about-us"
-              className="font-mono text-xs tracking-[0.15em] text-[#8A8880] hover:text-[#E8FF00] border border-[#2E2E2E] hover:border-[#E8FF00]/50 px-8 py-3 transition-all glass-card"
-            >
-              LEARN MORE →
-            </Link>
-          </div>
-        </motion.div>
-      </section>
     </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, Variants } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import Image from "next/image";
 
 const FLOAT_CHARS = [
   { t: "guild", x: 8, y: 12, d: 0 },
@@ -86,17 +87,15 @@ const titleContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.14, delayChildren: 0.25 },
+    transition: { staggerChildren: 0.4, delayChildren: 0.2 },
   },
 };
 
-const titleLine = {
-  hidden: { opacity: 0, y: 48, filter: "blur(10px)" },
+const titleLine: Variants = {
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+    transition: { duration: 1.8, ease: "easeInOut" },
   },
 };
 
@@ -168,13 +167,18 @@ export default function AboutHero() {
         style={{ x: parallaxX, y: parallaxY }}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] pointer-events-none"
       >
-        <svg
-          className="about-hero-hex-spin w-[min(72vw,540px)] h-[min(72vw,540px)] opacity-[0.08]"
-          viewBox="0 0 100 100"
+        <motion.div
+          animate={{ y: [-12, 12, -12], rotate: [-2, 2, -2] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          className="relative w-[min(65vw,480px)] h-[min(65vw,480px)] opacity-7"
         >
-          <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="#4BE2C4" strokeWidth="0.8" />
-          <polygon points="50,15 85,30 85,70 50,85 15,70 15,30" fill="none" stroke="#E8FF00" strokeWidth="0.4" opacity="0.6" />
-        </svg>
+          <Image
+            src="/about_logo.png"
+            alt="CodeCell Logo"
+            fill
+            className="object-contain"
+          />
+        </motion.div>
       </motion.div>
 
       {/* Floating code tokens */}
@@ -218,19 +222,19 @@ export default function AboutHero() {
           variants={titleContainer}
           initial="hidden"
           animate="visible"
-          className="about-hero-title-group select-none font-orbitron italic font-black leading-[0.92] tracking-tight"
+          className="about-hero-title-group select-none font-orbitron italic font-black leading-[0.92] tracking-tight flex justify-center gap-4 md:gap-8"
         >
-          <motion.span variants={titleLine} className="block">
+          <motion.span variants={titleLine} className="inline-block">
             <span className="about-hero-shine" data-text="WHO">
               WHO
             </span>
           </motion.span>
-          <motion.span variants={titleLine} className="block">
+          <motion.span variants={titleLine} className="inline-block">
             <span className="about-hero-shine" data-text="WE">
               WE
             </span>
           </motion.span>
-          <motion.span variants={titleLine} className="block">
+          <motion.span variants={titleLine} className="inline-block">
             <span className="about-hero-shine" data-text="ARE">
               ARE
             </span>
@@ -244,15 +248,7 @@ export default function AboutHero() {
           className="h-[2px] w-32 md:w-48 mx-auto mt-10 origin-center bg-gradient-to-r from-transparent via-[#4BE2C4] to-transparent"
         />
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="font-mono text-xs md:text-sm text-[#8A8880] mt-10 max-w-xl mx-auto leading-relaxed tracking-wide relative z-20"
-        >
-          The official development &amp; competitive programming guild of{" "}
-          <span className="text-[#F0EDE6]">Thadomal Shahani Engineering College</span>, Mumbai.
-        </motion.p>
+
       </div>
 
       {/* Scroll cue */}

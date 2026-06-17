@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -24,12 +24,13 @@ const HexagonalButton = ({ href }: { href: string }) => (
     >
       <div className="absolute inset-0 bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] opacity-80 group-hover:opacity-100 transition-opacity" />
       <div
-        className="relative bg-[#0D0D0D] px-12 py-3.5 font-mono text-sm font-black tracking-[0.18em] text-[#4BE2C4] transition-all duration-300 group-hover:text-[#0D0D0D] group-hover:bg-gradient-to-r group-hover:from-[#4BE2C4] group-hover:to-[#E8FF00] uppercase"
+        className="relative flex items-center justify-center bg-[#0D0D0D] px-12 py-3.5 font-mono text-sm font-black tracking-[0.18em] text-[#4BE2C4] transition-all duration-300 group-hover:text-[#0D0D0D] group-hover:bg-gradient-to-r group-hover:from-[#4BE2C4] group-hover:to-[#E8FF00] uppercase"
         style={{
-          clipPath: "polygon(15.5px 0%, calc(100% - 15.5px) 0%, 100% 50%, calc(100% - 15.5px) 100%, 15.5px 100%, 0% 50%)"
+          clipPath: "polygon(15.5px 0%, calc(100% - 15.5px) 0%, 100% 50%, calc(100% - 15.5px) 100%, 15.5px 100%, 0% 50%)",
+          paddingLeft: "calc(3rem + 0.18em)"
         }}
       >
-        CRUSH CHALLENGES
+        LOGIN
       </div>
     </div>
   </a>
@@ -99,13 +100,11 @@ export default function Home() {
               lineHeight: 0.85
             }}>CODECELL</div>
           </motion.div>
-          <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }} className="font-mono mx-auto mt-6 mb-8" style={{ fontSize: 13, letterSpacing: 3, color: '#7a9a7a', maxWidth: 600 }}>
-            WELCOME TO THE OFFICIAL HUB OF TSEC CODECELL: WHERE INNOVATION MEETS CHAOS &amp; CODE
-          </motion.p>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col items-center gap-4">
-            <HexagonalButton href="/challenges" />
-            <div className="font-mono select-none" style={{ fontSize: 11, color: '#4a7a4a', letterSpacing: 2 }}>
-              TSEC HACKS <span style={{ animation: 'pulse-loading 1.2s ease-in-out infinite' }}>LOADING ...</span>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col items-center gap-4 mt-12 md:mt-16">
+            <HexagonalButton href="/login" />
+            <div className="font-mono select-none text-center" style={{ fontSize: 11, color: '#4a7a4a', letterSpacing: 2, paddingLeft: 2 }}>
+              TSEC HACKS <span style={{ animation: 'pulse-loading 1.2s ease-in-out infinite' }}>LOADING...</span>
             </div>
           </motion.div>
         </div>

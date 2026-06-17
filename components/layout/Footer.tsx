@@ -1,17 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   Instagram,
-  MessageSquare,
-  MessageCircle,
-  FileText,
+  Linkedin,
+  Youtube,
+  Github,
+  Facebook,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import PrivacyPolicyModal from "./PrivacyPolicyModal";
 
 export default function Footer() {
   const pathname = usePathname();
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const isEventPage = pathname.startsWith("/events") || 
                       pathname.startsWith("/tsec-hacks") || 
                       pathname.startsWith("/dive-to-code") || 
@@ -89,40 +93,49 @@ export default function Footer() {
             </h3>
             <div className="flex flex-wrap gap-3 items-center">
               <a
-                href="https://chat.whatsapp.com/"
+                href="https://www.linkedin.com/company/tsec-codecell/?originalSubdomain=in"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-[#222222] hover:border-[#0A66C2] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
+                title="LinkedIn"
+              >
+                <Linkedin size={18} className="text-[#8A8880] group-hover:text-[#0A66C2] transition-colors" />
+              </a>
+              <a
+                href="https://www.youtube.com/channel/UCPPF2ezbCXV10fROZRiobfg"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-[#222222] hover:border-[#FF0000] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
+                title="YouTube"
+              >
+                <Youtube size={18} className="text-[#8A8880] group-hover:text-[#FF0000] transition-colors" />
+              </a>
+              <a
+                href="https://www.instagram.com/tseccodecell/"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-[#222222] hover:border-[#E1306C] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
+                title="Instagram"
+              >
+                <Instagram size={18} className="text-[#8A8880] group-hover:text-[#E1306C] transition-colors" />
+              </a>
+              <a
+                href="https://github.com/tseccodecell"
                 target="_blank"
                 rel="noreferrer"
                 className="w-10 h-10 border border-[#222222] hover:border-[#4BE2C4] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="WhatsApp Channel"
+                title="GitHub"
               >
-                <MessageCircle size={18} className="text-[#8A8880] group-hover:text-[#4BE2C4] transition-colors" />
+                <Github size={18} className="text-[#8A8880] group-hover:text-[#4BE2C4] transition-colors" />
               </a>
               <a
-                href="https://discord.gg/"
+                href="https://www.facebook.com/TSECCodeCell/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#FF4D00] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="Discord Server"
+                className="w-10 h-10 border border-[#222222] hover:border-[#1877F2] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
+                title="Facebook"
               >
-                <MessageSquare size={18} className="text-[#8A8880] group-hover:text-[#FF4D00] transition-colors" />
-              </a>
-              <a
-                href="https://instagram.com/tseccodecell"
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#E8FF00] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="Instagram Feed"
-              >
-                <Instagram size={18} className="text-[#8A8880] group-hover:text-[#E8FF00] transition-colors" />
-              </a>
-              <a
-                href="https://forms.gle/"
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 border border-[#222222] hover:border-[#4BE2C4] flex items-center justify-center bg-[#111111] transition-all duration-300 group"
-                title="Membership Form"
-              >
-                <FileText size={18} className="text-[#8A8880] group-hover:text-[#4BE2C4] transition-colors" />
+                <Facebook size={18} className="text-[#8A8880] group-hover:text-[#1877F2] transition-colors" />
               </a>
             </div>
           </div>
@@ -134,14 +147,12 @@ export default function Footer() {
             </h3>
             <ul className="flex flex-col gap-3 font-sans text-[13px] text-[#8A8880]">
               <li>
-                <span className="cursor-default hover:text-[#F0EDE6] transition-colors">
+                <button 
+                  onClick={() => setIsPrivacyOpen(true)}
+                  className="cursor-pointer text-left hover:text-[#F0EDE6] transition-colors focus:outline-none"
+                >
                   Privacy Policy
-                </span>
-              </li>
-              <li>
-                <span className="cursor-default hover:text-[#F0EDE6] transition-colors">
-                  Terms of Sandbox
-                </span>
+                </button>
               </li>
               <li className="text-[10px] font-mono text-[#4A4A4A] mt-2 select-none uppercase tracking-widest">
                 VER: 2026.06.01
@@ -156,6 +167,8 @@ export default function Footer() {
           <div className="mt-2 sm:mt-0">BUILT WITH ❤️ + {"{}"}</div>
         </div>
       </footer>
+
+      <PrivacyPolicyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
     </>
   );
 }

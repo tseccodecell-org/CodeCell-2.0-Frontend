@@ -95,28 +95,30 @@ export default function Navbar() {
           {/* =====================================
               LOGO / BRAND
           ===================================== */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 font-mono text-sm tracking-[0.18em] font-bold text-[#F0EDE6] transition-colors duration-200 group"
-          >
-            <div className="w-6 h-6 relative neon-glow-cyan">
-              <Image
-                src="/logo.png"
-                alt="TSEC CodeCell Logo"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="text-[#F0EDE6] group-hover:text-[#4BE2C4] transition-colors duration-200">
-              TSEC CODECELL_
-            </span>
-          </Link>
+          <div className="flex-1">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.18em] font-bold text-[#F0EDE6] transition-colors duration-200 group"
+            >
+              <div className="w-6 h-6 relative neon-glow-cyan">
+                <Image
+                  src="/logo.png"
+                  alt="TSEC CodeCell Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <span className="text-[#F0EDE6] group-hover:text-[#4BE2C4] transition-colors duration-200">
+                TSEC CODECELL_
+              </span>
+            </Link>
+          </div>
 
           {/* =====================================
               DESKTOP NAV
           ===================================== */}
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden lg:flex flex-none items-center gap-10">
             {navItems.map((item, index) => {
               const isEven = index % 2 === 0;
               const isHome = item.label === "HOME";
@@ -267,30 +269,9 @@ export default function Navbar() {
           </nav>
 
           {/* =====================================
-              DESKTOP LOGIN BUTTON
+              DESKTOP LOGIN BUTTON (Removed)
           ===================================== */}
-          <div className="hidden lg:block">
-            <Link href="/login">
-              <button
-                className="
-                  btn-sweep-cyan
-                  border
-                  border-[#4BE2C4]/40
-                  px-6
-                  py-2
-                  font-mono
-                  text-xs
-                  font-bold
-                  tracking-[0.15em]
-                  text-[#4BE2C4]
-                  bg-transparent
-                  rounded-none
-                "
-              >
-                [ LOGIN ]
-              </button>
-            </Link>
-          </div>
+          <div className="hidden lg:block flex-1"></div>
 
           {/* =====================================
               MOBILE HAMBURGER
@@ -432,37 +413,7 @@ export default function Navbar() {
                 );
               })}
 
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                style={{ transitionDelay: `${navItems.length * 50}ms` }}
-                className={`
-                  w-full
-                  transition-all
-                  duration-300
-                  transform
-                  ${open ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}
-                `}
-              >
-                <button
-                  className="
-                    w-full
-                    btn-sweep-cyan
-                    border
-                    border-[#4BE2C4]/40
-                    py-3
-                    font-mono
-                    text-xs
-                    font-bold
-                    tracking-[0.15em]
-                    text-[#4BE2C4]
-                    bg-transparent
-                    rounded-none
-                  "
-                >
-                  [ LOGIN ]
-                </button>
-              </Link>
+              {/* LOGIN MOBILE BUTTON REMOVED */}
             </nav>
           </div>
         )}

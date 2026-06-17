@@ -221,19 +221,10 @@ export default function AboutHero() {
           className="about-hero-title-group select-none font-orbitron italic font-black leading-[0.92] tracking-tight"
         >
           <motion.span variants={titleLine} className="block">
-            <span className="about-hero-shine" data-text="WHO">
-              WHO
-            </span>
+            <span className="about-hero-shine" data-text="WHO WE">WHO WE</span>
           </motion.span>
           <motion.span variants={titleLine} className="block">
-            <span className="about-hero-shine" data-text="WE">
-              WE
-            </span>
-          </motion.span>
-          <motion.span variants={titleLine} className="block">
-            <span className="about-hero-shine" data-text="ARE">
-              ARE
-            </span>
+            <span className="about-hero-shine" data-text="ARE?">ARE?</span>
           </motion.span>
         </motion.h1>
 

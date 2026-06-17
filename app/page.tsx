@@ -15,7 +15,7 @@ const tickerItems = [
 
 // Flawless hexagonal cut-corner CTA button
 const HexagonalButton = ({ href }: { href: string }) => (
-  <a href={href} className="relative group block w-fit">
+  <a href="/login" className="relative group block w-fit">
     <div
       className="relative bg-transparent p-[1.5px] drop-shadow-[0_0_15px_rgba(75,226,196,0.3)] transition-all duration-300 group-hover:drop-shadow-[0_0_25px_rgba(232,255,0,0.5)]"
       style={{
@@ -29,7 +29,7 @@ const HexagonalButton = ({ href }: { href: string }) => (
           clipPath: "polygon(15.5px 0%, calc(100% - 15.5px) 0%, 100% 50%, calc(100% - 15.5px) 100%, 15.5px 100%, 0% 50%)"
         }}
       >
-        CRUSH CHALLENGES
+        LOGIN / REGISTER
       </div>
     </div>
   </a>
@@ -99,13 +99,13 @@ export default function Home() {
               lineHeight: 0.85
             }}>CODECELL</div>
           </motion.div>
-          <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }} className="font-mono mx-auto mt-6 mb-8" style={{ fontSize: 13, letterSpacing: 3, color: '#7a9a7a', maxWidth: 600 }}>
+          <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }} className="font-mono mx-auto mt-6 mb-8" style={{ fontSize: 13, letterSpacing: 1.5, lineHeight: 1.7, color: '#7a9a7a', maxWidth: 500 }}>
             WELCOME TO THE OFFICIAL HUB OF TSEC CODECELL: WHERE INNOVATION MEETS CHAOS &amp; CODE
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col items-center gap-4">
             <HexagonalButton href="/challenges" />
-            <div className="font-mono select-none" style={{ fontSize: 11, color: '#4a7a4a', letterSpacing: 2 }}>
-              TSEC HACKS <span style={{ animation: 'pulse-loading 1.2s ease-in-out infinite' }}>LOADING ...</span>
+            <div className="font-mono select-none" style={{ fontSize: 11, color: '#ff6b6b', letterSpacing: 2 }}>
+              WEEKLY CHALLENGES <span style={{ animation: 'pulse-loading 1.2s ease-in-out infinite', color: '#ffdddd' }}>COMING SOON</span>
             </div>
           </motion.div>
         </div>

@@ -1151,6 +1151,63 @@
   animation: about-aurora-drift 10s ease-in-out infinite alternate-reverse;
 }
 
+/* ========================================================
+   ABOUT HERO: SECTION PSEUDO-LAYER ENHANCEMENTS
+   ======================================================== */
+.about-hero {
+  isolation: isolate;
+}
+
+.about-hero::before,
+.about-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.about-hero::before {
+  background-image:
+    radial-gradient(circle at 18% 18%, rgba(75, 226, 196, 0.18), transparent 24%),
+    radial-gradient(circle at 82% 14%, rgba(232, 255, 0, 0.12), transparent 20%),
+    radial-gradient(circle at 44% 84%, rgba(232, 255, 0, 0.06), transparent 20%);
+  opacity: 0.9;
+  filter: blur(20px);
+}
+
+.about-hero::after {
+  background-image:
+    radial-gradient(circle at 52% 8%, rgba(255, 255, 255, 0.08), transparent 16%),
+    radial-gradient(circle at 22% 68%, rgba(75, 226, 196, 0.06), transparent 22%),
+    radial-gradient(circle at 78% 72%, rgba(232, 255, 0, 0.05), transparent 20%);
+  mix-blend-mode: screen;
+  opacity: 0.72;
+  animation: about-hero-ambient 18s ease-in-out infinite alternate;
+}
+
+@keyframes about-hero-ambient {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(18px, -12px) scale(1.02); }
+  100% { transform: translate(-14px, 10px) scale(0.98); }
+}
+
+.about-hero-grid {
+  opacity: 0.6;
+}
+
+.about-hero-core-glow {
+  opacity: 0.7;
+}
+
+.about-hero-title-group {
+  text-shadow: 0 0 30px rgba(75, 226, 196, 0.15);
+}
+
+.about-hero-kicker {
+  letter-spacing: 0.24em;
+}
+
 .about-hero-core-glow {
   position: absolute;
   left: 50%;

@@ -16,10 +16,10 @@ const navItems: NavItem[] = [
   { label: "HOME", href: "/" },
   {
     label: "EVENTS",
-    href: "/events",
+    href: "#",
     dropdownItems: [
       { label: "TSEC HACKS", href: "/tsec-hacks" },
-      { label: "WEEKLY CHALLENGES", href: "/challenges" },
+      { label: "WEEKLY", href: "/dashboard" },
       { label: "DIVE TO CODE", href: "/dive-to-code" },
       { label: "BRAIN2WIN", href: "/brain2win" },
     ],
@@ -64,7 +64,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isEventPage = pathname.startsWith("/events") || 
+  const isEventPage = pathname.startsWith("/dashboard") || 
                       pathname.startsWith("/tsec-hacks") || 
                       pathname.startsWith("/dive-to-code") || 
                       pathname.startsWith("/brain2win") ||
@@ -159,9 +159,9 @@ export default function Navbar() {
                         if (!isSubActive) e.currentTarget.style.color = "#F0EDE6";
                       }}
                     >
-                      <Link href={item.href} className="hover:text-inherit transition-none">
+                      <span className="hover:text-inherit transition-none">
                         {item.label}
-                      </Link>
+                      </span>
                       <ChevronDown
                         size={12}
                         className={`transition-transform duration-200 ${

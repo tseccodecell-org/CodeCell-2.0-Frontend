@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authProgress, setAuthProgress] = useState(0);
   const [authPhase, setAuthPhase] = useState("");
+  const [usernameInput, setUsernameInput] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +41,10 @@ export default function LoginPage() {
       if (progress >= 100) {
         clearInterval(interval);
         setTimeout(() => {
-          router.push("/");
+          localStorage.setItem("dashboard_isLoggedIn", "true");
+          localStorage.setItem("dashboard_username", usernameInput || "root_operator");
+          localStorage.setItem("dashboard_collegeName", "TSEC Mumbai");
+          router.push("/dashboard");
         }, 800);
       }
     }, 50);
@@ -114,6 +118,8 @@ export default function LoginPage() {
                 type="text"
                 required
                 placeholder="root_operator"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
                 className="
                   w-full
                   bg-[#0D0D0D]

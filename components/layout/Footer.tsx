@@ -16,7 +16,7 @@ import PrivacyPolicyModal from "./PrivacyPolicyModal";
 export default function Footer() {
   const pathname = usePathname();
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
-  const isEventPage = pathname.startsWith("/events") || 
+  const isEventPage = pathname.startsWith("/dashboard") || 
                       pathname.startsWith("/tsec-hacks") || 
                       pathname.startsWith("/dive-to-code") || 
                       pathname.startsWith("/brain2win");
@@ -64,8 +64,8 @@ export default function Footer() {
             </h3>
             <ul className="flex flex-col gap-3 font-sans text-[13px] text-[#8A8880]">
               <li>
-                <Link href="/events" className="hover:text-[#E8FF00] transition-colors duration-200">
-                  Events Hub
+                <Link href="/dashboard" className="hover:text-[#E8FF00] transition-colors duration-200">
+                  Weekly Gambit
                 </Link>
               </li>
               <li>

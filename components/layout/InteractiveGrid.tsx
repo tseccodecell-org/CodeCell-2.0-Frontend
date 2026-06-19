@@ -40,7 +40,7 @@ export default function InteractiveGrid() {
           radial-gradient(
             circle 300px at var(--mouse-x, -500px) var(--mouse-y, -500px),
             ${
-              pathname.startsWith("/events") || 
+              pathname.startsWith("/dashboard") || 
               pathname.startsWith("/challenges") || 
               pathname.startsWith("/leaderboard") ||
               pathname.startsWith("/tsec-hacks") ||

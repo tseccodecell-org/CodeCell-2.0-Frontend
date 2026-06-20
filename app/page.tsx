@@ -1,17 +1,12 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 import HomeSections from "@/components/sections/HomeSections";
 
-// Scrolling Ticker Data
-const tickerItems = [
-  "TSEC HACKS 2026 REGISTRATIONS OPEN",
-  "WEEKLY CHALLENGE #48 LIVE",
-  "LEADERBOARD UPDATED: @aryan_s LEADS",
-  "SYSTEM DESIGN BOOTCAMP: REPLAY AVAILABLE",
-  "500+ STUDENTS ENROLLED IN THE GUILD",
-];
+// Scrolling Ticker Data (removed)
 
 // Flawless hexagonal cut-corner CTA button
 const HexagonalButton = ({ href }: { href: string }) => (
@@ -73,9 +68,9 @@ export default function Home() {
         </div>
 
         {/* Background hexagon outlines */}
-        <svg className="absolute pointer-events-none z-[1]" style={{ top: '10%', left: '5%', width: 250, height: 250 }} viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="rgba(0,229,180,0.06)" strokeWidth="1.5" /></svg>
-        <svg className="absolute pointer-events-none z-[1]" style={{ top: '55%', left: '65%', width: 450, height: 450 }} viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="rgba(0,229,180,0.06)" strokeWidth="1" /></svg>
-        <svg className="absolute pointer-events-none z-[1]" style={{ top: '25%', left: '45%', width: 350, height: 350 }} viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="rgba(0,229,180,0.06)" strokeWidth="1.2" /></svg>
+        <svg className="absolute pointer-events-none z-[1]" style={{ top: '12%', left: '8%', width: 220, height: 220 }} viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="rgba(0,229,180,0.06)" strokeWidth="1.2" /></svg>
+        <svg className="absolute pointer-events-none z-[1]" style={{ top: '55%', left: '60%', width: 400, height: 400 }} viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="rgba(0,229,180,0.06)" strokeWidth="1" /></svg>
+        <svg className="absolute pointer-events-none z-[1]" style={{ top: '25%', left: '40%', width: 315, height: 315 }} viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="rgba(0,229,180,0.06)" strokeWidth="1.2" /></svg>
 
         {/* Vignette overlay */}
         <div className="absolute inset-0 z-[2] pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, #080c08 100%)' }} />
@@ -83,36 +78,53 @@ export default function Home() {
         {/* ========== CENTRAL TITLE BLOCK ========== */}
         <div className="relative z-10 text-center select-none" style={{ lineHeight: 0.9 }}>
           <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: "easeOut" }}>
-            <div className="title-tsec-ref" data-text="TSEC" style={{
+            <div className="title-tsec-ref about-hero-shine" data-text="TSEC" style={{
               fontFamily: "'Orbitron', 'Arial Black', 'Impact', sans-serif",
               fontSize: 'clamp(80px, 12vw, 140px)',
               fontStyle: 'italic',
               fontWeight: 900,
               letterSpacing: '-2px',
-              lineHeight: 0.85
+              lineHeight: 0.85,
+              backgroundImage: 'linear-gradient(90deg, #4be2c4 0%, #e8ff00 22%, #f0ede6 45%, #4be2c4 68%, #e8ff00 100%)',
+              backgroundSize: '200% 100%',
+              backgroundPosition: '0% 50%',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              WebkitTextStroke: '0px',
+              WebkitTextStrokeColor: 'transparent',
+              animation: 'about-title-shine 4s linear 0s infinite'
             }}>TSEC</div>
-            <div className="title-codecell-ref" data-text="CODECELL" style={{
+            <div className="title-codecell-ref about-hero-shine" data-text="CODECELL" style={{
               fontFamily: "'Orbitron', 'Arial Black', 'Impact', sans-serif",
               fontSize: 'clamp(70px, 11vw, 128px)',
               fontStyle: 'italic',
               fontWeight: 900,
               letterSpacing: '-2px',
-              lineHeight: 0.85
+              lineHeight: 0.85,
+              backgroundImage: 'linear-gradient(90deg, #4be2c4 0%, #e8ff00 22%, #f0ede6 45%, #4be2c4 68%, #e8ff00 100%)',
+              backgroundSize: '200% 100%',
+              backgroundPosition: '0% 50%',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              WebkitTextStroke: '0px',
+              WebkitTextStrokeColor: 'transparent',
+              animation: 'about-title-shine 4s linear 1.2s infinite'
             }}>CODECELL</div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col items-center gap-4 mt-12 md:mt-16">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col items-center gap-4 mt-8 md:mt-12">
             <HexagonalButton href="/login" />
-            <div className="font-mono select-none text-center" style={{ fontSize: 11, color: '#4a7a4a', letterSpacing: 2, paddingLeft: 2 }}>
-              TSEC HACKS <span style={{ animation: 'pulse-loading 1.2s ease-in-out infinite' }}>LOADING...</span>
-            </div>
           </motion.div>
         </div>
 
         {/* ========== FLOATING 3D ELEMENTS ========== */}
 
         {/* ELEMENT 1 â€” 3D KEYBOARD */}
-        <div className="absolute hidden lg:block z-[5]" style={{ left: '3%', bottom: '18%', width: 280, height: 160, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.25)', borderRadius: 8, padding: 12, boxShadow: '20px 20px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0,229,180,0.08)', animation: 'float-keyboard 6s ease-in-out infinite alternate' }}>
+        <div className="absolute hidden lg:block z-[5]" style={{ left: '6%', bottom: '14%', width: 250, height: 140, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 8, padding: 10, boxShadow: '10px 12px 24px rgba(0,0,0,0.55), 0 0 18px rgba(0,229,180,0.06)', animation: 'float-keyboard 6s ease-in-out infinite alternate' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, width: '100%', height: '100%' }}>
             {Array.from({ length: 40 }).map((_, i) => {
               const isGlow = [4, 19, 20, 36].includes(i);
@@ -123,7 +135,7 @@ export default function Home() {
         </div>
 
         {/* ELEMENT 2 â€” 3D CODE EDITOR CARD */}
-        <div className="absolute hidden lg:block z-[5]" style={{ left: '2%', top: '18%', width: 240, height: 170, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 6, overflow: 'hidden', boxShadow: '-15px 25px 50px rgba(0,0,0,0.7), 0 0 20px rgba(0,229,180,0.06)', animation: 'float-code 5s ease-in-out 0.8s infinite alternate' }}>
+        <div className="absolute hidden lg:block z-[5]" style={{ left: '6%', top: '14%', width: 216, height: 153, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 6, overflow: 'hidden', boxShadow: '-10px 18px 36px rgba(0,0,0,0.65), 0 0 14px rgba(0,229,180,0.05)', animation: 'float-code 5s ease-in-out 0.8s infinite alternate' }}>
           <div style={{ height: 28, background: '#111f11', borderBottom: '1px solid rgba(0,229,180,0.1)', display: 'flex', alignItems: 'center', padding: '0 10px', gap: 6 }}>
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff5f57' }} />
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#febc2e' }} />
@@ -141,33 +153,33 @@ export default function Home() {
         </div>
 
         {/* ELEMENT 3 â€” HEXAGONAL BADGES */}
-        <div className="absolute hidden lg:block z-[5]" style={{ top: '12%', right: '28%', width: 90, height: 90, filter: 'drop-shadow(0 0 12px rgba(0,229,180,0.4))', animation: 'float-badge1 7s ease-in-out 1.6s infinite alternate' }}>
-          <svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="3" /><text x="50" y="44" fontFamily="monospace" fontSize="12" fill="#c8f000" fontWeight="bold" textAnchor="middle">TSEC</text><text x="50" y="62" fontFamily="monospace" fontSize="9" fill="#00e5b4" fontWeight="bold" textAnchor="middle">CodeCell</text></svg>
+        <div className="absolute hidden lg:block z-[5]" style={{ top: '12%', right: '20%', width: 80, height: 80, filter: 'drop-shadow(0 0 10px rgba(0,229,180,0.35))', animation: 'float-badge1 7s ease-in-out 1.6s infinite alternate' }}>
+          <svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="3" /><text x="50" y="44" fontFamily="monospace" fontSize="11" fill="#c8f000" fontWeight="bold" textAnchor="middle">TSEC</text><text x="50" y="62" fontFamily="monospace" fontSize="8" fill="#00e5b4" fontWeight="bold" textAnchor="middle">CodeCell</text></svg>
         </div>
-        <div className="absolute hidden lg:block z-[5]" style={{ bottom: '28%', right: '8%', width: 70, height: 70, filter: 'drop-shadow(0 0 8px rgba(200,240,0,0.3))', animation: 'float-badge2 5.5s ease-in-out 2.1s infinite alternate' }}>
-          <svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="3" /><text x="50" y="44" fontFamily="monospace" fontSize="12" fill="#c8f000" fontWeight="bold" textAnchor="middle">TSEC</text><text x="50" y="62" fontFamily="monospace" fontSize="9" fill="#00e5b4" fontWeight="bold" textAnchor="middle">CodeCell</text></svg>
+        <div className="absolute hidden lg:block z-[5]" style={{ bottom: '28%', right: '6%', width: 62, height: 62, filter: 'drop-shadow(0 0 7px rgba(200,240,0,0.28))', animation: 'float-badge2 5.5s ease-in-out 2.1s infinite alternate' }}>
+          <svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="3" /><text x="50" y="44" fontFamily="monospace" fontSize="11" fill="#c8f000" fontWeight="bold" textAnchor="middle">TSEC</text><text x="50" y="62" fontFamily="monospace" fontSize="8" fill="#00e5b4" fontWeight="bold" textAnchor="middle">CodeCell</text></svg>
         </div>
 
         {/* ELEMENT 4 â€” TECH TOOL ICON TILES */}
-        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '14%', right: '6%', width: 64, height: 64, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 14, boxShadow: '10px 15px 30px rgba(0,0,0,0.5), 0 0 15px rgba(200,240,0,0.1)', animation: 'float-tile-a 6s ease-in-out 0.4s infinite alternate' }}>
+        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '14%', right: '10%', width: 58, height: 58, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 14, boxShadow: '8px 12px 22px rgba(0,0,0,0.45), 0 0 12px rgba(200,240,0,0.08)', animation: 'float-tile-a 6s ease-in-out 0.4s infinite alternate' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 6 2.5 6 5.5V7H12V8.5H6.5C4.5 8.5 3 10 3 12C3 14 4.5 15.5 6.5 15.5H8V14C8 11.8 9.8 10 12 10H18V8.5C18 5.5 17.52 2 12 2Z" fill="#c8f000" /><path d="M12 22C17.52 22 18 21.5 18 18.5V17H12V15.5H17.5C19.5 15.5 21 14 21 12C21 10 19.5 8.5 17.5 8.5H16V10C16 12.2 14.2 14 12 14H6V15.5C6 18.5 6.48 22 12 22Z" fill="#00e5b4" /><circle cx="9" cy="5" r="1" fill="#080c08" /><circle cx="15" cy="19" r="1" fill="#080c08" /></svg>
           <span className="font-mono" style={{ fontSize: 8, color: '#4a7a4a', fontWeight: 700 }}>Python</span>
         </div>
-        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '28%', right: '3%', width: 64, height: 64, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 14, boxShadow: '8px 12px 25px rgba(0,0,0,0.5), 0 0 12px rgba(0,229,180,0.12)', animation: 'float-tile-b 4.5s ease-in-out 1.2s infinite alternate' }}>
+        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '28%', right: '8%', width: 58, height: 58, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 14, boxShadow: '7px 10px 20px rgba(0,0,0,0.45), 0 0 10px rgba(0,229,180,0.1)', animation: 'float-tile-b 4.5s ease-in-out 1.2s infinite alternate' }}>
           <svg width="28" height="20" viewBox="0 0 28 20" fill="none"><rect x="2" y="2" width="4" height="3" fill="#00e5b4" opacity={0.8} /><rect x="7" y="2" width="4" height="3" fill="#00e5b4" opacity={0.8} /><rect x="12" y="2" width="4" height="3" fill="#00e5b4" opacity={0.8} /><rect x="7" y="6" width="4" height="3" fill="#00e5b4" /><rect x="12" y="6" width="4" height="3" fill="#00e5b4" /><rect x="17" y="6" width="4" height="3" fill="#00e5b4" /><rect x="12" y="10" width="4" height="3" fill="#00e5b4" /><path d="M1 14C3 13 5 13 7 14C11 16 16 16 19 14C21 13 22 11 23 10C24 9 26 9 27 10C28 11 27 13 26 14C24 16 21 18 18 18C13 18 7 18 2 17C1 16.5 0.5 15 1 14Z" fill="#00e5b4" /></svg>
           <span className="font-mono" style={{ fontSize: 8, color: '#4a7a4a', fontWeight: 700 }}>Docker</span>
         </div>
-        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '8%', right: '16%', width: 64, height: 64, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 14, boxShadow: '6px 10px 20px rgba(0,0,0,0.5)', animation: 'float-tile-c 7s ease-in-out 2.8s infinite alternate' }}>
+        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '8%', right: '12%', width: 58, height: 58, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 14, boxShadow: '6px 9px 18px rgba(0,0,0,0.45)', animation: 'float-tile-c 7s ease-in-out 2.8s infinite alternate' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" strokeWidth="2"><circle cx="18" cy="6" r="3" fill="#0d1a0d" /><circle cx="6" cy="18" r="3" fill="#0d1a0d" /><circle cx="6" cy="6" r="3" fill="#0d1a0d" /><path d="M6 9v6M18 9C18 13 6 11 6 15" strokeLinecap="round" /></svg>
           <span className="font-mono" style={{ fontSize: 8, color: '#4a7a4a', fontWeight: 700 }}>Git</span>
         </div>
-        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '38%', right: '18%', width: 72, height: 72, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 14, boxShadow: '12px 18px 35px rgba(0,0,0,0.6), 0 0 20px rgba(255,154,60,0.1)', animation: 'float-tile-d 5.2s ease-in-out 0.6s infinite alternate' }}>
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="6" fill="#ff9a3c" /><ellipse cx="16" cy="16" rx="14" ry="4" stroke="#ff9a3c" strokeWidth="1.5" transform="rotate(-30 16 16)" /><circle cx="6" cy="11" r="2.5" fill="#ff9a3c" /><circle cx="26" cy="21" r="2.5" fill="#ff9a3c" /></svg>
-          <span className="font-mono" style={{ fontSize: 8, color: '#4a7a4a', fontWeight: 700 }}>Jupyter</span>
+        <div className="absolute hidden lg:flex flex-col items-center justify-center gap-1 z-[5]" style={{ top: '38%', right: '14%', width: 64, height: 64, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 14, boxShadow: '10px 14px 28px rgba(0,0,0,0.55)', animation: 'float-tile-d 5.2s ease-in-out 0.6s infinite alternate' }}>
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="6" fill="#ff9a3c" /><ellipse cx="16" cy="16" rx="14" ry="4" stroke="#ff9a3c" strokeWidth="1.5" transform="rotate(-30 16 16)" /><circle cx="6" cy="11" r="2.5" fill="#ff9a3c" /><circle cx="26" cy="21" r="2.5" fill="#ff9a3c" /></svg>
+          <span className="font-mono" style={{ fontSize: 7, color: '#4a7a4a', fontWeight: 700 }}>Jupyter</span>
         </div>
 
         {/* ELEMENT 5 â€” 3D SERVER RACK */}
-        <div className="absolute hidden lg:flex flex-col gap-1.5 z-[5]" style={{ right: '0.5%', top: '45%', width: 130, padding: 8, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 6, boxShadow: '-20px 20px 40px rgba(0,0,0,0.7), 0 0 25px rgba(57,255,20,0.06)', animation: 'float-server 8s ease-in-out 1.8s infinite alternate' }}>
+        <div className="absolute hidden lg:flex flex-col gap-1.5 z-[5]" style={{ right: '4%', top: '40%', width: 117, padding: 6, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 6, boxShadow: '-14px 16px 30px rgba(0,0,0,0.65), 0 0 18px rgba(57,255,20,0.04)', animation: 'float-server 8s ease-in-out 1.8s infinite alternate' }}>
           {[1, 2, 3, 4, 5, 6].map(n => (
             <div key={n} className="flex items-center gap-1.5 font-mono" style={{ height: 22, background: '#111f11', border: '1px solid rgba(0,229,180,0.1)', borderRadius: 3, padding: '0 8px' }}>
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: n % 2 === 1 ? '#39ff14' : '#1a2e1a', boxShadow: n % 2 === 1 ? '0 0 6px #39ff14' : 'none' }} />
@@ -177,66 +189,15 @@ export default function Home() {
         </div>
 
         {/* ELEMENT 6 â€” STATS MATRIX CARD */}
-        <div className="absolute hidden lg:block z-[5]" style={{ right: '5%', top: '10%', width: 160, padding: 10, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.2)', borderRadius: 4, boxShadow: '10px 15px 30px rgba(0,0,0,0.6)', animation: 'float-stats 4.8s ease-in-out 1.4s infinite alternate' }}>
+        <div className="absolute hidden lg:block z-[5]" style={{ right: '8%', top: '10%', width: 144, padding: 8, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.18)', borderRadius: 4, boxShadow: '8px 12px 24px rgba(0,0,0,0.6)', animation: 'float-stats 4.8s ease-in-out 1.4s infinite alternate' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px 6px' }}>
-            {['109.2', '409.1', '002.3', '761.5', '008.2', '991.0', '325.9', '654.4', '110.7'].map((v, i) => (
+            {[ '109.2', '409.1', '002.3', '761.5', '008.2', '991.0', '325.9', '654.4', '110.7' ].map((v, i) => (
               <div key={i} className="font-mono text-center" style={{ fontSize: 13, color: [0, 4, 8].includes(i) ? '#c8f000' : '#e8f5e8', fontWeight: [0, 4, 8].includes(i) ? 700 : 400 }}>{v}</div>
             ))}
           </div>
         </div>
 
-        {/* ELEMENT 7 â€” NEURAL NETWORK NODE GRAPH */}
-        <div className="absolute hidden lg:block z-[5]" style={{ right: '2%', bottom: '8%', width: 180, height: 140, filter: 'drop-shadow(0 0 15px rgba(0,229,180,0.2))', animation: 'float-nn 6.5s ease-in-out 2.2s infinite alternate' }}>
-          <svg width="100%" height="100%" viewBox="0 0 180 140" fill="none">
-            {[30, 70, 110].map(iy => [20, 53, 87, 120].map(hy => <line key={`i${iy}-h${hy}`} x1="30" y1={iy} x2="90" y2={hy} stroke="rgba(0,229,180,0.25)" strokeWidth="1" />)).flat()}
-            {[20, 53, 87, 120].map(hy => [45, 95].map(oy => <line key={`h${hy}-o${oy}`} x1="90" y1={hy} x2="150" y2={oy} stroke="rgba(0,229,180,0.25)" strokeWidth="1" />)).flat()}
-            <line x1="30" y1="70" x2="90" y2="53" stroke="#c8f000" strokeWidth="1.5"><animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite" /></line>
-            <line x1="30" y1="70" x2="90" y2="87" stroke="#c8f000" strokeWidth="1.5"><animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite" /></line>
-            <line x1="90" y1="53" x2="150" y2="95" stroke="#c8f000" strokeWidth="1.5"><animate attributeName="opacity" values="0.2;1;0.2" dur="1.5s" repeatCount="indefinite" /></line>
-            {[30, 70, 110].map(y => <circle key={`i${y}`} cx="30" cy={y} r="7" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="1.5" />)}
-            {[20, 53, 87, 120].map(y => <circle key={`h${y}`} cx="90" cy={y} r="7" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="1.5" />)}
-            {[45, 95].map(y => <circle key={`o${y}`} cx="150" cy={y} r="7" fill="#0d1a0d" stroke="#00e5b4" strokeWidth="1.5" />)}
-          </svg>
-        </div>
-
-        {/* ELEMENT 8 â€” CODECELL LABEL CHIPS */}
-        {[
-          { top: '22%', left: '42%', anim: 'float-chip1 5s ease-in-out 0.3s infinite alternate' },
-          { bottom: '32%', left: '36%', anim: 'float-chip2 6.2s ease-in-out 1.1s infinite alternate' },
-          { top: '48%', right: '22%', anim: 'float-chip3 5.8s ease-in-out 2s infinite alternate' },
-        ].map((pos, i) => (
-          <div key={`chip-${i}`} className="absolute hidden lg:flex items-center gap-1.5 font-mono z-[5]" style={{ ...pos, background: 'rgba(0,229,180,0.06)', border: '1px solid rgba(0,229,180,0.25)', borderRadius: 3, padding: '4px 10px', fontSize: 11, color: '#00e5b4', letterSpacing: 1, animation: pos.anim }}>
-            <span style={{ fontSize: 8 }}>â—‰</span>CODECELL
-          </div>
-        ))}
-
-        {/* SYSTEM STATUS BARS */}
-        <div className="absolute hidden xl:flex flex-col gap-[5px] z-10" style={{ left: '1.5%', top: '38%', transform: 'perspective(400px) rotateY(8deg)' }}>
-          {[
-            { label: '00:15:A2:3B:5C', dot: '#39ff14' }, { label: 'SYS_STATUS: 100', dot: '#c8f000' },
-            { label: 'VAL_A: 0x7FFA', dot: '#39ff14' }, { label: 'LATENCY: 12MS', dot: '#c8f000' },
-            { label: 'MEM_USE: 41.2%', dot: '#39ff14' }, { label: 'NODE_ID: 1098', dot: '#c8f000' },
-          ].map((s, i) => (
-            <div key={i} className="flex justify-between items-center font-mono" style={{ width: 190, background: '#0d1a0d', border: '1px solid rgba(0,229,180,0.15)', borderRadius: 2, padding: '4px 10px', fontSize: 11, color: '#4a7a4a' }}>
-              <span>{s.label}</span>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, boxShadow: `0 0 4px ${s.dot}` }} />
-            </div>
-          ))}
-        </div>
-
-        {/* ========== BOTTOM TICKER BAR ========== */}
-        <div className="border-t border-b border-[#222222]/60 py-2.5 overflow-hidden bg-[#080808]/95 backdrop-blur-sm w-full absolute bottom-0 left-0 z-20 flex items-center">
-          <div className="relative w-full overflow-hidden flex items-center">
-            <div className="flex animate-marquee-slow whitespace-nowrap gap-12 font-mono text-label-tag text-[#8A8880]">
-              {[...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
-                <span key={index} className="flex items-center gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E8FF00] shadow-[0_0_8px_#E8FF00]" />
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Bottom ticker removed */}
       </section>
 
       <HomeSections />

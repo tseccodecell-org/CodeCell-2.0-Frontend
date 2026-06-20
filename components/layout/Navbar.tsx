@@ -16,12 +16,11 @@ const navItems: NavItem[] = [
   { label: "HOME", href: "/" },
   {
     label: "EVENTS",
-    href: "#",
+    href: "/events",
     dropdownItems: [
-      { label: "TSEC HACKS", href: "/tsec-hacks" },
-      { label: "WEEKLY", href: "/dashboard" },
-      { label: "DIVE TO CODE", href: "/dive-to-code" },
-      { label: "BRAIN2WIN", href: "/brain2win" },
+      { label: "TSEC HACKS", href: "/events/tsec-hacks" },
+      { label: "WEEKLY CHALLANGES", href: "/events/weekly-challanges" },
+      { label: "MINI EVENT", href: "/events/mini-event" },
     ],
   },
   { label: "ABOUT US", href: "/about-us" },
@@ -65,11 +64,8 @@ export default function Navbar() {
   }, []);
 
   const isEventPage = pathname.startsWith("/dashboard") || 
-                      pathname.startsWith("/tsec-hacks") || 
-                      pathname.startsWith("/dive-to-code") || 
-                      pathname.startsWith("/brain2win") ||
-                      pathname.startsWith("/challenges") ||
-                      pathname.startsWith("/leaderboard");
+                      pathname.startsWith("/leaderboard") || 
+                      pathname.startsWith("/events");
 
   const primaryAccent = isEventPage ? "#D4AF37" : "#4BE2C4";
   const secondaryAccent = isEventPage ? "#F5E6A3" : "#E8FF00";

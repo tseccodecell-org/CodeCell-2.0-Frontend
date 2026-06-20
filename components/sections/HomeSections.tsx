@@ -124,10 +124,10 @@ const swagPerks = [
 
 
 const stats = [
-  { value: 500, suffix: "+", label: "Students Enrolled", sub: "Active guild members", podium: "metric-podium-1" },
-  { value: 50, suffix: "+", label: "Weekly Challenges", sub: "Problems shipped", podium: "metric-podium-2" },
+  { value: 40, suffix: "+", label: "Students Enrolled", sub: "Committee members", podium: "metric-podium-1" },
+  { value: 50, suffix: "+", label: "Weekly Challenges", sub: " events conducted", podium: "metric-podium-2" },
   { value: 20, suffix: "+", label: "Events Hosted", sub: "Hackathons & workshops", podium: "" },
-  { value: 1000, suffix: "+", label: "Submissions", sub: "Compiler runs logged", podium: "" },
+  { value: 4000, suffix: "+", label: "Submissions", sub: "Total registrationsd", podium: "" },
 ];
 
 
@@ -680,7 +680,7 @@ export default function HomeSections() {
 
   const SPEED = 48; // Pixels per second
   const PERK_ITEM_WIDTH = 228;
-  const SPONSOR_ITEM_WIDTH = 280;
+  const SPONSOR_ITEM_WIDTH = 320;
 
   const perksRepeats = 4;
   const sponsorsRepeats = 4;
@@ -808,58 +808,28 @@ export default function HomeSections() {
       <SectionWrap>
         <SectionHeader
           index="03 — PERKS & PARTNERS"
-          title="High-Value Ecosystem"
+          title="Our Sponsors & Swag"
           subtitle="// global brands supporting our developers"
         />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-10">
-          <BentoMotion className="lg:col-span-2">
-            <GlassCard className="p-8 md:p-10 h-full metric-podium-1 glass-card-glow">
-              <Trophy className="text-[#E8FF00] mb-4" size={28} />
-              <span className="text-label-tag text-[#8A8880]">// FLAGSHIP PRIZE POOL</span>
-              <h3 className="text-h2-scale text-[#F0EDE6] mt-3 uppercase">TSEC Hacks 2026</h3>
-              <p className="text-body-scale text-[#8A8880] mt-4 max-w-lg">
-                500+ registered builders. 48-hour national hackathon. Cash prizes, mentorship, and production deployment experience.
-              </p>
-            </GlassCard>
-          </BentoMotion>
-          <BentoMotion delay={0.1}>
-            <GlassCard className="p-8 h-full metric-podium-2 glass-card-glow flex flex-col justify-center">
-              <span className="text-label-tag text-[#8A8880]">// WEEKLY REWARDS</span>
-              <p className="font-display text-5xl font-bold text-[#4BE2C4] mt-3 neon-text-cyan">#048</p>
-              <p className="font-mono text-xs text-[#8A8880] mt-2">Live challenge · Leaderboard XP</p>
-            </GlassCard>
-          </BentoMotion>
-        </div>
+        {/* Removed flagship prize + weekly rewards cards as requested */}
 
-        <GlassCard hover={false} className="py-6 overflow-hidden mb-6">
-          <div className="premium-marquee px-6" style={{ animationDuration: `${perkDuration}s` }}>
-            {[...swagPerks, ...swagPerks, ...swagPerks, ...swagPerks].map((perk, i) => {
-              const Icon = perk.icon;
-              return (
-                <div key={`${perk.label}-${i}`} className="flex items-center gap-3 shrink-0 px-4">
-                  <Icon size={16} className="text-[#4BE2C4]" />
-                  <span className="font-mono text-xs text-[#8A8880] tracking-wider uppercase whitespace-nowrap">
-                    {perk.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </GlassCard>
+        {/* Swag perks marquee removed per request */}
 
-        <GlassCard hover={false} className="py-8 overflow-hidden">
-          <div className="premium-marquee flex items-center h-20" style={{ animationDuration: `${sponsorDuration}s` }}>
+        <GlassCard hover={false} className="py-10 overflow-hidden">
+          <div className="premium-marquee flex items-center h-28 md:h-36" style={{ animationDuration: `${sponsorDuration}s` }}>
             {[...sponsorLogos, ...sponsorLogos, ...sponsorLogos, ...sponsorLogos].map((logo, idx) => (
-              <div key={idx} className="shrink-0 flex items-center justify-center px-6 md:px-10 min-w-[120px]">
-                <Image
-                  src={`${logo.src}?v=2`}
-                  alt={logo.alt}
-                  width={150}
-                  height={80}
-                  className="w-32 md:w-44 h-auto max-h-16 object-contain opacity-80 hover:opacity-100 transition-opacity"
-                  style={{ transform: logo.scale ? `scale(${logo.scale})` : "none" }}
-                  unoptimized
-                />
+              <div key={idx} className="shrink-0 flex items-center justify-center px-8 md:px-12 min-w-[160px] md:min-w-[240px]">
+                <div className="p-3 md:p-4 rounded-xl bg-[#050505]/60 border border-[#222] flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:scale-105">
+                  <Image
+                    src={`${logo.src}?v=2`}
+                    alt={logo.alt}
+                    width={220}
+                    height={100}
+                    className="w-36 md:w-56 h-auto max-h-20 md:max-h-28 object-contain transition-transform duration-300"
+                    style={{ transform: logo.scale ? `scale(${logo.scale})` : "none" }}
+                    unoptimized
+                  />
+                </div>
               </div>
             ))}
           </div>

@@ -56,6 +56,8 @@ const teamCrew = [
   { name: "Tarunpreet Uppal", role: "", handle: "@tarunpreet.u", photo: "/team_lead.png", team: "jcom", github: "https://github.com/Tarun-Uppal", linkedin: "https://www.linkedin.com/in/-tarunuppal/" },
   { name: "Dhanvin Penkar", role: "", handle: "@dhanvin.p", photo: "/Codecell%20Jcoms%20pics/Dhanvin_Photo.png", team: "jcom", github: "https://github.com/DaddyisLegit", linkedin: "https://in.linkedin.com/in/dhanvin-penkar-4356943b9" },
   { name: "Jordan Mendonca", role: "", handle: "@jordan.m", photo: "/Codecell%20Jcoms%20pics/Jordan_Photo.jpg", team: "jcom", github: "https://github.com/jordan210507", linkedin: "https://www.linkedin.com/in/jordan21/" },
+  // Associated professor (image located in public/professor/associated_prof.jpeg)
+  { name: "Associated Professor", role: "Associated Professor", handle: "", photo: "/professor/associated_prof.jpeg", team: "assoc", github: "", linkedin: "" },
 ];
 
 const values = [
@@ -97,7 +99,7 @@ const faqs: FaqItem[] = [
   },
   {
     q: "How do I participate in weekly challenges?",
-    a: "Simply navigate to our /challenges portal, sign in with your student credentials, and solve the open problems inside our web compiler. Your points will be automatically added to the global leaderboard.",
+    a: "Simply navigate to our /dashboard portal, sign in with your student credentials, and solve the open problems inside our web compiler. Your points will be automatically added to the global leaderboard.",
   },
   {
     q: "What technologies does CodeCell focus on?",
@@ -114,7 +116,7 @@ const faqs: FaqItem[] = [
 ];
 
 function CrewCarousel() {
-  const [activeTab, setActiveTab] = useState<"Scom" | "jcom">("Scom");
+  const [activeTab, setActiveTab] = useState<"Scom" | "jcom" | "assoc">("assoc");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const filteredTeam = teamCrew.filter(m => m.team === activeTab);
@@ -135,6 +137,12 @@ function CrewCarousel() {
   return (
     <div className="w-full relative">
       <div className="flex justify-center gap-4 mb-8">
+        <button
+          onClick={() => setActiveTab("assoc")}
+          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors border rounded-sm ${activeTab === "assoc" ? "bg-[#B388FF]/10 border-[#B388FF] text-[#B388FF]" : "border-[#333] text-[#888] hover:border-[#B388FF]/50 hover:text-[#ccc]"}`}
+        >
+          Associate Professor
+        </button>
         <button
           onClick={() => setActiveTab("Scom")}
           className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors border rounded-sm ${activeTab === "Scom" ? "bg-[#4BE2C4]/10 border-[#4BE2C4] text-[#4BE2C4]" : "border-[#333] text-[#888] hover:border-[#4BE2C4]/50 hover:text-[#ccc]"}`}
@@ -174,7 +182,7 @@ function CrewCarousel() {
                 </div>
                 <div className="p-4 border-t border-[#111111] flex-1 bg-[#050505] relative z-10">
                   <h4 className="font-sans text-sm font-semibold text-[#F0EDE6] truncate">{member.name}</h4>
-                  <p className={`font-mono text-[9px] mt-1 truncate ${activeTab === "Scom" ? "text-[#E8FF00]" : "text-[#4BE2C4]"}`}>{member.role}</p>
+                  <p className={`font-mono text-[9px] mt-1 truncate ${activeTab === "Scom" ? "text-[#E8FF00]" : activeTab === "jcom" ? "text-[#4BE2C4]" : "text-[#B388FF]"}`}>{member.role}</p>
                   <p className="font-mono text-[9px] text-[#8A8880] mt-0.5">{member.handle}</p>
                 </div>
               </GlassCard>
@@ -215,7 +223,7 @@ export default function AboutUsPage() {
               </p>
             </div>
             <Link
-              href="/challenges"
+              href="/dashboard"
               className="inline-flex items-center gap-2 mt-10 font-mono text-xs tracking-widest text-[#4BE2C4] hover:text-[#E8FF00] transition-colors"
             >
               ENTER SANDBOX →

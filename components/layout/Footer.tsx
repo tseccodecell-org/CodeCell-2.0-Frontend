@@ -16,10 +16,7 @@ import PrivacyPolicyModal from "./PrivacyPolicyModal";
 export default function Footer() {
   const pathname = usePathname();
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
-  const isEventPage = pathname.startsWith("/dashboard") || 
-                      pathname.startsWith("/tsec-hacks") || 
-                      pathname.startsWith("/dive-to-code") || 
-                      pathname.startsWith("/brain2win");
+  const isEventPage = pathname.startsWith("/dashboard");
 
   const primaryAccent = isEventPage ? "#D4AF37" : "#4BE2C4";
   const secondaryAccent = isEventPage ? "#F5E6A3" : "#E8FF00";
@@ -69,18 +66,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/challenges" className="hover:text-[#E8FF00] transition-colors duration-200">
-                  Weekly Challenges
-                </Link>
-              </li>
-              <li>
                 <Link href="/about-us" className="hover:text-[#E8FF00] transition-colors duration-200">
                   About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/tsec-hacks" className="hover:text-[#E8FF00] transition-colors duration-200">
-                  TSEC Hacks
                 </Link>
               </li>
             </ul>

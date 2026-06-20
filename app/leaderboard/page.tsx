@@ -37,10 +37,10 @@ export default function LeaderboardPage() {
     <div className="min-h-screen bg-[#0A0A0A] px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto flex flex-col">
       {/* Back to Challenges */}
       <div className="mb-8">
-        <Link href="/challenges">
+        <Link href="/dashboard">
           <button className="flex items-center gap-2 text-xs font-mono text-[#8A8880] hover:text-[#D4AF37] transition-colors">
             <ChevronLeft size={14} />
-            RETURN TO THE BOARD
+            RETURN TO THE ARENA
           </button>
         </Link>
       </div>

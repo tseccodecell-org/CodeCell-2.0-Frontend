@@ -14,16 +14,18 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "HOME", href: "/" },
-  {
-    label: "EVENTS",
-    href: "/events",
-    dropdownItems: [
-      { label: "TSEC HACKS", href: "/tsec-hacks" },
-      { label: "WEEKLY CHALLENGES", href: "/challenges" },
-      { label: "DIVE TO CODE", href: "/dive-to-code" },
-      { label: "BRAIN2WIN", href: "/brain2win" },
-    ],
-  },
+  { label: "WEEKLY_CHALLENGES", href:"/challenges"}, 
+  { label: "EVENTS", href:"/events"}, 
+  // {
+  //   label: "EVENTS",
+  //   href: "/events",
+  //   dropdownItems: [
+  //     { label: "TSEC HACKS", href: "/tsec-hacks" },
+  //     { label: "WEEKLY CHALLENGES", href: "/challenges" },
+  //     { label: "DIVE TO CODE", href: "/dive-to-code" },
+  //     { label: "BRAIN2WIN", href: "/brain2win" },
+  //   ],
+  // },
   { label: "ABOUT US", href: "/about-us" },
 ];
 

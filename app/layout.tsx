@@ -32,7 +32,7 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "TSEC CodeCell | Terminal Meets Gallery",
+  title: "TSEC CodeCell",
   description: "The official coding committee of Thadomal Shahani Engineering College",
 };
 

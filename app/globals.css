@@ -710,6 +710,9 @@
   -webkit-text-stroke: 0px transparent;
   text-shadow: none;
   filter: none;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 .title-tsec-ref::after,

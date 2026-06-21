@@ -77,7 +77,7 @@ export default function Home() {
 
         {/* ========== CENTRAL TITLE BLOCK ========== */}
         <div className="relative z-10 text-center select-none" style={{ lineHeight: 0.9 }}>
-          <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: "easeOut" }}>
+          <motion.div className="inline-flex flex-col items-center" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: "easeOut" }}>
             <div className="title-tsec-ref about-hero-shine" data-text="TSEC" style={{
               fontFamily: "'Orbitron', 'Arial Black', 'Impact', sans-serif",
               fontSize: 'clamp(80px, 12vw, 140px)',

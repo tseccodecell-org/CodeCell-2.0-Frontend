@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
     href: "/events",
     dropdownItems: [
       { label: "TSEC HACKS", href: "/events/tsec-hacks" },
-      { label: "WEEKLY CHALLANGES", href: "/events/weekly-challanges" },
+      { label: "WEEKLY CHALLENGES", href: "/events/weekly-challenges" },
       { label: "MINI EVENT", href: "/events/mini-event" },
     ],
   },
@@ -63,9 +63,9 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isEventPage = pathname.startsWith("/dashboard") || 
-                      pathname.startsWith("/leaderboard") || 
-                      pathname.startsWith("/events");
+  const isEventPage = pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/leaderboard") ||
+    pathname.startsWith("/events");
 
   const primaryAccent = isEventPage ? "#D4AF37" : "#4BE2C4";
   const secondaryAccent = isEventPage ? "#F5E6A3" : "#E8FF00";
@@ -76,8 +76,8 @@ export default function Navbar() {
       <div
         ref={progressRef}
         className="fixed top-0 left-0 h-[2px] z-[9999]"
-        style={{ 
-          width: "0%", 
+        style={{
+          width: "0%",
           willChange: "width",
           background: `linear-gradient(to right, ${primaryAccent}, ${secondaryAccent})`,
           boxShadow: isEventPage ? `0 0 10px ${primaryAccent}40` : "none"
@@ -160,9 +160,8 @@ export default function Navbar() {
                       </span>
                       <ChevronDown
                         size={12}
-                        className={`transition-transform duration-200 ${
-                          activeDropdown === item.label ? "rotate-180" : ""
-                        }`}
+                        className={`transition-transform duration-200 ${activeDropdown === item.label ? "rotate-180" : ""
+                          }`}
                       />
                     </button>
 
@@ -183,34 +182,35 @@ export default function Navbar() {
 
                     {/* Dropdown Menu */}
                     {activeDropdown === item.label && (
-                      <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 ${isEventPage ? "bg-[#0A0A0A] border-[#D4AF37]/20 shadow-[0_8px_32px_rgba(212,175,55,0.05)]" : "bg-[#0D0D0D] border-[#2A2A2A] shadow-[0_8px_32px_rgba(0,0,0,0.8)]"} border py-2 flex flex-col z-[1000] backdrop-blur-md bg-opacity-95`}>
-                        {item.dropdownItems.map((subItem) => {
-                          const isSubItemActive = pathname === subItem.href;
-                          return (
-                            <Link
-                              key={subItem.label}
-                              href={subItem.href}
-                              className={`
-                                px-4
-                                py-2.5
-                                text-[10px]
-                                font-mono
-                                font-bold
-                                tracking-wider
-                                transition-colors
-                                duration-200
-                                border-l-2
-                                ${
-                                  isSubItemActive
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 z-[1000]">
+                        <div className={`w-full ${isEventPage ? "bg-[#0A0A0A] border-[#D4AF37]/20 shadow-[0_8px_32px_rgba(212,175,55,0.05)]" : "bg-[#0D0D0D] border-[#2A2A2A] shadow-[0_8px_32px_rgba(0,0,0,0.8)]"} border py-2 flex flex-col backdrop-blur-md bg-opacity-95`}>
+                          {item.dropdownItems.map((subItem) => {
+                            const isSubItemActive = pathname === subItem.href;
+                            return (
+                              <Link
+                                key={subItem.label}
+                                href={subItem.href}
+                                className={`
+                                  px-4
+                                  py-2.5
+                                  text-[10px]
+                                  font-mono
+                                  font-bold
+                                  tracking-wider
+                                  transition-colors
+                                  duration-200
+                                  border-l-2
+                                  ${isSubItemActive
                                     ? (isEventPage ? "text-[#D4AF37] border-[#D4AF37] bg-[#D4AF37]/5" : "text-[#E8FF00] border-[#E8FF00] bg-[#141414]")
                                     : (isEventPage ? "text-[#8A8880] border-transparent hover:text-[#F0EDE6] hover:bg-[#D4AF37]/5 hover:border-[#D4AF37]/50" : "text-[#4A4A4A] border-transparent hover:text-[#F0EDE6] hover:bg-[#141414] hover:border-[#4BE2C4]")
-                                }
-                              `}
-                            >
-                              [ {subItem.label} ]
-                            </Link>
-                          );
-                        })}
+                                  }
+                                `}
+                              >
+                                [ {subItem.label} ]
+                              </Link>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -334,7 +334,7 @@ export default function Navbar() {
                           font-bold
                           tracking-[0.15em]
                           py-2
-                          h-[32px]
+                          h-[42px]
                           flex
                           items-center
                           justify-between
@@ -346,9 +346,8 @@ export default function Navbar() {
                         <span>{item.label}</span>
                         <ChevronDown
                           size={14}
-                          className={`transition-transform duration-200 ${
-                            isMobileOpen ? "rotate-180" : ""
-                          }`}
+                          className={`transition-transform duration-200 ${isMobileOpen ? "rotate-180" : ""
+                            }`}
                         />
                       </button>
 
@@ -394,7 +393,7 @@ export default function Navbar() {
                       py-2
                       border-b
                       border-[#161616]
-                      h-[32px]
+                      h-[42px]
                       flex
                       items-center
                       transition-all

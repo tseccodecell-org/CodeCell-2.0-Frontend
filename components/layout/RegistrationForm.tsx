@@ -236,24 +236,7 @@ export function RegistrationForm() {
                                 </div>
                             </div>
 
-                            <div className="pt-2">
-                                <button
-                                    onClick={() => {
-                                        setFormData({
-                                            fullName: "",
-                                            collegeName: "",
-                                            yearOfStudy: "",
-                                            course: "",
-                                            location: "",
-                                        });
-                                        setActiveStep(1);
-                                        setIsRegistered(false);
-                                    }}
-                                    className="px-6 py-2.5 bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white font-semibold text-xs rounded-xl uppercase tracking-wider hover:bg-zinc-800 transition duration-300 cursor-pointer"
-                                >
-                                    Create New Registration
-                                </button>
-                            </div>
+
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-6 relative z-10">

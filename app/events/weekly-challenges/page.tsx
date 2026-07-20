@@ -23,7 +23,7 @@ export default function WeeklyChallengesPage() {
 
         <Link
           href="/register"
-          className="inline-flex items-center justify-center rounded-full border border-[#4BE2C4]/50 hover:bg-[#4BE2C4] px-10 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-[#F0EDE6] hover:text-[#0d0d0d] transition duration-300 transform active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(75,226,196,0.05)] hover:shadow-[0_0_20px_rgba(75,226,196,0.3)]"
+          className="inline-flex items-center justify-center rounded-full border border-[#4BE2C4]/40 hover:border-transparent px-10 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-[#F0EDE6] hover:text-[#0d0d0d] hover:bg-gradient-to-r hover:from-[#4BE2C4] hover:to-[#E8FF00] transition-all duration-300 transform active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(75,226,196,0.05)] hover:shadow-[0_0_25px_rgba(75,226,196,0.3)]"
         >
           Register Now
         </Link>

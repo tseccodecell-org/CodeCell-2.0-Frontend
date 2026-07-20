@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono, Inter, Orbitron } from "next/font/google";
 
+
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Loader from "@/components/layout/Loader";
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
+
+import { Providers } from "./providers";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -50,6 +53,8 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable} ${orbitron.variable}`}
     >
       <body className="antialiased">
+        <Providers>
+
         <InteractiveGrid />
         <Loader />
         <Navbar />
@@ -59,6 +64,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        </Providers>
       </body>
     </html>
   );

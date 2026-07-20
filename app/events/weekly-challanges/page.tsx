@@ -10,10 +10,10 @@ export default function WeeklyChallangesPage() {
           This section is being built right now. Stay tuned for weekly challenge announcements, practice problems, and event details.
         </p>
         <Link
-          href="/"
+          href="/register"
           className="inline-flex items-center justify-center rounded-full border border-[#4BE2C4]/60 px-8 py-3 text-sm font-bold uppercase tracking-[0.24em] text-[#F0EDE6] transition duration-200 hover:border-[#E8FF00]/80 hover:text-[#E8FF00]"
         >
-          Return Home
+          Register Now
         </Link>
       </div>
     </main>

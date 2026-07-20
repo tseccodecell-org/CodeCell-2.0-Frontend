@@ -8,9 +8,7 @@ export default function WeeklyChallengesPage() {
         <div className="absolute top-0 right-0 w-40 h-40 bg-[#4BE2C4]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#E8FF00]/10 rounded-full blur-3xl pointer-events-none" />
 
-        <p className="mb-4 text-xs uppercase tracking-[0.4em] text-[#4BE2C4] font-semibold">
-          EVENTS / WEEKLY CHALLENGES
-        </p>
+
 
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 uppercase leading-tight font-display">
           Weekly challenges <br className="hidden sm:inline" />

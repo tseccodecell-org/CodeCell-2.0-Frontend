@@ -4,24 +4,37 @@ import React from "react";
 
 export function CyberGrid() {
     return (
-        <div className="absolute inset-0 -z-50 overflow-hidden bg-black select-none pointer-events-none">
-            {/* Very faint, premium ambient gold blur at the top center */}
+        <div className="absolute inset-0 -z-50 overflow-hidden bg-[#0a0a0a] select-none pointer-events-none">
+            {/* Subtle grid pattern */}
             <div
-                className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[70vw] h-[40vw] max-w-[1000px] rounded-full opacity-20 pointer-events-none"
+                className="absolute inset-0 opacity-[0.02]"
                 style={{
-                    background: "radial-gradient(circle at center, rgba(212, 175, 55, 0.25) 0%, rgba(22, 22, 23, 0.05) 70%, transparent 100%)",
-                    filter: "blur(80px)"
+                    backgroundImage: `
+            linear-gradient(to right, #4BE2C4 1px, transparent 1px),
+            linear-gradient(to bottom, #4BE2C4 1px, transparent 1px)
+          `,
+                    backgroundSize: "40px 40px",
                 }}
             />
 
-            {/* Subtle bottom-right lighting for depth */}
+            {/* Faint, premium ambient cyan blur at the top center */}
             <div
-                className="absolute bottom-[-15%] right-[10%] w-[35vw] h-[35vw] rounded-full opacity-10 pointer-events-none"
+                className="absolute top-[-30%] left-[50%] -translate-x-1/2 w-[80vw] h-[50vw] max-w-[1000px] rounded-full opacity-30 pointer-events-none"
                 style={{
-                    background: "radial-gradient(circle at center, rgba(212, 175, 55, 0.12) 0%, transparent 80%)",
-                    filter: "blur(120px)"
+                    background: "radial-gradient(circle at center, rgba(75, 226, 196, 0.18) 0%, transparent 70%)",
+                    filter: "blur(130px)"
+                }}
+            />
+
+            {/* Subtle bottom-right lighting for depth using theme lime */}
+            <div
+                className="absolute bottom-[-20%] right-[10%] w-[50vw] h-[50vw] rounded-full opacity-20 pointer-events-none"
+                style={{
+                    background: "radial-gradient(circle at center, rgba(232, 255, 0, 0.12) 0%, transparent 80%)",
+                    filter: "blur(150px)"
                 }}
             />
         </div>
     );
 }
+

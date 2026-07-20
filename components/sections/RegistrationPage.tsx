@@ -1,30 +1,20 @@
-
 import { CyberGrid } from "../layout/CyberGrid";
 import { RegistrationForm } from "../layout/RegistrationForm";
 
-
-export const metadata = {
-  title: "Weekly Challenges Registration",
-  description: "Register for the weekly strategic challenge events.",
-};
-
 export default function RegistrationPage() {
   return (
-    <main className="relative min-h-screen flex flex-col justify-between overflow-x-hidden font-sans bg-black">
-
-      {/* Subtle Apple-style background golds and rich blacks */}
+    <main className="relative min-h-screen flex flex-col justify-between overflow-x-hidden font-sans bg-[#0a0a0a]">
+      {/* Background lights and grid */}
       <CyberGrid />
 
-
-
       {/* Main Form Center Panel */}
-      <div className="flex-1 flex flex-col items-center justify-center py-10 z-30 select-text">
-        <div className="w-full text-center max-w-2xl px-4 mb-4">
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-white inline-block mb-3.5">
-            Weekly Challenges Registration
-          </h2>
-          <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed font-medium">
-            Enter your credentials and academic details to register for the upcoming week's competition.
+      <div className="flex-1 flex flex-col items-center justify-center py-12 md:py-20 z-30 select-text">
+        <div className="w-full text-center max-w-2xl px-6 mb-8">
+          <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
+            Weekly Challenges <span className="bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] bg-clip-text text-transparent">Registration</span>
+          </h1>
+          <p className="text-sm md:text-base text-zinc-400 max-w-md mx-auto leading-relaxed font-normal">
+            Verify your account and complete your academic profile to participate in the upcoming weekly challenges.
           </p>
         </div>
 
@@ -32,18 +22,17 @@ export default function RegistrationPage() {
         <RegistrationForm />
       </div>
 
-      {/* Apple-style clean footer */}
-      <footer className="w-full border-t border-zinc-950 bg-black/95 py-5 px-6 z-40 text-center text-[10px] text-zinc-650 tracking-wider">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between space-y-2.5 md:space-y-0 text-zinc-500 font-medium">
+      {/* Clean elegant footer */}
+      <footer className="w-full border-t border-zinc-900/50 bg-[#0c0c0c]/80 backdrop-blur-md py-6 px-6 z-40 text-center text-xs text-zinc-500 font-normal">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <span>Official participant registration for weekly challenge sessions.</span>
+            <span>Official participant portal for weekly competition sessions.</span>
           </div>
           <div>
-            <span>© {new Date().getFullYear()} Challenge Commission. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} TSEC CodeCell. All rights reserved.</span>
           </div>
         </div>
       </footer>
-
     </main>
   );
 }

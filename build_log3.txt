@@ -1,0 +1,287 @@
+﻿   Γû▓ Next.js 15.5.18
+   - Environments: .env
+
+   Creating an optimized production build ...
+node.exe : Found 11 
+warnings while optimizing 
+generated CSS:
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE $NPX_CLI_JS 
+$args
++   ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo          
+    : NotSpecified: (Found  
+   11 warnin... generated   
+  CSS::String) [], Remot    
+eException
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+
+Issue #1:
+[2mΓöé     filter: 
+drop-shadow(0 10px 28px 
+rgba(0, 180, 216, 
+0.12));[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-keyboard {
+[2mΓöå[22m                
+            
+[33m[2m^--[22m Unknown 
+at rule: @keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(-2deg);[22m
+
+Issue #2:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-code {
+[2mΓöå[22m                
+        [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(1deg);[22m
+
+Issue #3:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-badge1 {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(0.5deg);[22m
+
+Issue #4:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-badge2 {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(-0.6deg);[22m
+
+Issue #5:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-tile-a {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(-0.2deg);[22m
+
+Issue #6:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-tile-b {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(0.2deg);[22m
+
+Issue #7:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-tile-c {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(-0.9deg);[22m
+
+Issue #8:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-tile-d {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(0.2deg);[22m
+
+Issue #9:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-server {
+[2mΓöå[22m                
+          [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(0.1deg);[22m
+
+Issue #10:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+float-stats {
+[2mΓöå[22m                
+         [33m[2m^--[22m 
+Unknown at rule: 
+@keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       transform: 
+translateY(0) 
+rotate(-0.2deg);[22m
+
+Issue #11:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @keyframes 
+pulse-loading {
+[2mΓöå[22m                
+           
+[33m[2m^--[22m Unknown 
+at rule: @keyframes[39m
+[2mΓöå[22m
+[2mΓöé     0% {[22m
+[2mΓöé       opacity: 
+0.22;[22m
+
+ Γ£ô Compiled successfully in 30.5s
+   Skipping linting
+   Checking validity of types ...
+Failed to compile.
+
+./components/sections/weekly
+-challenges/Timeline.tsx:40:
+66
+Type error: No overload 
+matches this call.
+  Overload 1 of 2, '(props: 
+TimelineSceneProps, 
+context?: any): string | 
+number | bigint | boolean | 
+ReactElement<unknown, 
+string | 
+JSXElementConstructor<any>> 
+| ... 4 more ... | 
+undefined', gave the 
+following error.
+    Type 'import("E:/Codecel
+l-Website/lib/api-client").W
+eek[] | undefined' is not 
+assignable to type 'import("
+E:/Codecell-Website/componen
+ts/3d/TimelineScene").Week[]
+ | undefined'.
+      Type 'import("E:/Codec
+ell-Website/lib/api-client")
+.Week[]' is not assignable 
+to type 'import("E:/Codecell
+-Website/components/3d/Timel
+ineScene").Week[]'.
+        Type 'Week' is 
+missing the following 
+properties from type 
+'Week': week, piece, rank, 
+desc, difficulty
+  Overload 2 of 2, '(props: 
+TimelineSceneProps): string 
+| number | bigint | boolean 
+| ReactElement<unknown, 
+string | 
+JSXElementConstructor<any>> 
+| ... 4 more ... | 
+undefined', gave the 
+following error.
+    Type 'import("E:/Codecel
+l-Website/lib/api-client").W
+eek[] | undefined' is not 
+assignable to type 'import("
+E:/Codecell-Website/componen
+ts/3d/TimelineScene").Week[]
+ | undefined'.
+      Type 'import("E:/Codec
+ell-Website/lib/api-client")
+.Week[]' is not assignable 
+to type 'import("E:/Codecell
+-Website/components/3d/Timel
+ineScene").Week[]'.
+        Type 'Week' is 
+missing the following 
+properties from type 
+'Week': week, piece, rank, 
+desc, difficulty
+
+[0m [90m 38 |[39m       
+[33m<[39m[33mdiv[39m cla
+ssName[33m=[39m[32m"absol
+ute inset-0 
+z-0"[39m[33m>[39m
+ [90m 39 |[39m         
+[33m<[39m[33mdiv[39m cla
+ssName[33m=[39m[32m"stick
+y top-0 w-full 
+h-screen"[39m[33m>[39m
+[31m[1m>[22m[39m[90m 
+40 |[39m           [33m<[
+39m[33mTimelineSceneDynamic
+[39m scrollProgress[33m=[
+39m{scrollYProgress} 
+weeksData[33m=[39m{weeks} 
+[33m/[39m[33m>[39m
+ [90m    |[39m            
+                            
+                          
+[31m[1m^[22m[39m
+ [90m 41 |[39m         [3
+3m<[39m[33m/[39m[33mdiv
+[39m[33m>[39m
+ [90m 42 |[39m       [33m
+<[39m[33m/[39m[33mdiv[3
+9m[33m>[39m
+ [90m 43 |[39m[0m
+Next.js build worker exited 
+with code: 1 and signal: 
+null

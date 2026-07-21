@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Loader from "@/components/layout/Loader";
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
+import { Providers } from "./providers";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -57,15 +58,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="antialiased" suppressHydrationWarning>
-        <InteractiveGrid />
-        <Loader />
-        <Navbar />
+        <Providers>
+          <InteractiveGrid />
+          <Loader />
+          <Navbar />
 
-        {/* Prevent navbar overlap */}
-        <main className="relative z-10 min-h-screen">
-          {children}
-        </main>
-        <Footer />
+          {/* Prevent navbar overlap */}
+          <main className="relative z-10 min-h-screen">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

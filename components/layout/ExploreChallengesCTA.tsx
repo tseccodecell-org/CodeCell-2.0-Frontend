@@ -11,7 +11,7 @@ export function ExploreChallengesCTA({ variant = "default" }: { variant?: "defau
       className="inline-block"
     >
       <Link
-        href="/challenges"
+        href="/register"
         className={`group relative inline-flex items-center gap-3 rounded-full glass-gold overflow-hidden
           ${variant === "large" ? "px-8 py-4 text-base" : "px-6 py-3 text-sm"}
           font-medium tracking-wide text-foreground transition-all

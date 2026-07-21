@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
     href: "/events",
     dropdownItems: [
       { label: "TSEC HACKS", href: "/events/tsec-hacks" },
-      { label: "WEEKLY CHALLANGES", href: "/events/weekly-challanges" },
+      { label: "WEEKLY CHALLENGES", href: "/events/weekly-challenges" },
       { label: "MINI EVENT", href: "/events/mini-event" },
     ],
   },
@@ -65,7 +65,8 @@ export default function Navbar() {
 
   const isEventPage = pathname.startsWith("/dashboard") ||
     pathname.startsWith("/leaderboard") ||
-    pathname.startsWith("/events");
+    pathname.startsWith("/events") ||
+    pathname.startsWith("/register");
 
   const primaryAccent = isEventPage ? "#D4AF37" : "#4BE2C4";
   const secondaryAccent = isEventPage ? "#F5E6A3" : "#E8FF00";

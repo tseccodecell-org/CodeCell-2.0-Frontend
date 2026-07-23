@@ -10,6 +10,8 @@ export default function LoginPage() {
     // We don't need to check localStorage here anymore.
   }, []);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+
   return (
     <div className="min-h-[calc(100vh-80px)] bg-transparent flex items-center justify-center px-6 py-12 select-none">
       <div className="w-full max-w-md border border-[#2A2A2A] bg-[#111111]/80 backdrop-blur-sm p-8 font-mono shadow-2xl relative">
@@ -43,7 +45,7 @@ export default function LoginPage() {
             <span className="uppercase">OAUTH_V2</span>
           </div>
           <button
-            onClick={() => window.location.href = "http://localhost:8080/oauth/google/login"}
+            onClick={() => (window.location.href = `${BASE_URL}/oauth/google/login`)}
             className="
               w-full 
               bg-white text-black 

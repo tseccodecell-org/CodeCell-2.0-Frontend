@@ -112,6 +112,14 @@ export default function Footer() {
                   Privacy Policy
                 </button>
               </li>
+              <li>
+                <Link
+                  href="/codeofconduct"
+                  className="hover:text-[#F0EDE6] transition-colors duration-200"
+                >
+                  Code of Conduct
+                </Link>
+              </li>
               <li className="text-[10px] font-mono text-[#4A4A4A] mt-2 select-none uppercase tracking-widest">
                 VER: 2026.06.01
               </li>

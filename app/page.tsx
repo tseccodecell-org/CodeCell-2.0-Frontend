@@ -10,7 +10,7 @@ import HomeSections from "@/components/sections/HomeSections";
 
 // Flawless hexagonal cut-corner CTA button
 const HexagonalButton = ({ href }: { href: string }) => (
-  <a href="/login" className="relative group block w-fit">
+  <a href={href} className="relative group block w-fit">
     <div
       className="relative bg-transparent p-[1.5px] drop-shadow-[0_0_15px_rgba(75,226,196,0.3)] transition-all duration-300 group-hover:drop-shadow-[0_0_25px_rgba(232,255,0,0.5)]"
       style={{
@@ -25,7 +25,7 @@ const HexagonalButton = ({ href }: { href: string }) => (
           paddingLeft: "calc(3rem + 0.18em)"
         }}
       >
-        LOGIN
+        REGISTER FOR WEEKLY CHALLENGES
       </div>
     </div>
   </a>
@@ -123,7 +123,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col items-center gap-4 mt-8 md:mt-12">
-            <HexagonalButton href="/login" />
+            <HexagonalButton href="/events/weekly-challenges" />
           </motion.div>
         </div>
 

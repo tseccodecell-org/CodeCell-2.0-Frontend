@@ -212,25 +212,34 @@ export default function CodeOfConductPage() {
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
               <span className="text-[#4BE2C4]">6.</span> AI and External Tools
             </h2>
-            <p className="mb-3 text-[#8A8880]">Unless explicitly prohibited in a specific challenge:</p>
-            <ul className="space-y-3 list-none font-sans">
+            <p className="mb-4 text-[#C0BEB8]">
+              To ensure a fair and skill-based competition, the use of Artificial Intelligence (AI) tools is strictly prohibited during the active submission window of every weekly challenge.
+            </p>
+            <p className="mb-4 text-[#C0BEB8]">
+              Participants must solve all problems independently using their own knowledge and programming skills.
+            </p>
+            <p className="mb-3 font-semibold text-[#F0EDE6]">The following actions are strictly prohibited:</p>
+            <ul className="space-y-3 list-none font-sans mb-6">
               <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>AI coding assistants (e.g., ChatGPT, GitHub Copilot, Gemini, Claude) may be used as learning aids.</span>
+                <span className="text-[#FF4D4D] mt-1">•</span>
+                <span>Using AI to generate complete or partial solutions.</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Participants remain fully responsible for understanding any generated code.</span>
+                <span className="text-[#FF4D4D] mt-1">•</span>
+                <span>Using AI to explain problem statements or suggest algorithms during the contest.</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Blindly submitting AI-generated solutions without comprehension is discouraged.</span>
+                <span className="text-[#FF4D4D] mt-1">•</span>
+                <span>Using AI-generated code with or without modification.</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Any challenge-specific restrictions regarding AI usage will supersede this policy.</span>
+                <span className="text-[#FF4D4D] mt-1">•</span>
+                <span>Using browser extensions or IDE plugins that provide AI-assisted coding.</span>
               </li>
             </ul>
+            <p className="font-mono text-xs font-bold text-[#E8FF00] uppercase tracking-wider">
+              All decisions made by the us regarding AI usage and rule violations shall be final and binding.
+            </p>
           </section>
 
           {/* Section 7 */}

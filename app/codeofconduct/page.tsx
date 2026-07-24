@@ -185,32 +185,7 @@ export default function CodeOfConductPage() {
           {/* Section 5 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">5.</span> GitHub and Code Repository
-            </h2>
-            <ul className="space-y-3 list-none font-sans">
-              <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Participants are encouraged to maintain a GitHub repository containing their weekly solutions.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>The organizing committee may request repository access for verification purposes, especially for shortlisted participants.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Repository history should accurately reflect the participant's development process.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Attempts to manipulate commit history or conceal copied work may result in disciplinary action.</span>
-              </li>
-            </ul>
-          </section>
-
-          {/* Section 6 */}
-          <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
-            <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">6.</span> AI and External Tools
+              <span className="text-[#4BE2C4]">5.</span> AI and External Tools
             </h2>
             <p className="mb-4 text-[#C0BEB8]">
               To ensure a fair and skill-based competition, the use of Artificial Intelligence (AI) tools is strictly prohibited during the active submission window of every weekly challenge.
@@ -242,10 +217,10 @@ export default function CodeOfConductPage() {
             </p>
           </section>
 
-          {/* Section 7 */}
+          {/* Section 6 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">7.</span> Collaboration Policy
+              <span className="text-[#4BE2C4]">6.</span> Collaboration Policy
             </h2>
             <div className="space-y-4 font-sans">
               <div>
@@ -285,10 +260,10 @@ export default function CodeOfConductPage() {
             </div>
           </section>
 
-          {/* Section 8 */}
+          {/* Section 7 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">8.</span> Leaderboard and XP
+              <span className="text-[#4BE2C4]">7.</span> Leaderboard and XP
             </h2>
             <p className="mb-3 font-semibold text-[#F0EDE6]">XP is awarded based on:</p>
             <ul className="space-y-3 list-none font-sans mb-6">
@@ -317,10 +292,10 @@ export default function CodeOfConductPage() {
             </p>
           </section>
 
-          {/* Section 9 */}
+          {/* Section 8 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">9.</span> Round 2 Eligibility
+              <span className="text-[#4BE2C4]">8.</span> Round 2 Eligibility
             </h2>
             <p className="mb-3 text-[#8A8880]">Only verified participants are eligible for the Offline Finale.</p>
             <p className="mb-3 font-semibold text-[#F0EDE6]">Qualification is based on:</p>
@@ -347,10 +322,10 @@ export default function CodeOfConductPage() {
             </div>
           </section>
 
-          {/* Section 10 */}
+          {/* Section 9 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">10.</span> Internship Opportunities
+              <span className="text-[#4BE2C4]">9.</span> Internship Opportunities
             </h2>
             <p className="mb-3 text-[#C0BEB8]">
               Round 2 qualifiers become eligible for internship opportunities offered by the event's hiring partners.
@@ -360,10 +335,10 @@ export default function CodeOfConductPage() {
             </p>
           </section>
 
-          {/* Section 11 */}
+          {/* Section 10 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">11.</span> Online Conduct
+              <span className="text-[#4BE2C4]">10.</span> Online Conduct
             </h2>
             <p className="mb-3 font-semibold text-[#F0EDE6]">Participants must not:</p>
             <ul className="space-y-3 list-none font-sans mb-6">
@@ -397,10 +372,10 @@ export default function CodeOfConductPage() {
             </p>
           </section>
 
-          {/* Section 12 */}
+          {/* Section 11 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">12.</span> Communication
+              <span className="text-[#4BE2C4]">11.</span> Communication
             </h2>
             <ul className="space-y-3 list-none font-sans">
               <li className="flex items-start gap-2">
@@ -418,11 +393,11 @@ export default function CodeOfConductPage() {
             </ul>
           </section>
 
-          {/* Section 13 */}
+          {/* Section 12 */}
           <section className="bg-[#121212] border border-[#FF4D4D]/30 p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#FF4D4D] uppercase tracking-wider mb-4 flex items-center gap-2">
               <ShieldAlert size={20} className="text-[#FF4D4D]" />
-              <span>13. Violations and Penalties</span>
+              <span>12. Violations and Penalties</span>
             </h2>
             <p className="mb-6 text-[#C0BEB8]">
               Depending on the severity of the violation, the organizing committee may impose one or more of the following actions:
@@ -466,10 +441,10 @@ export default function CodeOfConductPage() {
             </p>
           </section>
 
-          {/* Section 14 */}
+          {/* Section 13 */}
           <section className="bg-[#121212] border border-[#222222] p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
-              <span className="text-[#4BE2C4]">14.</span> Organizer Rights
+              <span className="text-[#4BE2C4]">13.</span> Organizer Rights
             </h2>
             <p className="mb-3 text-[#8A8880]">The Weekly Challenges Organizing Committee reserves the right to:</p>
             <ul className="space-y-3 list-none font-sans mb-6">
@@ -499,11 +474,11 @@ export default function CodeOfConductPage() {
             </p>
           </section>
 
-          {/* Section 15 */}
+          {/* Section 14 */}
           <section className="bg-[#121212] border border-[#4BE2C4]/40 p-6 md:p-8 rounded-lg">
             <h2 className="font-mono text-lg font-bold text-[#F0EDE6] uppercase tracking-wider mb-4 flex items-center gap-2">
               <CheckCircle2 size={20} className="text-[#4BE2C4]" />
-              <span>15. Acceptance of the Code of Conduct</span>
+              <span>14. Acceptance of the Code of Conduct</span>
             </h2>
             <p className="text-[#C0BEB8] leading-relaxed mb-4">
               By registering for Weekly Challenges 2026, participants acknowledge that they have read, understood, and agreed to abide by this Code of Conduct, the Fair Play Policy, and all event rules.

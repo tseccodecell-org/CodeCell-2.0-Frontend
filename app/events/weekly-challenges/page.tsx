@@ -1,36 +1,130 @@
-import Link from "next/link";
+"use client";
 
-export const metadata = {
-    title: "Weekly Challenges – TSEC CodeCell",
-    description: "Weekly Challenges registrations are live. Participate in weekly strategic matches and scale the CodeCell leaderboard.",
-};
+import { useState } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, ArrowRight, Trophy, Zap, ShieldCheck } from "lucide-react";
+import { Hero } from "@/components/sections/weekly-challenges/Hero";
+import { Overview } from "@/components/sections/weekly-challenges/Overview";
+import { Prizes } from "@/components/sections/weekly-challenges/Prizes";
+import { FAQ } from "@/components/sections/weekly-challenges/FAQ";
+import { FinalCTA } from "@/components/sections/weekly-challenges/FinalCTA";
 
 export default function WeeklyChallengesPage() {
-    return (
-        <main className="min-h-screen bg-[#080c08] text-[#E8FF00] flex items-center justify-center px-6 py-16 relative">
-            <div className="max-w-4xl text-center border border-[#4BE2C4]/25 bg-[#0d0d0d]/90 backdrop-blur-xl p-10 md:p-12 rounded-[32px] shadow-[0_0_80px_rgba(75,226,196,0.15)] relative overflow-hidden group">
-                {/* Ambient Glowing Overlays */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#4BE2C4]/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#E8FF00]/10 rounded-full blur-3xl pointer-events-none" />
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 uppercase leading-tight font-display">
-                    Weekly Challenges <br className="hidden sm:inline" />
-                    <span className="bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] bg-clip-text text-transparent">
-                        Registrations are live
-                    </span>
-                </h1>
+  return (
+    <main className="flex min-h-screen flex-col bg-[#02040A] text-white selection:bg-[#eab308]/30 selection:text-[#eab308] relative">
+      {/* Landing Page Content */}
+      <Hero onRegisterClick={() => setShowRegisterModal(true)} />
 
-                <p className="mx-auto max-w-2xl text-sm leading-relaxed text-zinc-400 mb-9">
-                    Participate in our weekly strategic matches, solve core programmatic problems, and scale the ranks of the CodeCell leaderboard. Put your skills to the test in this week&apos;s active events.
-                </p>
+      <Prizes />
+      <Overview />
+      <FAQ />
 
+      {/* Bottom CTA with Trigger */}
+      <div className="relative pb-16 flex justify-center">
+        <button
+          onClick={() => setShowRegisterModal(true)}
+          className="px-10 py-4 rounded-full border border-[#eab308]/60 bg-[#eab308]/15 text-[#eab308] hover:bg-[#eab308] hover:text-black font-mono font-black text-xs md:text-sm tracking-[0.25em] transition-all duration-300 shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:shadow-[0_0_50px_rgba(234,179,8,0.7)] transform active:scale-95 cursor-pointer"
+        >
+          [ CLAIM YOUR SPOT – REGISTER NOW ]
+        </button>
+      </div>
+
+      <FinalCTA />
+
+      {/* Floating Glowing CTA Button (Sticky Bottom Right) */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          onClick={() => setShowRegisterModal(true)}
+          className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
+        >
+          <span>Register Now</span>
+          <ArrowRight size={16} />
+        </button>
+      </div>
+
+      {/* Registration Dialog Modal */}
+      <AnimatePresence>
+        {showRegisterModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="w-full max-w-lg bg-[#070707] border border-[#eab308]/40 rounded-3xl p-8 shadow-[0_0_80px_rgba(234,179,8,0.2)] relative overflow-hidden text-white"
+            >
+              {/* Background Accent Glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#eab308]/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowRegisterModal(false)}
+                className="absolute top-5 right-5 text-gray-400 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Modal Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#eab308]/10 border border-[#eab308]/30 flex items-center justify-center text-[#eab308]">
+                  <Trophy size={24} />
+                </div>
+                <div>
+                  <span className="font-mono text-[10px] text-[#eab308] tracking-[0.25em] uppercase block">
+                    TSEC CODECELL 2026
+                  </span>
+                  <h2 className="font-sans font-extrabold text-xl md:text-2xl uppercase tracking-tight text-white">
+                    Weekly Challenges
+                  </h2>
+                </div>
+              </div>
+
+              <p className="text-zinc-300 text-sm leading-relaxed mb-6">
+                Enter the weekly arena, solve algorithmic problems, gain global XP, and qualify for the offline finale at TSEC!
+              </p>
+
+              {/* Highlights */}
+              <div className="space-y-3 mb-8 bg-[#0D0D0D] border border-white/10 rounded-2xl p-4 text-xs">
+                <div className="flex items-center gap-3 text-zinc-300">
+                  <Zap size={16} className="text-[#eab308] shrink-0" />
+                  <span>6 Weeks of curated competitive coding matches</span>
+                </div>
+                <div className="flex items-center gap-3 text-zinc-300">
+                  <ShieldCheck size={16} className="text-[#eab308] shrink-0" />
+                  <span>Exclusive certificates, prizes & internship perks</span>
+                </div>
+              </div>
+
+              {/* Proceed to Registration Action */}
+              <div className="flex flex-col gap-3">
                 <Link
-                    href="/register"
-                    className="inline-flex items-center justify-center rounded-full border border-[#4BE2C4]/40 hover:border-transparent px-10 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-[#F0EDE6] hover:text-[#0d0d0d] hover:bg-gradient-to-r hover:from-[#4BE2C4] hover:to-[#E8FF00] transition-all duration-300 transform active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(75,226,196,0.05)] hover:shadow-[0_0_25px_rgba(75,226,196,0.3)]"
+                  href="/register"
+                  onClick={() => setShowRegisterModal(false)}
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#eab308] to-[#f59e0b] text-black font-mono font-extrabold text-xs uppercase tracking-[0.2em] hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
                 >
-                    Register Now
+                  <span>Proceed to Registration</span>
+                  <ArrowRight size={16} />
                 </Link>
-            </div>
-        </main>
-    );
+                <button
+                  onClick={() => setShowRegisterModal(false)}
+                  className="w-full py-2 text-zinc-400 hover:text-white font-mono text-xs tracking-wider transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
+  );
 }
+

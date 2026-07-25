@@ -5,7 +5,11 @@ import { Playfair_Display } from "next/font/google";
 
 const playfair = Playfair_Display({ subsets: ["latin"] });
 
-export function Hero() {
+interface HeroProps {
+  onRegisterClick?: () => void;
+}
+
+export function Hero({ onRegisterClick }: HeroProps) {
   return (
     <section className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden bg-[#02040A] border-b border-[#eab308]/20">
       {/* Grid Background */}
@@ -124,17 +128,55 @@ export function Hero() {
           <span className="inline-block w-2 h-4 ml-3 bg-[#4ADE80] animate-pulse" />
         </motion.div>
 
+        {/* CTA Register Now Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="relative mt-8"
+        >
+          <button
+            onClick={onRegisterClick}
+            className="px-10 py-4 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] shadow-[0_0_35px_rgba(234,179,8,0.5)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
+          >
+            <span>REGISTER NOW</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+        </motion.div>
+
         {/* Bottom Features */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-          className="relative mt-14 text-[#8A8A8A] text-[10px] md:text-xs tracking-[0.25em] font-mono flex flex-wrap justify-center items-center gap-x-6 gap-y-2 pb-6 md:pb-0"
+          className="relative mt-12 md:mt-14 text-[#B0B0B0] text-xs md:text-sm tracking-[0.2em] font-mono flex flex-col justify-center items-center gap-y-3 md:gap-y-4 pb-6 md:pb-0 font-medium px-4 w-full"
         >
-          <span>6 WEEKS</span>
-          <span>N DSA PROBLEMS</span>
-          <span className="text-[#333]">•</span>
-          <span>THREE CHAMPIONS</span>
+          {/* Top Line */}
+          <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5 gap-y-2 text-center">
+            <span>6 WEEKS</span>
+            <span className="text-[#eab308]/60">•</span>
+            <span>1 CHALLENGE EVERY WEEK</span>
+            <span className="text-[#eab308]/60">•</span>
+            <span>30 HOUR WINDOW</span>
+            <span className="text-[#eab308]/60">•</span>
+            <span>TOP 20 FINALISTS</span>
+            <span className="text-[#eab308]/60">•</span>
+            <span>OFFLINE FINALE @ TSEC</span>
+          </div>
+
+          {/* Middle Line
+          <div className="flex flex-wrap justify-center items-center gap-x-4 md:gap-x-6 gap-y-2 text-center">
+            <span>3-HOUR ONSITE CONTEST</span>
+            <span className="text-[#eab308]/60">•</span>
+            <span>INTERNSHIP OPPORTUNITIES</span>
+          </div> */}
+
+          {/* Bottom Line Tagline */}
+          <div className="flex flex-wrap justify-center items-center gap-x-4 md:gap-x-6 gap-y-2 mt-2 md:mt-3 text-center">
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] font-bold text-sm md:text-base tracking-[0.3em] ml-[0.3em]">
+              CODE <span className="text-[#eab308] mx-2 md:mx-4">/</span> COMPETE <span className="text-[#eab308] mx-2 md:mx-4">/</span> CONQUER
+            </span>
+          </div>
         </motion.div>
 
         {/* Bottom Glowing Gradient Border */}

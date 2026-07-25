@@ -4,12 +4,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const FAQS = [
-  { q: "What are Weekly Challenges?", a: "Weekly Challenges is an 8-week intensive coding arena. Every week unlocks a new set of algorithmic problems themed around a chess strategy. Solve problems to earn XP and climb the leaderboard." },
-  { q: "How long is the competition?", a: "The competition runs for 8 continuous weeks. A new week starts every Monday at 00:00 IST." },
-  { q: "Can beginners participate?", a: "Absolutely. We start from the 'Pawn' level (Easy) and gradually progress to 'Grandmaster' (Hard/Expert). There's something for everyone to learn and conquer." },
-  { q: "How is ranking calculated?", a: "Ranking is based on Total XP. You earn XP by solving daily challenges. Faster solutions (optimal time/space complexity) might yield bonus XP in special rounds." },
-  { q: "When are solutions released?", a: "Editorials and optimal solutions are released at the end of each week, allowing everyone to study the 'Grandmaster Analysis'." },
-  { q: "Can I discuss solutions?", a: "Yes, once a challenge is unlocked, you can discuss hints and approaches in 'The Analysis Room' (Forum). However, directly sharing code is discouraged until the editorial is released." },
+  { q: "What are Weekly Challenges?", a: "Weekly Challenges is a 6-week competitive programming league hosted by TSEC CodeCell, starting August 2, 2026. Every Sunday at 4:00 PM, a new problem is released with a 30-plus-hour window for participants to solve, earn XP, and climb the leaderboard. The top 20 performers advance to an offline 3-hour finale at TSEC, Bandra, where all qualifiers become eligible for internship opportunities with hiring partners." },
+  { q: "How long is the competition?", a: "The competition consists of a 6-week online league where one problem is released every week, followed by a 3-hour offline finale for the top 20 participants. In total, the online phase spans 6 weeks, culminating in the 3-hour onsite contest at TSEC, Bandra." },
+  { q: "Can beginners participate?", a: "Yes, students of all skill levels are welcome to participate. The event is designed to foster learning, and detailed editorials are published after every submission window so beginners can learn from each solution." },
+  { q: "How is ranking calculated?", a: "In Round 1, rankings are determined by a dynamic XP system where participants earn XP based on their submission performance, consistency across all six weeks, and relative rank on the leaderboard. Every weekly problem contributes to your overall score, and the live leaderboard updates periodically throughout the league.For the final rankings and overall champions, everything is decided by your performance during the 3-hour onsite coding contest in Round 2." },
+  { q: "When are solutions released?", a: "Solutions and editorials are released immediately after the weekly submission window closes every Monday at 11:59 PM. Once published, participants can continue submitting solutions for learning and practice, though post-window submissions will not count toward XP or leaderboard rankings." },
+  { q: "Can I discuss solutions?", a: "To ensure fair play, discussing, sharing, or copying solutions during an active submission window (Sunday 4:00 PM to Monday 11:59 PM) is strictly prohibited and can result in disqualification. Once the window closes and editorials are published, open discussion and learning with the community are highly encouraged!" },
 ];
 
 export function FAQ() {

@@ -122,26 +122,26 @@ export function RegistrationForm() {
         <div className="w-full max-w-xl mx-auto px-4 md:px-6">
             {/* Colorful Gradient Border Wrapper Card */}
             <div
-                className="relative group p-[1px] rounded-3xl bg-gradient-to-br from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] shadow-[0_0_40px_rgba(75,226,196,0.12)] hover:shadow-[0_0_50px_rgba(75,226,196,0.22)] transition-all duration-500 ease-out"
+                className="relative group p-[1px] rounded-3xl bg-gradient-to-br from-[#D4AF37] via-[#F5E6A3] to-[#eab308] shadow-[0_0_40px_rgba(212,175,55,0.15)] hover:shadow-[0_0_50px_rgba(212,175,55,0.25)] transition-all duration-500 ease-out"
             >
                 <div className="relative bg-[#0d0d0d]/90 backdrop-blur-2xl rounded-[23px] p-6 md:p-8 overflow-hidden z-10">
 
                     {/* Subtle inside gradient background overlays for premium feel */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#4BE2C4]/5 rounded-full blur-3xl pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#E8FF00]/5 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#eab308]/10 rounded-full blur-3xl pointer-events-none" />
 
                     {/* Sleek Step Progress Bar */}
                     {!isRegistered && (
                         <div className="mb-6 relative z-10">
                             <div className="flex justify-between items-center text-xs text-zinc-400 mb-2">
-                                <span className="font-semibold uppercase tracking-wider text-zinc-300">
+                                <span className="font-semibold uppercase tracking-wider text-[#D4AF37]">
                                     {activeStep === 1 ? "Identity Verification" : "Profile Details"}
                                 </span>
                                 <span className="font-medium text-zinc-400">Step {activeStep} of 2</span>
                             </div>
                             <div className="h-[3px] w-full bg-zinc-900 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] transition-all duration-500 ease-out"
+                                    className="h-full bg-gradient-to-r from-[#D4AF37] via-[#F5E6A3] to-[#eab308] transition-all duration-500 ease-out"
                                     style={{ width: `${(activeStep / 2) * 100}%` }}
                                 />
                             </div>
@@ -430,7 +430,7 @@ export function RegistrationForm() {
                                                             type="button"
                                                             onClick={() => selectYearOfStudy(yr)}
                                                             className={`py-2 px-0.5 rounded-xl text-xs font-semibold tracking-wide border transition-all duration-300 cursor-pointer text-center ${isSelected
-                                                                ? "bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] border-transparent text-[#0d0d0d] font-bold shadow-[0_0_10px_rgba(75,226,196,0.18)]"
+                                                                ? "bg-gradient-to-r from-[#D4AF37] via-[#F5E6A3] to-[#eab308] border-transparent text-[#0d0d0d] font-bold shadow-[0_0_10px_rgba(212,175,55,0.25)]"
                                                                 : "bg-[#141414] border-zinc-800 hover:border-zinc-700 text-zinc-450 hover:text-zinc-200"
                                                                 }`}
                                                         >
@@ -454,7 +454,7 @@ export function RegistrationForm() {
                                                 )}
                                             </div>
                                             <div className="relative group">
-                                                <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-250 ${focusedField === "location" ? "text-[#4BE2C4]" : "text-zinc-500"}`}>
+                                                <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-250 ${focusedField === "location" ? "text-[#D4AF37]" : "text-zinc-500"}`}>
                                                     <MapPin className="w-4 h-4" />
                                                 </div>
                                                 <input
@@ -468,7 +468,7 @@ export function RegistrationForm() {
                                                     className={`w-full bg-[#141414] border ${errors.location
                                                         ? "border-red-500/40 focus:border-red-500"
                                                         : focusedField === "location"
-                                                            ? "border-[#4BE2C4] shadow-[0_0_12px_rgba(75,226,196,0.15)]"
+                                                            ? "border-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.2)]"
                                                             : "border-zinc-800 hover:border-zinc-700"
                                                         } rounded-xl py-2.5 pl-10 pr-4 text-xs text-zinc-200 placeholder-zinc-700 focus:outline-none transition-all duration-300`}
                                                 />
@@ -499,7 +499,7 @@ export function RegistrationForm() {
 
                                         <button
                                             type="submit"
-                                            className="col-span-2 py-3.5 bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] hover:shadow-[0_0_20px_rgba(75,226,196,0.3)] text-[#0d0d0d] font-bold rounded-xl uppercase tracking-wider text-[11px] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+                                            className="col-span-2 py-3.5 bg-gradient-to-r from-[#D4AF37] via-[#F5E6A3] to-[#eab308] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] text-[#0d0d0d] font-bold rounded-xl uppercase tracking-wider text-[11px] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                                         >
                                             <span>Complete Registration</span>
                                             <Send className="w-4 h-4 text-[#0d0d0d]" />

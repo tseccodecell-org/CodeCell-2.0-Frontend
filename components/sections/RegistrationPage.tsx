@@ -10,8 +10,11 @@ export default function RegistrationPage() {
             {/* Main Form Center Panel */}
             <div className="flex-1 flex flex-col items-center justify-center py-12 md:py-20 z-30 select-text">
                 <div className="w-full text-center max-w-2xl px-6 mb-8">
+                    <span className="text-[#D4AF37] font-mono text-xs font-bold tracking-[0.25em] uppercase block mb-2">
+                        TSEC CODECELL 2026
+                    </span>
                     <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
-                        Weekly Challenges <span className="bg-gradient-to-r from-[#4BE2C4] via-[#00B4D8] to-[#E8FF00] bg-clip-text text-transparent">Registration</span>
+                        Weekly Challenges <span className="bg-gradient-to-r from-[#D4AF37] via-[#F5E6A3] to-[#eab308] bg-clip-text text-transparent">Registration</span>
                     </h1>
                     <p className="text-sm md:text-base text-zinc-400 max-w-md mx-auto leading-relaxed font-normal">
                         Verify your account and complete your academic profile to participate in the upcoming weekly challenges.

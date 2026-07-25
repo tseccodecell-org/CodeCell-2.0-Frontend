@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Check, Clock } from "lucide-react";
+import { getWeek, getWeekProblems } from "@/lib/api-client";
 
 type Difficulty = "easy" | "medium" | "hard";
-
-//temporary interface from mockdata, fetch it from the lib/types later
 
 interface Problem {
   problemId: string;
@@ -17,7 +16,8 @@ interface Problem {
 }
 
 interface WeekData {
-  weekId: number;
+  weekId: string; // real backend UUID
+  weekNumber: number;
   title: string;
   glyph: string;
   dateRange: string;
@@ -25,21 +25,21 @@ interface WeekData {
   problems: Problem[];
 }
 
-// ---- TEMP: mock week data, keyed by weekId. Replace with the fetch below ----
-const MOCK_WEEK: Omit<WeekData, "weekId"> = {
-  title: "Diagonal Assault",
-  glyph: "♝",
-  dateRange: "JUL 20 – JUL 26",
-  isLive: true,
-  problems: [
-    { problemId: "p1", title: "Bishop's Reach",        difficulty: "easy",   points: 100, solved: true },
-    { problemId: "p2", title: "Pinned Down",            difficulty: "easy",   points: 100, solved: true },
-    { problemId: "p3", title: "Light Square Blockade",  difficulty: "medium", points: 250, solved: false },
-    { problemId: "p4", title: "Fianchetto Frenzy",      difficulty: "medium", points: 250, solved: false },
-    { problemId: "p5", title: "Battery on the Long Diagonal", difficulty: "hard", points: 500, solved: false },
-    { problemId: "p6", title: "Zugzwang Cascade",       difficulty: "hard",   points: 500, solved: false },
-  ],
-};
+const GLYPHS = ["♟", "♞", "♝", "♜", "♛", "♚"];
+
+function normalizeDifficulty(raw: string): Difficulty {
+  const lower = raw.toLowerCase();
+  if (lower.includes("hard") || lower.includes("expert") || lower.includes("master")) return "hard";
+  if (lower.includes("easy")) return "easy";
+  return "medium";
+}
+
+function formatDateRange(startsAt: string, endsAt: string): string {
+  const opts: Intl.DateTimeFormatOptions = { month: "short", day: "2-digit" };
+  const start = new Date(startsAt).toLocaleDateString("en-US", opts).toUpperCase();
+  const end = new Date(endsAt).toLocaleDateString("en-US", opts).toUpperCase();
+  return `${start} – ${end}`;
+}
 
 const DIFFICULTY_STYLE: Record<Difficulty, string> = {
   easy: "text-[#6FCF97] border-[#6FCF97]/30",
@@ -57,33 +57,42 @@ export default function WeekPage() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // ---- Real fetch (swap in once endpoint is live) ----
-    // import axios from "axios";
-    //
-    // async function getWeek(id: string): Promise<WeekData> {
-    //   const { data } = await axios.get(`/api/weeks/all_problems`, {
-    //     params: { weekId: id },
-    //   });
-    //   return data.week;
-    // }
-    //
-    // let cancelled = false;
-    // setLoading(true);
-    // getWeek(weekId).then((data) => {
-    //   if (!cancelled) setWeek(data);
-    // }).catch(() => {
-    //   if (!cancelled) setError(true);
-    // }).finally(() => {
-    //   if (!cancelled) setLoading(false);
-    // });
-    // return () => { cancelled = true; };
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
 
-    // ---- Mock stand-in until the endpoint exists ----
-    const timer = setTimeout(() => {
-      setWeek({ weekId: Number(weekId), ...MOCK_WEEK });
-      setLoading(false);
-    }, 900);
-    return () => clearTimeout(timer);
+    Promise.all([getWeek(weekId), getWeekProblems(weekId)])
+      .then(([weekRes, problemsRes]) => {
+        if (cancelled) return;
+        setWeek({
+          weekId: weekRes.id,
+          weekNumber: weekRes.week_number,
+          title: weekRes.chapter_name,
+          glyph: GLYPHS[(weekRes.week_number - 1) % GLYPHS.length],
+          dateRange: formatDateRange(weekRes.starts_at, weekRes.ends_at),
+          isLive: weekRes.is_active,
+          // NOTE: "solved" isn't available from this endpoint — it would need
+          // a per-user submissions lookup. Defaulting to false for now.
+          problems: problemsRes.map((p) => ({
+            problemId: p.id,
+            title: p.title,
+            difficulty: normalizeDifficulty(p.difficulty),
+            points: p.base_points,
+            solved: false,
+          })),
+        });
+      })
+      .catch((err) => {
+        console.error(`WeekPage: failed to fetch week ${weekId}:`, err);
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [weekId]);
 
   if (loading) return <WeekLoading />;
@@ -120,7 +129,7 @@ export default function WeekPage() {
       <div className="border-b border-[#1a1c24] pb-8 mb-8 relative z-10">
         <div className="flex items-center gap-3 mb-2">
           <span className="font-mono text-[10px] text-[#D9A404] tracking-[0.2em]">
-            WK.0{week.weekId} // {week.dateRange}
+            WK.0{week.weekNumber} // {week.dateRange}
           </span>
           {week.isLive && (
             <span className="flex items-center gap-1.5 font-mono text-[9px] tracking-[0.15em] text-[#D9A404] border border-[#D9A404]/40 px-2 py-0.5">

@@ -11,7 +11,7 @@ export interface AuthUser {
   name: string;
 }
 
-export type LeaderboardTab = "TSEC" | "OTHER";
+export type LeaderboardTab = "TSEC" | "GLOBAL";
 
 // ---- Weekly ----
 

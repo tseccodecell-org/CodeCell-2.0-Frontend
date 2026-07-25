@@ -3,14 +3,13 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Shield, ArrowLeft } from "lucide-react";
+import { BASE_URL } from "@/lib/api-client";
 
 export default function LoginPage() {
   useEffect(() => {
     // If the user already has the cookie, middleware will let them into dashboard.
     // We don't need to check localStorage here anymore.
   }, []);
-
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-transparent flex items-center justify-center px-6 py-12 select-none">

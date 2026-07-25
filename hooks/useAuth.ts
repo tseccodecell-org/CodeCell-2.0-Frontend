@@ -43,9 +43,20 @@ export function useAuth(): UseAuthResult {
           throw new Error(`Failed to load session (${res.status})`);
         }
 
-        const data: AuthUser = await res.json();
+        const json = await res.json();
+        
+        if (!json.success || !json.data) {
+          throw new Error("Invalid profile response");
+        }
+
+        const authUser: AuthUser = {
+          id: json.data.id,
+          name: json.data.name,
+          role: json.data.is_tsec_user ? UserRole.TSEC : UserRole.OTHER,
+        };
+
         if (!cancelled) {
-          setUser(data);
+          setUser(authUser);
         }
       } catch (err) {
         if (!cancelled) {

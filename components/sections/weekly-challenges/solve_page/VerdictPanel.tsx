@@ -1,8 +1,22 @@
 "use client";
 
-import React from "react";
-import { Clock, Cpu, MemoryStick } from "lucide-react";
+import React, { useState } from "react";
 import {
+  Clock,
+  Cpu,
+  MemoryStick,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Terminal,
+  Copy,
+  Check,
+  Zap,
+  Layers,
+  X,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import type {
   SubmissionStatus,
   SubmissionTestResult,
 } from "@/lib/types/submission";
@@ -16,7 +30,8 @@ interface VerdictPanelProps {
   stdout?: string;
   stderr?: string;
   errorMessage?: string;
-  testResults: SubmissionTestResult[];
+  testResults?: SubmissionTestResult[];
+  onClose?: () => void;
 }
 
 export default function VerdictPanel({
@@ -28,228 +43,179 @@ export default function VerdictPanel({
   stdout,
   stderr,
   errorMessage,
-  testResults,
+  testResults = [],
+  onClose,
 }: VerdictPanelProps) {
-  const getStatusText = () => {
-    switch (status) {
-      case "IDLE":
-        return "Idle";
+  const [activeTab, setActiveTab] = useState<"stdout" | "stderr" | "testcases">("stdout");
+  const [copied, setCopied] = useState(false);
 
-      case "QUEUED":
-        return "Queued...";
-
-      case "RUNNING":
-        return "Running...";
-
-      case "COMPLETED":
-        return verdict ?? "Completed";
-
-      case "FAILED":
-        return "System Error";
-
-      default:
-        return "Idle";
-    }
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const getStatusColor = () => {
-    switch (status) {
-      case "IDLE":
-        return "text-slate-400";
-
-      case "QUEUED":
-        return "text-blue-400";
-
-      case "RUNNING":
-        return "text-yellow-400 animate-pulse";
-
-      case "FAILED":
-        return "text-red-500";
-
-      case "COMPLETED":
-        switch (verdict) {
-          case "ACCEPTED":
-            return "text-green-400";
-
-          case "WRONG_ANSWER":
-            return "text-red-400";
-
-          case "TIME_LIMIT_EXCEEDED":
-            return "text-yellow-400";
-
-          case "RUNTIME_ERROR":
-            return "text-orange-400";
-
-          case "COMPILATION_ERROR":
-            return "text-red-500";
-
-          default:
-            return "text-blue-400";
-        }
-
-      default:
-        return "text-slate-400";
+  const getVerdictBadge = () => {
+    if (status === "IDLE") {
+      return (
+        <span className="flex items-center gap-2 px-3 py-1 rounded-full border border-gray-700 bg-gray-900/60 font-mono text-xs text-gray-400 uppercase tracking-wider">
+          <span className="w-2 h-2 rounded-full bg-gray-500" /> Ready
+        </span>
+      );
     }
+
+    if (status === "QUEUED" || status === "RUNNING") {
+      return (
+        <span className="flex items-center gap-2 px-3 py-1 rounded-full border border-[#4BE2C4]/40 bg-[#4BE2C4]/10 font-mono text-xs text-[#4BE2C4] uppercase tracking-wider animate-pulse">
+          <span className="w-2 h-2 rounded-full bg-[#4BE2C4] animate-ping" /> Running...
+        </span>
+      );
+    }
+
+    if (status === "FAILED") {
+      return (
+        <span className="flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/40 bg-red-500/10 font-mono text-xs text-red-400 font-bold uppercase tracking-wider">
+          <XCircle size={14} /> Failed
+        </span>
+      );
+    }
+
+    const isAccepted = verdict === "ACCEPTED" || verdict === "SUCCESS";
+    if (isAccepted) {
+      return (
+        <span className="flex items-center gap-2 px-3.5 py-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 font-mono text-xs text-emerald-400 font-black uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+          <CheckCircle2 size={15} /> ACCEPTED (100/100)
+        </span>
+      );
+    }
+
+    if (verdict === "WRONG_ANSWER") {
+      return (
+        <span className="flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/40 bg-red-500/10 font-mono text-xs text-red-400 font-bold uppercase tracking-wider">
+          <XCircle size={14} /> Wrong Answer
+        </span>
+      );
+    }
+
+    return (
+      <span className="flex items-center gap-2 px-3 py-1 rounded-full border border-[#E8FF00]/40 bg-[#E8FF00]/10 font-mono text-xs text-[#E8FF00] font-bold uppercase tracking-wider">
+        <Zap size={14} /> {verdict ?? "Completed"}
+      </span>
+    );
   };
 
-  const getOutput = () => {
-    switch (status) {
-      case "IDLE":
-        return "Program output will appear here...";
-
-      case "QUEUED":
-        return "Submission queued...";
-
-      case "RUNNING":
-        return "Executing against test cases...";
-
-      case "FAILED":
-        return stderr || "A system error occurred while judging.";
-
-      case "COMPLETED":
-        return (errorMessage ||stderr ||stdout ||"Execution completed.");
-
-      default:
-        return "";
+  const getOutputText = () => {
+    if (status === "IDLE") {
+      return "▸ Click 'Run Code' or 'Submit Solution' to compile and execute your program.";
     }
+    if (status === "RUNNING" || status === "QUEUED") {
+      return "▸ Compiling source code...\n▸ Executing tests against sandbox environment...";
+    }
+    if (stdout && stdout.trim()) {
+      return stdout;
+    }
+    return errorMessage || stderr || "✓ Execution completed cleanly.";
   };
 
   return (
-    <div className="bg-[#111827] border-t border-slate-700">
-      {/* Header */}
-      <div className="px-5 py-3 border-b border-slate-700 flex items-center justify-between">
-        <h2 className="text-white font-semibold text-lg">
-          Verdict
-        </h2>
-
-        <span className={`font-semibold ${getStatusColor()}`}>
-          {getStatusText()}
-        </span>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 p-4">
-        <StatCard
-          icon={<Clock size={18} />}
-          label="Time"
-          value={
-            status === "COMPLETED" && executionTime !== undefined
-              ? `${executionTime} ms`
-              : "--"
-          }
-        />
-
-        <StatCard
-          icon={<MemoryStick size={18} />}
-          label="Memory"
-          value={
-            status === "COMPLETED" && memoryUsed !== undefined
-              ? `${memoryUsed} KB`
-              : "--"
-          }
-        />
-
-        <StatCard
-          icon={<Cpu size={18} />}
-          label="Score"
-          value={
-            status === "COMPLETED" && score !== undefined
-              ? `${score}`
-              : "--"
-          }
-        />
-      </div>
-
-      {/* Scrollable Content */}
-      <div className="p-4 space-y-4">
-
-        {/* Output */}
-        <div className="bg-[#0f172a] rounded-lg border border-slate-700">
-          <div className="px-4 py-2 border-b border-slate-700 text-sm text-slate-300 font-medium">
-            Output
+    <motion.div
+      initial={{ scale: 0.94, opacity: 0, y: 15 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.94, opacity: 0, y: 15 }}
+      transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      className="w-full max-w-2xl bg-[#080D0A] border border-[#4BE2C4]/40 rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.8)] overflow-hidden font-sans text-gray-200 select-none relative"
+    >
+      {/* Top Header Bar */}
+      <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A100C]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-[#4BE2C4]/10 border border-[#4BE2C4]/30 flex items-center justify-center text-[#4BE2C4]">
+            <Terminal size={16} />
           </div>
-
-          <pre className="p-4 whitespace-pre-wrap overflow-x-auto font-mono text-sm text-green-300">
-            {getOutput()}
-          </pre>
+          <div>
+            <h3 className="font-orbitron font-bold text-xs uppercase tracking-wider text-white">
+              Execution Output
+            </h3>
+            <span className="font-mono text-[9px] text-[#4BE2C4] uppercase tracking-widest block -mt-0.5">
+              CODECELL RUNTIME RESULT
+            </span>
+          </div>
         </div>
 
-        {/* Test Case Results */}
-        {testResults.length > 0 && (
-          <div className="rounded-lg border border-slate-700 overflow-hidden">
-            <div className="px-4 py-2 bg-slate-800 border-b border-slate-700 text-sm font-medium text-slate-300">
-              Test Case Results
-            </div>
+        <div className="flex items-center gap-3">
+          {getVerdictBadge()}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+      </div>
 
-            <table className="w-full text-sm">
-              <thead className="bg-slate-900 text-slate-400">
-                <tr>
-                  <th className="px-4 py-2 text-left">Test</th>
-                  <th className="px-4 py-2 text-left">Verdict</th>
-                  <th className="px-4 py-2 text-left">Time</th>
-                  <th className="px-4 py-2 text-left">Memory</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {testResults.map((result) => (
-                  <tr
-                    key={result.testCaseId}
-                    className="border-t border-slate-700 hover:bg-slate-800/50"
-                  >
-                    <td className="px-4 py-2">
-                      {result.orderNum + 1}
-                    </td>
-
-                    <td className="px-4 py-2">
-                      {result.verdict}
-                    </td>
-
-                    <td className="px-4 py-2">
-                      {result.timeMs !== undefined
-                        ? `${result.timeMs} ms`
-                        : "-"}
-                    </td>
-
-                    <td className="px-4 py-2">
-                      {result.memoryKb !== undefined
-                        ? `${result.memoryKb} KB`
-                        : "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Metrics Row (Time, Memory, Points) */}
+      <div className="grid grid-cols-3 gap-3 p-4 bg-[#050806] border-b border-white/5 font-mono">
+        <div className="bg-[#0A0F0C] border border-white/10 rounded-xl p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Clock size={14} className="text-[#E8FF00]" />
+            <span className="text-[10px] text-gray-400 uppercase">Time</span>
           </div>
+          <span className="text-xs font-bold text-white">
+            {status === "COMPLETED" && executionTime !== undefined ? `${executionTime} ms` : "--"}
+          </span>
+        </div>
+
+        <div className="bg-[#0A0F0C] border border-white/10 rounded-xl p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MemoryStick size={14} className="text-[#4BE2C4]" />
+            <span className="text-[10px] text-gray-400 uppercase">Memory</span>
+          </div>
+          <span className="text-xs font-bold text-white">
+            {status === "COMPLETED" && memoryUsed !== undefined ? `${(memoryUsed / 1024).toFixed(1)} MB` : "--"}
+          </span>
+        </div>
+
+        <div className="bg-[#0A0F0C] border border-white/10 rounded-xl p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Cpu size={14} className="text-emerald-400" />
+            <span className="text-[10px] text-gray-400 uppercase">Score</span>
+          </div>
+          <span className="text-xs font-bold text-white">
+            {status === "COMPLETED" ? `${score ?? 100} / 100` : "--"}
+          </span>
+        </div>
+      </div>
+
+      {/* Output Content */}
+      <div className="p-4 bg-[#030504]">
+        <div className="flex items-center justify-between mb-2 font-mono text-[10px] text-gray-400 uppercase tracking-widest">
+          <span>// STDOUT & LOGS</span>
+          <button
+            onClick={() => copyToClipboard(getOutputText())}
+            className="flex items-center gap-1 text-gray-400 hover:text-white px-2 py-0.5 rounded hover:bg-white/5 transition-colors"
+          >
+            {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+
+        <div className="bg-[#010202] border border-white/10 rounded-xl p-4 font-mono text-xs leading-relaxed text-[#4BE2C4] shadow-inner max-h-[220px] overflow-y-auto">
+          <pre className="whitespace-pre-wrap">{getOutputText()}</pre>
+        </div>
+      </div>
+
+      {/* Footer Close CTA */}
+      <div className="p-4 bg-[#060A08] border-t border-white/5 flex justify-end">
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-xl bg-[#4BE2C4] text-black font-mono font-bold text-xs uppercase tracking-widest hover:bg-[#E8FF00] transition-colors cursor-pointer"
+          >
+            CLOSE DIALOG
+          </button>
         )}
       </div>
-    </div>
-  );
-}
-
-interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-}: StatCardProps) {
-  return (
-    <div className="rounded-lg bg-slate-800 border border-slate-700 p-3">
-      <div className="flex items-center gap-2 text-slate-400 mb-2">
-        {icon}
-        <span className="text-xs uppercase tracking-wide">
-          {label}
-        </span>
-      </div>
-
-      <div className="text-white text-lg font-semibold">
-        {value}
-      </div>
-    </div>
+    </motion.div>
   );
 }

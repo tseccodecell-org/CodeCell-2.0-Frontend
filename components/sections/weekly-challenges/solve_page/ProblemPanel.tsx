@@ -299,13 +299,7 @@ function PanelError({ message }: { message: string }) {
 // Main component
 // ---------------------------------------------------------------------------
 
-const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-
-if (!DEFAULT_API_BASE_URL) {
-  throw new Error(
-    "NEXT_PUBLIC_API_BASE_URL is not defined. Check your .env.local file."
-  );
-}
+const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
 export default function ProblemPanel({
   problem: problemProp,

@@ -258,6 +258,7 @@ export default function WeeklyPlatform() {
 
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showRuntimeModal, setShowRuntimeModal] = useState(false);
 
   // Sync code template with language & active problem
   useEffect(() => {
@@ -652,38 +653,45 @@ export default function WeeklyPlatform() {
         <div className="min-h-screen flex flex-col z-10 relative">
 
           {/* TOP NAVIGATION HEADER */}
-          <header className="sticky top-0 z-40 w-full border-b border-[#D4AF37]/20 bg-[#060606]/85 backdrop-blur-2xl shadow-[0_0_35px_rgba(0,0,0,0.35)]">
+          <header className="sticky top-0 z-40 w-full border-b border-[#D4AF37]/20 bg-[#0A0A0A]/90 backdrop-blur-2xl shadow-xl">
             <div className="max-w-7xl mx-auto flex h-20 items-center justify-between px-6">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/20 to-[#F5E6A3]/10 text-xl text-[#D4AF37] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-lg text-[#D4AF37] font-bold">
                   ♛
                 </div>
                 <div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/10 px-2.5 py-1 text-[9px] font-mono uppercase tracking-[0.25em] text-[#D4AF37] mb-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" /> live arena
-                  </div>
-                  <span className="font-serif text-sm tracking-wider font-bold text-[#FFFFFF] block uppercase">
+                  <span className="font-sans text-base tracking-wide font-bold text-white block">
                     TSEC CODECELL
                   </span>
-                  <span className="font-mono text-[9px] text-[#8A8880] tracking-widest uppercase block -mt-1">
-                    WEEKLY CHALLENGES 2026
+                  <span className="font-mono text-[10px] text-[#D4AF37] tracking-widest uppercase block">
+                    DEVELOPER DASHBOARD
                   </span>
                 </div>
               </div>
 
               <div className="hidden md:flex items-center gap-3">
-                <div className="rounded-full border border-[#D4AF37]/20 bg-[#0D0D0D] px-3 py-2 text-right shadow-inner">
-                  <span className="font-mono text-[10px] text-[#D4AF37] block uppercase">// active session</span>
-                  <span className="text-xs font-semibold text-[#FFFFFF] block">{username}</span>
+                <button
+                  onClick={() => setShowRuntimeModal(true)}
+                  className="flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest transition-all duration-300 shadow-sm group cursor-pointer"
+                >
+                  <Terminal size={12} className="text-[#D4AF37] group-hover:text-black" />
+                  <span>INSTALL CODECELL RUNTIME</span>
+                </button>
+
+                <div className="rounded-full border border-[#D4AF37]/20 bg-[#121212] px-4 py-1.5 text-right font-mono">
+                  <span className="text-[9px] text-[#8A8880] block uppercase">Session</span>
+                  <span className="text-xs font-semibold text-white block">{username}</span>
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#F5E6A3] text-[#0A0A0A] font-bold text-xs border border-[#D4AF37]/30 shadow-[0_0_18px_rgba(212,175,55,0.2)]">
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D4AF37] text-[#0A0A0A] font-bold text-xs font-mono shadow-md">
                   {(username || "?").split(" ").map(n => n?.[0] || "").join("").toUpperCase()}
                 </div>
+
                 <button
                   onClick={() => {
                     window.location.href = "http://localhost:8080/oauth/logout";
                   }}
-                  className="ml-2 flex items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+                  className="ml-2 flex items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors cursor-pointer"
                 >
                   LOGOUT
                 </button>
@@ -691,7 +699,7 @@ export default function WeeklyPlatform() {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden rounded border border-[#2A2A2A] bg-[#0D0D0D]/80 p-2 text-[#EBE6DD] shadow-inner"
+                className="md:hidden rounded border border-[#2A2A2A] bg-[#0D0D0D] p-2 text-[#EBE6DD]"
               >
                 {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
@@ -701,51 +709,45 @@ export default function WeeklyPlatform() {
           {/* MAIN CONTAINER LAYOUT */}
           <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-6">
 
-            {/* LEFT SIDEBAR: PROFILE & QUICK NAVIGATION (takes ~20% width) */}
+            {/* LEFT SIDEBAR: PROFILE & QUICK NAVIGATION */}
             <aside className={`lg:w-1/5 shrink-0 flex flex-col gap-6 ${mobileMenuOpen ? "block" : "hidden lg:flex"}`}>
               {/* User Profile Card */}
-              <div className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#0E0E0E] via-[#111111] to-[#080808] p-6 shadow-[0_0_35px_rgba(0,0,0,0.3)]">
-                <div className="absolute right-[-20px] bottom-[-24px] text-[#D4AF37]/8 font-serif text-9xl select-none pointer-events-none">
-                  ♞
-                </div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(212,175,55,0.16),_transparent_32%)]" />
+              <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#0E0E0D] p-6 shadow-xl relative overflow-hidden">
+                <span className="font-mono text-[10px] text-[#D4AF37] tracking-widest block mb-4 uppercase">User Profile</span>
 
-                <span className="relative font-mono text-[9px] text-[#D4AF37] tracking-widest block mb-4 uppercase">// operative dossier</span>
-
-                <div className="relative flex items-center gap-3 mb-5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#D4AF37]/30 bg-[#1C1C1C] text-[#D4AF37] font-bold text-sm font-mono shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#D4AF37]/30 bg-[#1A1A1A] text-[#D4AF37] font-bold text-xs font-mono">
                     {(username || "?").split(" ").map(n => n?.[0] || "").join("").toUpperCase()}
                   </div>
-                  <div>
-                    <h3 className="text-sm font-serif font-bold text-[#FFFFFF] truncate max-w-[120px]">{username}</h3>
-                    <p className="text-[10px] text-[#8A8880] truncate max-w-[120px]">{collegeName}</p>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-white truncate">{username}</h3>
+                    <p className="text-[11px] text-[#8A8880] truncate">{collegeName}</p>
                   </div>
                 </div>
 
-                <div className="relative grid grid-cols-2 gap-3 border-t border-[#2A2A2A] pt-4 font-mono">
-                  <div className="rounded-xl border border-[#1F1F1F] bg-[#0A0A0A]/70 p-2.5">
-                    <span className="text-[9px] text-[#8A8880] block uppercase tracking-wider">rank</span>
+                <div className="grid grid-cols-2 gap-2.5 border-t border-white/10 pt-4 font-mono text-xs">
+                  <div className="rounded-xl border border-white/5 bg-[#121211] p-2.5">
+                    <span className="text-[9px] text-[#8A8880] block uppercase">Rank</span>
                     <span className="text-sm text-[#D4AF37] font-bold">#47</span>
                   </div>
-                  <div className="rounded-xl border border-[#1F1F1F] bg-[#0A0A0A]/70 p-2.5">
-                    <span className="text-[9px] text-[#8A8880] block uppercase tracking-wider">streak</span>
-                    <span className="text-sm text-[#10B981] font-bold flex items-center gap-1">
+                  <div className="rounded-xl border border-white/5 bg-[#121211] p-2.5">
+                    <span className="text-[9px] text-[#8A8880] block uppercase">Streak</span>
+                    <span className="text-sm text-emerald-400 font-bold flex items-center gap-1">
                       <Zap size={10} className="fill-current" /> 4w
                     </span>
                   </div>
-                  <div className="col-span-2 rounded-xl border border-[#1F1F1F] bg-[#0A0A0A]/70 p-2.5">
-                    <span className="text-[9px] text-[#8A8880] block uppercase tracking-wider">trials solved</span>
-                    <span className="text-xs text-[#FFFFFF]">08 / 15</span>
+                  <div className="col-span-2 rounded-xl border border-white/5 bg-[#121211] p-2.5">
+                    <span className="text-[9px] text-[#8A8880] block uppercase">Challenges Solved</span>
+                    <span className="text-xs text-white font-bold">08 / 15</span>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-[#2A2A2A] bg-[#0A0A0A]/80 p-4 shadow-[0_0_25px_rgba(0,0,0,0.25)]">
-                <span className="font-mono text-[9px] text-[#8A8880] tracking-widest block mb-3 px-2 uppercase">// NAV_SYSTEM</span>
-                <nav className="flex flex-col gap-1 text-sm font-mono">
+              <div className="rounded-2xl border border-white/10 bg-[#0E0E0D] p-4 shadow-xl">
+                <span className="font-mono text-[10px] text-[#8A8880] tracking-widest block mb-3 px-2 uppercase">Navigation</span>
+                <nav className="flex flex-col gap-1 text-xs font-mono">
                   {[
                     { id: "dashboard", label: "Dashboard", icon: Code2 },
-                    { id: "discussions", label: "Discussions", icon: MessageSquare },
                     { id: "leaderboard", label: "Leaderboard", icon: Trophy },
                     { id: "challenges", label: "Weekly Challenges", icon: Calendar },
                     { id: "submissions", label: "Submissions", icon: History },
@@ -753,7 +755,6 @@ export default function WeeklyPlatform() {
                     { id: "profile", label: "Profile", icon: User }
                   ].map((item) => {
                     const Icon = item.icon;
-                    // Highlight Discussions too since they share dashboard feed focus
                     const isActive = activePage === item.id;
                     return (
                       <button
@@ -762,9 +763,9 @@ export default function WeeklyPlatform() {
                           setActivePage(item.id as PageId);
                           setMobileMenuOpen(false);
                         }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left uppercase text-xs tracking-wider ${isActive
-                            ? "bg-[#D4AF37]/12 border-l-2 border-[#D4AF37] text-[#D4AF37] font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                            : "text-[#8A8880] hover:text-[#FFFFFF] hover:bg-[#121212] border-l-2 border-transparent"
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left uppercase tracking-wider ${isActive
+                            ? "bg-[#D4AF37]/10 border-l-2 border-[#D4AF37] text-[#D4AF37] font-bold"
+                            : "text-[#8A8880] hover:text-white hover:bg-white/5 border-l-2 border-transparent"
                           }`}
                       >
                         <Icon size={14} />
@@ -782,10 +783,10 @@ export default function WeeklyPlatform() {
                       setIsLoggedIn(false);
                       setShowLoginForm(false);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left uppercase text-xs tracking-wider text-red-500 hover:text-red-400 hover:bg-red-950/20 border-l-2 border-transparent mt-2 font-mono"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left uppercase tracking-wider text-red-400 hover:bg-red-950/20 border-l-2 border-transparent mt-2 font-mono"
                   >
                     <Lock size={14} />
-                    Disconnect
+                    Logout
                   </button>
                 </nav>
               </div>
@@ -796,234 +797,67 @@ export default function WeeklyPlatform() {
 
               <AnimatePresence mode="wait">
                 {activePage === "dashboard" && (
-                  /* ==================== 1. DASHBOARD / DISCUSSIONS ==================== */
+                  /* ==================== 1. DASHBOARD OVERVIEW ==================== */
                   <motion.div
                     key="dashboard"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -15 }}
-                    className="flex flex-col gap-6"
+                    className="flex flex-col gap-6 font-sans"
                   >
-                    <div className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#101010] via-[#121212] to-[#080808] p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(212,175,55,0.16),_transparent_30%)]" />
-                      <div className="relative mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    {/* Welcome & Active Challenge Hero Card */}
+                    <div className="rounded-2xl border border-[#D4AF37]/30 bg-[#0E0E0D] p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                         <div>
-                          <span className="font-mono text-[9px] text-[#D4AF37] tracking-[0.3em] block mb-2 uppercase">// command center</span>
-                          <h2 className="font-serif text-xl text-[#FFFFFF] tracking-wider uppercase">Signal board</h2>
-                          <p className="mt-1 max-w-2xl text-xs text-[#8A8880]">
-                            Share insights, coordinate strategies, and keep the team moving through the current week.
+                          <div className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1 text-[10px] font-mono text-[#D4AF37] uppercase tracking-wider mb-3">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Contest Arena
+                          </div>
+                          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-wide mb-2">
+                            Week 04: Guarded Diagonals
+                          </h2>
+                          <p className="text-xs sm:text-sm text-[#8A8880] max-w-xl leading-relaxed">
+                            Given an N x N chessboard with M obstacle pieces placed, calculate the total number of guarded diagonal cells using optimal constraint tightness logic.
                           </p>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {[
-                            { label: "Live forum", value: "12 threads" },
-                            { label: "Your streak", value: "4 weeks" },
-                            { label: "Next trial", value: "Week 4" }
-                          ].map((item) => (
-                            <div key={item.label} className="rounded-full border border-[#2A2A2A] bg-[#0A0A0A]/80 px-3 py-1.5 text-[10px] font-mono text-[#8A8880]">
-                              <span className="text-[#D4AF37]">{item.label}:</span> {item.value}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
 
-                      <div className="relative flex items-start gap-4">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#1C1C1C] text-[#D4AF37] font-bold text-xs shrink-0">
-                          {(username || "?").split(" ").map(n => n?.[0] || "").join("").toUpperCase()}
-                        </div>
-                        <div className="flex-1">
+                        <div className="shrink-0">
                           <button
-                            onClick={() => setShowNewPostForm(true)}
-                            className="w-full text-left rounded-xl border border-[#2A2A2A] bg-[#0D0D0D]/90 px-4 py-3 text-xs text-[#8A8880] transition-all cursor-pointer font-mono shadow-inner hover:border-[#D4AF37]/35 hover:bg-[#121212]"
+                            onClick={() => {
+                              window.location.href = "/solve/guarded-diagonals";
+                            }}
+                            className="w-full sm:w-auto px-6 py-3.5 bg-[#D4AF37] hover:bg-[#F5E6A3] text-black font-mono font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                           >
-                            Start a discussion, ask a doubt, or share your approach...
+                            <span>SOLVE CHALLENGE</span>
+                            <ChevronRight size={14} />
                           </button>
                         </div>
                       </div>
-
-                      {/* Expanding New Post Form */}
-                      {showNewPostForm && (
-                        <motion.form
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          onSubmit={handleCreatePost}
-                          className="mt-5 pt-5 border-t border-[#1C1C1C] space-y-4"
-                        >
-                          <div>
-                            <input
-                              type="text"
-                              placeholder="Discussion Title (e.g. Week 4 Backtracking approach)"
-                              value={composerTitle}
-                              onChange={(e) => setComposerTitle(e.target.value)}
-                              className="w-full bg-[#121212] border border-[#2A2A2A] focus:border-[#D4AF37] px-4 py-2.5 rounded text-sm text-[#FFFFFF] outline-none font-serif"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <textarea
-                              placeholder="Describe your approach, share segment trees parameters, or ask algorithm logic..."
-                              value={composerContent}
-                              onChange={(e) => setComposerContent(e.target.value)}
-                              className="w-full bg-[#121212] border border-[#2A2A2A] focus:border-[#D4AF37] px-4 py-3 rounded text-sm text-[#FFFFFF] outline-none min-h-[120px] font-sans resize-y"
-                              required
-                            />
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input
-                              type="text"
-                              placeholder="Tags (comma separated: DSA, DP, Graphs)"
-                              value={composerTags}
-                              onChange={(e) => setComposerTags(e.target.value)}
-                              className="w-full bg-[#121212] border border-[#2A2A2A] focus:border-[#D4AF37] px-4 py-2 rounded text-xs text-[#FFFFFF] outline-none font-mono"
-                            />
-                            <div className="flex justify-end gap-2">
-                              <button
-                                type="button"
-                                onClick={() => setShowNewPostForm(false)}
-                                className="px-4 py-2 border border-[#2A2A2A] text-xs font-mono rounded hover:bg-[#161616]"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                type="submit"
-                                className="px-5 py-2 bg-[#D4AF37] hover:bg-[#F5E6A3] text-[#0A0A0A] font-bold text-xs font-mono rounded transition-colors"
-                              >
-                                Submit Discussion
-                              </button>
-                            </div>
-                          </div>
-                        </motion.form>
-                      )}
                     </div>
 
-                    {/* Discussions Feed Title */}
-                    <div className="flex items-center justify-between border-b border-[#1A1A1A] pb-3">
-                      <h2 className="font-serif text-lg text-[#FFFFFF] tracking-wider uppercase flex items-center gap-2">
-                        <MessageSquare size={16} className="text-[#D4AF37]" /> CodeCell Arena
-                      </h2>
-                      <span className="font-mono text-[10px] text-[#8A8880] uppercase tracking-widest">{posts.length} active threads</span>
-                    </div>
-
-                    {/* Feed Posts */}
-                    <div className="flex flex-col gap-4">
-                      {posts.map((post) => {
-                        const isUpvoted = upvotedPosts.has(post.id);
-                        const isSaved = savedPosts.has(post.id);
-                        return (
-                          <div
-                            key={post.id}
-                            className="relative rounded-2xl border border-[#2A2A2A] bg-gradient-to-br from-[#101010] via-[#0F0F0F] to-[#090909] p-6 shadow-[0_0_30px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D4AF37]/35 hover:shadow-[0_0_35px_rgba(212,175,55,0.12)]"
-                          >
-                            {/* Header details */}
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-[#1C1C1C] border border-[#D4AF37]/30 text-[#D4AF37] font-bold text-xs flex items-center justify-center font-mono">
-                                  {post.avatar}
-                                </div>
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs font-bold text-[#FFFFFF]">{post.author}</span>
-                                    <span className="px-1.5 py-0.5 border border-[#D4AF37]/30 bg-[#D4AF37]/5 text-[8px] text-[#D4AF37] font-mono rounded uppercase">
-                                      Rank {post.rank}
-                                    </span>
-                                  </div>
-                                  <p className="text-[10px] text-[#8A8880]">{post.college} · {post.time}</p>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => toggleSave(post.id)}
-                                className={`text-[#8A8880] hover:text-[#D4AF37] transition-colors ${isSaved ? "text-[#D4AF37]" : ""}`}
-                              >
-                                <Bookmark size={14} className={isSaved ? "fill-current" : ""} />
-                              </button>
-                            </div>
-
-                            {/* Content */}
-                            <h3 className="font-serif text-base text-[#FFFFFF] font-bold tracking-wide mb-2 uppercase hover:text-[#D4AF37] transition-colors cursor-pointer">
-                              {post.title}
-                            </h3>
-                            <MarkdownRenderer content={post.content} className="text-xs text-[#8A8880] leading-relaxed mb-4 font-sans" />
-
-                            {/* Tags */}
-                            <div className="flex flex-wrap gap-2 mb-5">
-                              {post.tags.map((tag, idx) => (
-                                <span
-                                  key={idx}
-                                  className="font-mono text-[9px] border border-[#1C1C1C] hover:border-[#D4AF37]/30 bg-[#070707] text-[#8A8880] px-2 py-0.5 tracking-wider uppercase transition-colors"
-                                >
-                                  #{tag}
-                                </span>
-                              ))}
-                            </div>
-
-                            {/* Footer Interaction Buttons */}
-                            <div className="flex items-center justify-between border-t border-[#1C1C1C] pt-4 font-mono text-[10px] text-[#8A8880]">
-                              <div className="flex items-center gap-4">
-                                <button
-                                  onClick={() => toggleUpvote(post.id)}
-                                  className={`flex items-center gap-1.5 hover:text-[#D4AF37] transition-colors ${isUpvoted ? "text-[#D4AF37] font-bold" : ""}`}
-                                >
-                                  <ThumbsUp size={12} className={isUpvoted ? "fill-current" : ""} />
-                                  <span>{post.upvotes} UPVOTES</span>
-                                </button>
-                                <button
-                                  onClick={() => setActiveReplyPostId(activeReplyPostId === post.id ? null : post.id)}
-                                  className="flex items-center gap-1.5 hover:text-[#FFFFFF] transition-colors"
-                                >
-                                  <MessageSquare size={12} />
-                                  <span>{post.commentsCount} COMMENTS</span>
-                                </button>
-                              </div>
-
-                              <button
-                                onClick={() => {
-                                  // Share action simulator
-                                  alert(`Link copied to clipboard: ${post.title}`);
-                                }}
-                                className="flex items-center gap-1.5 hover:text-[#FFFFFF] transition-colors"
-                              >
-                                <Share2 size={12} />
-                                <span>SHARE</span>
-                              </button>
-                            </div>
-
-                            {/* Replies List */}
-                            {post.comments.length > 0 && (
-                              <div className="mt-4 border-t border-[#161616] pt-4 space-y-3">
-                                {post.comments.map((comment, cIdx) => (
-                                  <div key={cIdx} className="bg-[#121212]/40 p-3 border border-[#1C1C1C] rounded text-xs">
-                                    <div className="flex items-center justify-between mb-1.5 font-mono text-[10px] text-[#D4AF37]">
-                                      <span className="font-bold">{comment.author}</span>
-                                      <span className="text-[#4A4A4A]">{comment.time}</span>
-                                    </div>
-                                    <MarkdownRenderer content={comment.content} className="text-xs text-[#8A8880] leading-relaxed font-sans" />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Comment Input */}
-                            {activeReplyPostId === post.id && (
-                              <div className="mt-4 border-t border-[#161616] pt-4 flex gap-2">
-                                <input
-                                  type="text"
-                                  placeholder="Write a professional reply..."
-                                  value={replyInput}
-                                  onChange={(e) => setReplyInput(e.target.value)}
-                                  className="flex-1 bg-[#121212] border border-[#2A2A2A] focus:border-[#D4AF37] px-3 py-2 rounded text-xs text-[#FFFFFF] outline-none font-sans"
-                                />
-                                <button
-                                  onClick={() => handleAddComment(post.id)}
-                                  className="px-4 py-2 bg-[#D4AF37] hover:bg-[#F5E6A3] text-[#0A0A0A] font-bold text-xs font-mono rounded transition-colors"
-                                >
-                                  Reply
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                    {/* Performance Metrics Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
+                      <div className="rounded-2xl border border-white/10 bg-[#0E0E0D] p-5 shadow-lg">
+                        <span className="text-[10px] text-[#8A8880] uppercase tracking-wider block mb-1">Global Rank</span>
+                        <div className="text-2xl font-bold text-[#D4AF37]">#47</div>
+                        <span className="text-[10px] text-emerald-400 mt-1 block">▲ Top 5% overall</span>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-[#0E0E0D] p-5 shadow-lg">
+                        <span className="text-[10px] text-[#8A8880] uppercase tracking-wider block mb-1">Weekly Streak</span>
+                        <div className="text-2xl font-bold text-emerald-400 flex items-center gap-1.5">
+                          <Zap size={16} className="fill-current" /> 4w
+                        </div>
+                        <span className="text-[10px] text-[#8A8880] mt-1 block">Active participant</span>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-[#0E0E0D] p-5 shadow-lg">
+                        <span className="text-[10px] text-[#8A8880] uppercase tracking-wider block mb-1">Challenges Solved</span>
+                        <div className="text-2xl font-bold text-white">08 / 15</div>
+                        <span className="text-[10px] text-[#8A8880] mt-1 block">53% completed</span>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-[#0E0E0D] p-5 shadow-lg">
+                        <span className="text-[10px] text-[#8A8880] uppercase tracking-wider block mb-1">Submission Accuracy</span>
+                        <div className="text-2xl font-bold text-emerald-400">94.2%</div>
+                        <span className="text-[10px] text-[#8A8880] mt-1 block">Clean verdicts</span>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -1038,16 +872,13 @@ export default function WeeklyPlatform() {
                     className="flex flex-col gap-6"
                   >
                     {/* Header Details */}
-                    <div className="border border-[#D4AF37]/20 bg-[#0E0E0E] p-6 rounded-lg text-center relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-24 h-[1px] bg-gradient-to-r from-[#D4AF37] to-transparent" />
-                      <div className="absolute top-0 left-0 w-[1px] h-24 bg-gradient-to-b from-[#D4AF37] to-transparent" />
-
-                      <span className="font-mono text-[9px] text-[#D4AF37] tracking-[0.3em] block mb-2 uppercase">// GLOBAL_RANKS</span>
-                      <h1 className="font-serif text-3xl text-[#FFFFFF] tracking-wider uppercase mb-1">
-                        Operative Leaderboard
+                    <div className="border border-[#D4AF37]/20 bg-[#0E0E0D] p-6 rounded-2xl text-center relative overflow-hidden font-sans">
+                      <span className="font-mono text-[10px] text-[#D4AF37] tracking-widest block mb-1 uppercase">GLOBAL RANKINGS</span>
+                      <h1 className="text-2xl sm:text-3xl text-white font-bold tracking-wide mb-1">
+                        Leaderboard
                       </h1>
-                      <p className="font-mono text-xs text-[#8A8880] tracking-widest mt-1">
-                        CLIMB THE TIER LEVELS TO ACHIEVE CHECKMATE
+                      <p className="text-xs text-[#8A8880] max-w-md mx-auto">
+                        Track your standing against developers across all participating colleges.
                       </p>
                     </div>
 
@@ -1245,16 +1076,13 @@ export default function WeeklyPlatform() {
                     className="flex flex-col gap-6"
                   >
                     {/* Header Strip */}
-                    <div className="border border-[#D4AF37]/20 bg-[#0E0E0E] p-6 rounded-lg text-center relative overflow-hidden">
-                      <div className="absolute bottom-0 right-0 w-24 h-[1px] bg-gradient-to-l from-[#D4AF37] to-transparent" />
-                      <div className="absolute bottom-0 right-0 w-[1px] h-24 bg-gradient-to-t from-[#D4AF37] to-transparent" />
-
-                      <span className="font-mono text-[9px] text-[#D4AF37] tracking-[0.3em] block mb-2 uppercase">// TIMELINE_COORDINATES</span>
-                      <h1 className="font-serif text-3xl text-[#FFFFFF] tracking-wider uppercase mb-1">
-                        8 Weeks · 8 Queens
+                    <div className="border border-[#D4AF37]/20 bg-[#0E0E0D] p-6 rounded-2xl text-center relative overflow-hidden font-sans">
+                      <span className="font-mono text-[10px] text-[#D4AF37] tracking-widest block mb-1 uppercase">DSA ARENA 2026</span>
+                      <h1 className="text-2xl sm:text-3xl text-white font-bold tracking-wide mb-1">
+                        Weekly Challenges
                       </h1>
-                      <p className="font-mono text-xs text-[#8A8880] tracking-widest mt-1">
-                        SOLVE EACH STAGE TO DEPLOY ALL EIGHT QUEENS ON THE META BOARD
+                      <p className="text-xs text-[#8A8880] max-w-xl mx-auto">
+                        Compete in weekly algorithmic challenges, refine problem-solving techniques, and scale the leaderboard.
                       </p>
                     </div>
 
@@ -1307,14 +1135,13 @@ export default function WeeklyPlatform() {
                               </div>
 
                               {isLocked ? (
-                                <div className="flex items-center gap-1.5 text-[#4A4A4A] border border-[#222] px-4 py-2 uppercase tracking-widest text-[9px] font-bold rounded">
+                        <div className="flex items-center gap-1.5 text-[#4A4A4A] border border-[#222] px-4 py-2 uppercase tracking-widest text-[9px] font-bold rounded">
                                   <Lock size={10} /> Locked
                                 </div>
                               ) : (
                                 <button
                                   onClick={() => {
-                                    setActiveProblem(COMPILER_PROBLEMS[0]);
-                                    setActivePage("dashboard");
+                                    window.location.href = `/solve/${String(week.id) === "1" ? "guarded-diagonals" : week.id}`;
                                   }}
                                   className={`px-4 py-2 border uppercase tracking-widest text-[9px] font-bold rounded transition-all flex items-center gap-1 ${isLive
                                       ? "border-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37] hover:text-[#0A0A0A] text-[#D4AF37]"
@@ -1394,7 +1221,7 @@ export default function WeeklyPlatform() {
                               <h2 className="font-serif text-lg text-[#FFFFFF] font-bold tracking-wide uppercase">
                                 {activeProblem.title}
                               </h2>
-                              <p className="font-mono text-[9px] text-[#8A8880] tracking-widest mt-0.5">TRIAL_0{activeProblem.id === "q2" ? "4" : "3"}</p>
+                              <p className="font-mono text-[9px] text-[#8A8880] tracking-widest mt-0.5">Problem {activeProblem.id === "q2" ? "04" : "03"}</p>
                             </div>
                             <span className={`font-mono text-[9px] border px-2 py-0.5 uppercase tracking-wider rounded ${activeProblem.difficulty === "Hard"
                                 ? "border-[#FF3333]/30 text-[#FF3333] bg-[#FF3333]/5"
@@ -1409,14 +1236,14 @@ export default function WeeklyPlatform() {
                             <MarkdownRenderer content={activeProblem.desc} className="text-[#FFFFFF]" />
 
                             <div>
-                              <h4 className="font-mono text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">// INPUT_FORMAT</h4>
+                              <h4 className="font-mono text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">Input Format</h4>
                               <div className="bg-[#070707] border border-[#1C1C1C] p-2.5 rounded">
                                 <MarkdownRenderer content={activeProblem.inputFormat} className="font-mono text-[10px]" />
                               </div>
                             </div>
 
                             <div>
-                              <h4 className="font-mono text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">// OUTPUT_FORMAT</h4>
+                              <h4 className="font-mono text-[10px] text-[#D4AF37] uppercase tracking-widest mb-1">Output Format</h4>
                               <div className="bg-[#070707] border border-[#1C1C1C] p-2.5 rounded">
                                 <MarkdownRenderer content={activeProblem.outputFormat} className="font-mono text-[10px]" />
                               </div>
@@ -1721,13 +1548,7 @@ export default function WeeklyPlatform() {
 
                 {/* Additional Tiers Grid */}
                 <div className="space-y-3 pt-4 border-t border-[#1C1C1C] mt-auto">
-                  <span className="font-mono text-[7px] text-[#4A4A4A] tracking-wider block text-center uppercase">// PLATINUM & GOLD</span>
-
-                  {/* Mindflix Holiday card */}
-                  <div className="border border-[#1A1A1A] bg-[#070707] p-2.5 rounded text-center group hover:border-[#D4AF37]/30 transition-colors">
-                    <div className="font-serif text-[10px] text-[#FFFFFF] font-bold uppercase tracking-wide group-hover:text-[#D4AF37]">Mindflix</div>
-                    <span className="font-mono text-[7px] text-[#8A8880] block uppercase mt-0.5">Holidays Partner</span>
-                  </div>
+                  <span className="font-mono text-[7px] text-[#4A4A4A] tracking-wider block text-center uppercase">// ECOSYSTEM PARTNERS</span>
 
                   {/* Engaze Card */}
                   <div className="border border-[#1A1A1A] bg-[#070707] p-2.5 rounded text-center group hover:border-[#D4AF37]/30 transition-colors">
@@ -1736,10 +1557,6 @@ export default function WeeklyPlatform() {
                   </div>
                 </div>
 
-                {/* Cyber accent decoration footer */}
-                <div className="font-mono text-[6px] text-[#333] text-center mt-3 tracking-widest select-none uppercase">
-                  cc_sponsor_auth_ok
-                </div>
               </div>
 
             </aside>
@@ -1749,8 +1566,8 @@ export default function WeeklyPlatform() {
           <footer className="w-full bg-[#0A0A0A] border-t border-[#D4AF37]/15 py-3.5 px-6 font-mono text-[10px] text-[#8A8880] text-center select-none relative z-40">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                <span>SHELL v2.0 CONNECTED // TSEC_CODECELL_SECURE</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>TSEC CODECELL // ONLINE ARENA</span>
               </div>
               <div className="hover:text-[#FFFFFF] transition-colors">
                 CODE. COMPETE. CONQUER. © 2026
@@ -1760,6 +1577,92 @@ export default function WeeklyPlatform() {
 
         </div>
       )}
+
+      {/* CODECELL RUNTIME INSTALLATION MODAL */}
+      <AnimatePresence>
+        {showRuntimeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 select-none font-mono"
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 20 }}
+              className="w-full max-w-xl bg-[#090E0B] border border-[#4BE2C4]/40 rounded-2xl p-6 md:p-8 shadow-[0_0_60px_rgba(75,226,196,0.15)] relative overflow-hidden text-white"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#4BE2C4]/10 border border-[#4BE2C4]/30 flex items-center justify-center text-[#4BE2C4]">
+                    <Terminal size={22} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-[#4BE2C4] tracking-[0.2em] uppercase block">
+                      TSEC CODECELL CLI v2.0
+                    </span>
+                    <h2 className="font-serif font-bold text-lg uppercase text-white tracking-wide">
+                      Install CodeCell Runtime
+                    </h2>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowRuntimeModal(false)}
+                  className="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <p className="text-xs text-[#8A9B93] leading-relaxed mb-6 font-sans">
+                The CodeCell Local Runtime CLI allows you to execute, benchmark, and submit competitive programming solutions directly from your terminal with instant sync to the global leaderboard.
+              </p>
+
+              {/* Terminal Install Command Box */}
+              <div className="bg-[#040705] border border-[#4BE2C4]/30 rounded-xl p-4 mb-6 relative">
+                <span className="text-[10px] text-[#8A9B93] block mb-2 uppercase tracking-widest">// RUN IN YOUR TERMINAL:</span>
+                <div className="flex items-center justify-between text-xs text-[#E8FF00] font-mono">
+                  <span>npm install -g @tsec/codecell-cli</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText("npm install -g @tsec/codecell-cli");
+                      alert("Install command copied to clipboard!");
+                    }}
+                    className="px-3 py-1 bg-[#4BE2C4]/20 hover:bg-[#4BE2C4] text-[#4BE2C4] hover:text-black rounded text-[10px] font-bold uppercase transition-all cursor-pointer"
+                  >
+                    COPY
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Commands List */}
+              <div className="border-t border-white/10 pt-4 space-y-2 text-[11px] text-[#8A9B93]">
+                <div className="flex justify-between">
+                  <span>Initialize workspace:</span>
+                  <span className="text-[#4BE2C4]">codecell init</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Run local test suite:</span>
+                  <span className="text-[#4BE2C4]">codecell test</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Submit to leaderboard:</span>
+                  <span className="text-[#4BE2C4]">codecell submit</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowRuntimeModal(false)}
+                className="w-full mt-6 py-3 rounded-xl bg-[#4BE2C4] text-black font-mono font-bold text-xs uppercase tracking-widest hover:bg-[#E8FF00] transition-colors cursor-pointer"
+              >
+                DONE
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -108,7 +108,7 @@ export default function Navbar() {
                 />
               </div>
               <span className="text-[#F0EDE6] group-hover:text-[#4BE2C4] transition-colors duration-200">
-                TSEC CODECELL_
+                TSEC CODECELL
               </span>
             </Link>
           </div>
@@ -133,7 +133,9 @@ export default function Navbar() {
                     onMouseEnter={() => setActiveDropdown(item.label)}
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
-                    <button
+                    <Link
+                      href={item.href}
+                      onClick={() => setActiveDropdown(null)}
                       className={`
                         flex
                         items-center
@@ -165,7 +167,7 @@ export default function Navbar() {
                         className={`transition-transform duration-200 ${activeDropdown === item.label ? "rotate-180" : ""
                           }`}
                       />
-                    </button>
+                    </Link>
 
                     <span
                       className={`
@@ -193,23 +195,24 @@ export default function Navbar() {
                             <Link
                               key={subItem.label}
                               href={subItem.href}
+                              onClick={() => setActiveDropdown(null)}
                               className={`
                                 px-4
                                 py-2.5
-                                text-[10px]
-                                font-mono
-                                font-bold
-                                tracking-wider
+                                text-xs
+                                font-sans
+                                font-medium
+                                tracking-wide
                                 transition-colors
                                 duration-200
                                 border-l-2
                                 ${isSubItemActive
                                   ? (isEventPage ? "text-[#D4AF37] border-[#D4AF37] bg-[#D4AF37]/5" : "text-[#E8FF00] border-[#E8FF00] bg-[#141414]")
-                                  : (isEventPage ? "text-[#8A8880] border-transparent hover:text-[#F0EDE6] hover:bg-[#D4AF37]/5 hover:border-[#D4AF37]/50" : "text-[#4A4A4A] border-transparent hover:text-[#F0EDE6] hover:bg-[#141414] hover:border-[#4BE2C4]")
+                                  : (isEventPage ? "text-[#8A8880] border-transparent hover:text-[#F0EDE6] hover:bg-[#D4AF37]/5 hover:border-[#D4AF37]/50" : "text-[#A0AFA7] border-transparent hover:text-[#F0EDE6] hover:bg-[#141414] hover:border-[#4BE2C4]")
                                 }
                               `}
                             >
-                              [ {subItem.label} ]
+                              {subItem.label}
                             </Link>
                           );
                         })}
@@ -364,13 +367,15 @@ export default function Navbar() {
                                 onClick={() => setOpen(false)}
                                 className={`
                                   py-1.5
-                                  font-bold
-                                  tracking-wider
+                                  text-xs
+                                  font-sans
+                                  font-medium
+                                  tracking-wide
                                   transition-colors
-                                  ${isSubItemActive ? activeColor : `text-[#4A4A4A] hover:text-[#F0EDE6]`}
+                                  ${isSubItemActive ? activeColor : `text-[#A0AFA7] hover:text-[#F0EDE6]`}
                                 `}
                               >
-                                [ {subItem.label} ]
+                                {subItem.label}
                               </Link>
                             );
                           })}

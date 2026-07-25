@@ -66,6 +66,24 @@ export default function LoginPage() {
             </svg>
             Sign in with Google
           </button>
+
+          <Link
+            href="/dashboard"
+            className="
+              w-full 
+              bg-[#4BE2C4]/10 text-[#4BE2C4] 
+              border border-[#4BE2C4]/40 hover:bg-[#4BE2C4] hover:text-black
+              px-4 py-3 
+              font-mono text-xs
+              font-bold
+              rounded
+              transition-all
+              flex items-center justify-center gap-2
+              uppercase tracking-widest
+            "
+          >
+            → DIRECT DASHBOARD ACCESS (DEV BYPASS)
+          </Link>
         </div>
 
         {/* Footer */}

@@ -41,14 +41,6 @@ export default function Footer() {
               <h3 className="font-mono text-[13px] font-bold text-[#F0EDE6] uppercase tracking-[0.2em] mb-4">
                 TSEC CODECELL
               </h3>
-              <p className="font-mono text-xs text-[#8A8880] leading-relaxed">
-                // where tsec students
-                <br />
-                ship production code
-              </p>
-            </div>
-            <div className="font-mono text-[10px] text-[#4BE2C4] mt-6 select-none uppercase tracking-wider font-bold">
-              [ SECURE SHELL v2.0 ]
             </div>
           </div>
 
@@ -59,8 +51,8 @@ export default function Footer() {
             </h3>
             <ul className="flex flex-col gap-3 font-sans text-[13px] text-[#8A8880]">
               <li>
-                <Link href="/dashboard" className="hover:text-[#E8FF00] transition-colors duration-200">
-                  Weekly Gambit
+                <Link href="/events/weekly-challenges" className="hover:text-[#E8FF00] transition-colors duration-200">
+                  Weekly Challenges
                 </Link>
               </li>
               <li>
@@ -119,9 +111,6 @@ export default function Footer() {
                 >
                   Code of Conduct
                 </Link>
-              </li>
-              <li className="text-[10px] font-mono text-[#4A4A4A] mt-2 select-none uppercase tracking-widest">
-                VER: 2026.06.01
               </li>
             </ul>
           </div>

@@ -59,7 +59,7 @@ export function SectionHeader({
 }: {
   index: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   align?: "left" | "center";
 }) {
   return (
@@ -68,15 +68,15 @@ export function SectionHeader({
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
       variants={fadeUp}
-      className={`mb-14 md:mb-20 ${align === "center" ? "text-center mx-auto max-w-3xl" : ""}`}
+      className={`mb-8 md:mb-10 ${align === "center" ? "text-center mx-auto max-w-3xl" : ""}`}
     >
-      <span className="text-label-tag text-[#4BE2C4] block mb-4 tracking-[0.2em]">
+      <span className="text-label-tag text-[#4BE2C4] block mb-2 tracking-[0.2em]">
         {index}
       </span>
       <h2 className="text-h1-scale font-bold uppercase tracking-tight text-[#F0EDE6]">
         {title}
       </h2>
-      <p className="text-mono-body text-[#8A8880] mt-4">{subtitle}</p>
+      {subtitle && <p className="text-mono-body text-[#8A8880] mt-2">{subtitle}</p>}
     </motion.header>
   );
 }
@@ -95,7 +95,7 @@ export function SectionWrap({
   return (
     <section
       id={id}
-      className={`relative py-24 md:py-32 border-b border-[#222222]/80 ${className}`}
+      className={`relative py-16 md:py-24 border-b border-[#222222]/80 ${className}`}
     >
       <div
         className={`mx-auto px-6 md:px-12 lg:px-16 ${narrow ? "max-w-4xl" : "max-w-7xl"}`}

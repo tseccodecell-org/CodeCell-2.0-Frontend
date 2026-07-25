@@ -4,7 +4,7 @@ import { Space_Grotesk, JetBrains_Mono, Inter, Orbitron, Poppins } from "next/fo
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import Loader from "@/components/layout/Loader";
+
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
 import { Providers } from "./providers";
 
@@ -60,7 +60,7 @@ export default function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         <Providers>
           <InteractiveGrid />
-          <Loader />
+
           <Navbar />
 
           {/* Prevent navbar overlap */}

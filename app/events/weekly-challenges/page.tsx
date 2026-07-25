@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, CalendarDays, Trophy } from "lucide-react";
+import { WeeklyTimeline } from "@/components/sections/weekly-challenges/WeeklyTimeline";
 
 export default function WeeklyChallenges() {
   return (
@@ -65,6 +66,9 @@ export default function WeeklyChallenges() {
             </span>
           </button>
         </Link>
+      </div>
+      <div className="mt-12">
+        <WeeklyTimeline />
       </div>
     </div>
   );

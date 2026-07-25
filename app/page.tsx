@@ -5,7 +5,6 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import HomeSections from "@/components/sections/HomeSections";
-
 // Scrolling Ticker Data (removed)
 
 // Flawless hexagonal cut-corner CTA button

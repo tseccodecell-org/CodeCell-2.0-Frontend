@@ -16,7 +16,7 @@ const navItems: NavItem[] = [
   { label: "HOME", href: "/" },
   {
     label: "EVENTS",
-    href: "/events",
+    href: "#",
     dropdownItems: [
       { label: "TSEC HACKS", href: "/events/tsec-hacks" },
       { label: "WEEKLY CHALLENGES", href: "/events/weekly-challenges" },

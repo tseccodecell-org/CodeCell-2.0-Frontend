@@ -716,7 +716,7 @@ export default function HomeSections() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="relative w-full h-full max-w-5xl max-h-[75vh]"
+                  className="relative w-full h-full max-w-5xl max-h-[75vh] group/image"
                 >
                   <Image
                     src={tsecHacksImages[galleryIndex]}
@@ -725,6 +725,14 @@ export default function HomeSections() {
                     className="object-contain"
                     priority
                   />
+                  {/* Floating Overlay Cross Icon directly on Image */}
+                  <button
+                    onClick={() => setIsGalleryOpen(false)}
+                    className="absolute top-3 right-3 z-30 p-3 rounded-full bg-black/80 border border-white/30 text-white hover:bg-[#E8FF00] hover:text-black transition-all shadow-2xl cursor-pointer hover:scale-110 active:scale-95"
+                    aria-label="Close image popup"
+                  >
+                    <X size={22} />
+                  </button>
                 </motion.div>
               </AnimatePresence>
 

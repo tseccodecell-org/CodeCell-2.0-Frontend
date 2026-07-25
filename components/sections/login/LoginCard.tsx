@@ -3,12 +3,15 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Shield, ArrowLeft } from "lucide-react";
+// import { BASE_URL } from "@/lib/api-client";
 
-export default function LoginPage() {
+export default function LoginCard() {
   useEffect(() => {
     // If the user already has the cookie, middleware will let them into dashboard.
     // We don't need to check localStorage here anymore.
   }, []);
+
+  const BASE_URL=process.env.NEXT_PUBLIC_API_BASE_URL;
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-transparent flex items-center justify-center px-6 py-12 select-none">
@@ -43,7 +46,7 @@ export default function LoginPage() {
             <span className="uppercase">OAUTH_V2</span>
           </div>
           <button
-            onClick={() => window.location.href = "http://localhost:8080/oauth/google/login"}
+            onClick={() => (window.location.href = `${BASE_URL}/oauth/google/login`)}
             className="
               w-full 
               bg-white text-black 
@@ -66,24 +69,6 @@ export default function LoginPage() {
             </svg>
             Sign in with Google
           </button>
-
-          <Link
-            href="/dashboard"
-            className="
-              w-full 
-              bg-[#4BE2C4]/10 text-[#4BE2C4] 
-              border border-[#4BE2C4]/40 hover:bg-[#4BE2C4] hover:text-black
-              px-4 py-3 
-              font-mono text-xs
-              font-bold
-              rounded
-              transition-all
-              flex items-center justify-center gap-2
-              uppercase tracking-widest
-            "
-          >
-            → DIRECT DASHBOARD ACCESS (DEV BYPASS)
-          </Link>
         </div>
 
         {/* Footer */}

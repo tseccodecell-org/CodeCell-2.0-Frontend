@@ -9,6 +9,7 @@ import { Overview } from "@/components/sections/weekly-challenges/Overview";
 import { Prizes } from "@/components/sections/weekly-challenges/Prizes";
 import { FAQ } from "@/components/sections/weekly-challenges/FAQ";
 import { FinalCTA } from "@/components/sections/weekly-challenges/FinalCTA";
+import LoginCard from "@/components/sections/login/LoginCard";
 
 export default function WeeklyChallengesPage() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -16,6 +17,7 @@ export default function WeeklyChallengesPage() {
   return (
     <main className="flex min-h-screen flex-col bg-[#02040A] text-white selection:bg-[#eab308]/30 selection:text-[#eab308] relative">
       {/* Landing Page Content */}
+      <LoginCard />
       <Hero onRegisterClick={() => setShowRegisterModal(true)} />
 
       <Prizes />

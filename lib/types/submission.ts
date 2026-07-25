@@ -40,6 +40,7 @@ export interface SubmitResponse {
 }
 
 export interface SubmissionTestResult {
+  passed: unknown;
   testCaseId: string;
   orderNum: number;
   verdict: string;

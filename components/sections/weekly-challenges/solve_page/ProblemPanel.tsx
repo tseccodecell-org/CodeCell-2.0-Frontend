@@ -27,6 +27,7 @@ import {
   Copy,
   Check,
   Tag as TagIcon,
+  AlertTriangle,
 } from "lucide-react";
 import type {
   ProblemDetail,
@@ -50,19 +51,30 @@ interface ProblemPanelProps {
 }
 
 // ---------------------------------------------------------------------------
-// Design tokens (kept local so the component ports cleanly between projects)
+// Design tokens — CodeCell brand palette, kept in sync with CodeEditor.tsx,
+// VerdictPanel.tsx and the Solve page.
 // ---------------------------------------------------------------------------
+// bg base      #06070B   panel        #0B0D13 / #0D0F14
+// border       #1A1C24   border alt   #22262F
+// text primary #F4F1EA   text muted   #8B93A7   text dim #5A5850
+// accent green #34D399   green soft   #6FCF97   green deep #12A87E
+// accent gold  #D9A404   (used only for "Medium" difficulty, matching the
+//                         Easy/Medium/Hard convention — not a UI accent here)
+// error red    #E2574C
 
 const tokens = {
-  bg: "#0A0A0A",
-  panel: "#0D0D0C",
-  border: "rgba(201,169,97,0.14)",
-  gold: "#C9A961",
-  goldBright: "#E4C368",
-  ink: "#F2F0EA",
-  muted: "#87847C",
-  green: "#3FA66E",
-  red: "#C9605A",
+  bg: "#06070B",
+  panel: "#0b0d13",
+  panelAlt: "#0d0f14",
+  border: "#1a1c24",
+  borderAlt: "#22262f",
+  ink: "#F4F1EA",
+  muted: "#8B93A7",
+  dim: "#5A5850",
+  green: "#34D399",
+  greenSoft: "#6FCF97",
+  gold: "#D9A404",
+  red: "#E2574C",
 };
 
 const difficultyColor = (difficulty: string) => {
@@ -71,17 +83,6 @@ const difficultyColor = (difficulty: string) => {
   if (d === "HARD") return tokens.red;
   return tokens.gold; // MEDIUM or unknown
 };
-
-// Small pawn glyph — the one signature nod to the chess motif, used sparingly.
-const PawnGlyph = ({ color }: { color: string }) => (
-  <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
-    <path
-      d="M6 0.5C7.10457 0.5 8 1.39543 8 2.5C8 3.05228 7.77614 3.55228 7.41421 3.91421C8.35543 4.35335 9 5.30231 9 6.4C9 7.03816 8.77716 7.62537 8.40706 8.08761C9.35314 8.68123 10 9.75894 10 11C10 11.5 10 12 9.5 12H2.5C2 12 2 11.5 2 11C2 9.75894 2.64686 8.68123 3.59294 8.08761C3.22284 7.62537 3 7.03816 3 6.4C3 5.30231 3.64457 4.35335 4.58579 3.91421C4.22386 3.55228 4 3.05228 4 2.5C4 1.39543 4.89543 0.5 6 0.5Z"
-      fill={color}
-    />
-    <rect x="1" y="12.5" width="10" height="1.2" rx="0.4" fill={color} />
-  </svg>
-);
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -98,14 +99,13 @@ function StatChip({
     <div
       className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5"
       style={{
-        border: `1px solid ${tokens.border}`,
+        border: `1px solid ${tokens.borderAlt}`,
+        background: tokens.panelAlt,
         color: tokens.muted,
       }}
     >
-      <span style={{ color: tokens.gold }}>{icon}</span>
-      <span className="text-[11px] tracking-wide" style={{ fontFamily: "ui-monospace, monospace" }}>
-        {label}
-      </span>
+      <span style={{ color: tokens.green }}>{icon}</span>
+      <span className="text-[11px] tracking-wide font-mono">{label}</span>
     </div>
   );
 }
@@ -120,16 +120,16 @@ function Section({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <PawnGlyph color={tokens.gold} />
+        <span className="w-1 h-3 rounded-full" style={{ background: tokens.green }} />
         <h3
-          className="text-[11px] font-semibold uppercase tracking-[0.14em]"
-          style={{ color: tokens.gold }}
+          className="text-[11px] font-mono font-bold uppercase tracking-[0.14em]"
+          style={{ color: tokens.green }}
         >
           {title}
         </h3>
       </div>
       <div
-        className="text-[13.5px] leading-relaxed"
+        className="text-[13.5px] leading-relaxed font-sans"
         style={{ color: tokens.ink, opacity: 0.9 }}
       >
         {children}
@@ -151,7 +151,7 @@ function CopyButton({ text }: { text: string }) {
           // clipboard access denied — fail silently, nothing to recover
         }
       }}
-      className="flex items-center gap-1 rounded px-1.5 py-1 text-[10px] uppercase tracking-wide transition-colors"
+      className="flex items-center gap-1 rounded px-1.5 py-1 text-[10px] font-mono uppercase tracking-wide transition-colors cursor-pointer hover:bg-white/5"
       style={{ color: copied ? tokens.green : tokens.muted }}
       aria-label="Copy to clipboard"
     >
@@ -167,15 +167,15 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
   return (
     <div
       className="rounded-lg overflow-hidden"
-      style={{ border: `1px solid ${tokens.border}` }}
+      style={{ border: `1px solid ${tokens.border}`, background: tokens.panelAlt }}
     >
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-3 py-2.5"
-        style={{ background: "rgba(201,169,97,0.05)" }}
+        className="flex w-full items-center justify-between px-3 py-2.5 cursor-pointer"
+        style={{ background: "rgba(52,211,153,0.05)" }}
       >
         <span
-          className="text-[11px] font-semibold uppercase tracking-wide"
+          className="text-[11px] font-mono font-semibold uppercase tracking-wide"
           style={{ color: tokens.ink }}
         >
           Example {index + 1}
@@ -197,17 +197,16 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
             <div className="flex flex-col gap-2.5 px-3 pb-3 pt-1">
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wide" style={{ color: tokens.muted }}>
+                  <span className="text-[10px] font-mono uppercase tracking-wide" style={{ color: tokens.muted }}>
                     Input
                   </span>
                   <CopyButton text={example.input} />
                 </div>
                 <pre
-                  className="whitespace-pre-wrap break-words rounded-md px-2.5 py-2 text-[12px]"
+                  className="whitespace-pre-wrap break-words rounded-md px-2.5 py-2 text-[12px] font-mono"
                   style={{
                     background: tokens.bg,
-                    color: tokens.ink,
-                    fontFamily: "ui-monospace, monospace",
+                    color: tokens.green,
                     border: `1px solid ${tokens.border}`,
                   }}
                 >
@@ -217,17 +216,16 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
 
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wide" style={{ color: tokens.muted }}>
+                  <span className="text-[10px] font-mono uppercase tracking-wide" style={{ color: tokens.muted }}>
                     Output
                   </span>
                   <CopyButton text={example.output} />
                 </div>
                 <pre
-                  className="whitespace-pre-wrap break-words rounded-md px-2.5 py-2 text-[12px]"
+                  className="whitespace-pre-wrap break-words rounded-md px-2.5 py-2 text-[12px] font-mono"
                   style={{
                     background: tokens.bg,
-                    color: tokens.ink,
-                    fontFamily: "ui-monospace, monospace",
+                    color: tokens.green,
                     border: `1px solid ${tokens.border}`,
                   }}
                 >
@@ -237,10 +235,10 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
 
               {example.explanation && (
                 <div>
-                  <span className="text-[10px] uppercase tracking-wide" style={{ color: tokens.muted }}>
+                  <span className="text-[10px] font-mono uppercase tracking-wide" style={{ color: tokens.muted }}>
                     Explanation
                   </span>
-                  <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: tokens.ink, opacity: 0.85 }}>
+                  <p className="mt-1 text-[12.5px] leading-relaxed font-sans" style={{ color: tokens.ink, opacity: 0.85 }}>
                     {example.explanation}
                   </p>
                 </div>
@@ -261,7 +259,7 @@ function PanelSkeleton() {
   const bar = (w: string) => (
     <div
       className="h-3 rounded animate-pulse"
-      style={{ width: w, background: "rgba(201,169,97,0.10)" }}
+      style={{ width: w, background: "rgba(52,211,153,0.08)" }}
     />
   );
   return (
@@ -282,15 +280,27 @@ function PanelSkeleton() {
   );
 }
 
-function PanelError({ message }: { message: string }) {
+function PanelError({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="flex flex-col items-start gap-2 p-6">
-      <span className="text-[11px] uppercase tracking-wide" style={{ color: tokens.red }}>
-        Could not load problem
+    <div className="flex flex-col items-start gap-3 p-6">
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(226,87,76,0.1)", border: `1px solid rgba(226,87,76,0.3)` }}>
+        <AlertTriangle size={16} style={{ color: tokens.red }} />
+      </div>
+      <span className="text-[11px] font-mono font-bold uppercase tracking-wide" style={{ color: tokens.red }}>
+        Couldn't load this problem
       </span>
-      <p className="text-[13px]" style={{ color: tokens.muted }}>
+      <p className="text-[13px] font-sans" style={{ color: tokens.muted }}>
         {message}
       </p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-lg transition-opacity hover:opacity-90 cursor-pointer"
+          style={{ color: tokens.bg, background: `linear-gradient(180deg, ${tokens.greenSoft} 0%, #12A87E 100%)` }}
+        >
+          Try Again
+        </button>
+      )}
     </div>
   );
 }
@@ -310,6 +320,7 @@ export default function ProblemPanel({
   const [problem, setProblem] = useState<ProblemDetail | null>(problemProp ?? null);
   const [loading, setLoading] = useState<boolean>(!problemProp && !!problemId);
   const [error, setError] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     if (problemProp || !problemId) return;
@@ -335,7 +346,7 @@ export default function ProblemPanel({
         setError(
           err?.response?.data?.error?.message ??
             err?.message ??
-            "Something went wrong fetching this problem."
+            "Something went wrong fetching this problem. Check your connection and try again."
         );
       })
       .finally(() => {
@@ -345,7 +356,7 @@ export default function ProblemPanel({
     return () => {
       cancelled = true;
     };
-  }, [problemId, problemProp, apiBaseUrl]);
+  }, [problemId, problemProp, apiBaseUrl, retryTick]);
 
   const defaultLanguage = useMemo(
     () => problem?.languages?.[0]?.language,
@@ -359,14 +370,20 @@ export default function ProblemPanel({
 
   return (
     <aside
-      className={`flex h-full w-[400px] shrink-0 flex-col overflow-y-auto ${className}`}
-      style={{
-        background: tokens.panel,
-        borderRight: `1px solid ${tokens.border}`,
-      }}
+      className={`flex h-full w-full shrink-0 flex-col overflow-y-auto ${className}`}
+      style={{ background: tokens.panel }}
     >
       {loading && <PanelSkeleton />}
-      {!loading && error && <PanelError message={error} />}
+      {!loading && error && (
+        <PanelError message={error} onRetry={() => setRetryTick((t) => t + 1)} />
+      )}
+      {!loading && !error && !problem && (
+        <div className="flex flex-col items-start gap-2 p-6">
+          <span className="text-[11px] font-mono uppercase tracking-wide" style={{ color: tokens.dim }}>
+            No problem selected
+          </span>
+        </div>
+      )}
 
       {!loading && !error && problem && (
         <motion.div
@@ -378,21 +395,20 @@ export default function ProblemPanel({
           {/* Title + difficulty */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <PawnGlyph color={difficultyColor(problem.difficulty)} />
               <span
-                className="text-[11px] font-semibold uppercase tracking-[0.14em]"
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: difficultyColor(problem.difficulty) }}
+              />
+              <span
+                className="text-[11px] font-mono font-semibold uppercase tracking-[0.14em]"
                 style={{ color: difficultyColor(problem.difficulty) }}
               >
                 {problem.difficulty}
               </span>
             </div>
             <h1
-              className="text-[26px] font-bold leading-tight"
-              style={{
-                color: tokens.ink,
-                fontFamily:
-                  "Georgia, 'Playfair Display', 'Times New Roman', serif",
-              }}
+              className="text-[24px] font-bold leading-tight font-sans"
+              style={{ color: tokens.ink }}
             >
               {problem.title}
             </h1>
@@ -412,11 +428,11 @@ export default function ProblemPanel({
               {problem.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full px-2.5 py-0.5 text-[10.5px] tracking-wide"
+                  className="rounded-full px-2.5 py-0.5 text-[10.5px] font-mono tracking-wide"
                   style={{
-                    color: tokens.gold,
-                    border: `1px solid ${tokens.border}`,
-                    fontFamily: "ui-monospace, monospace",
+                    color: tokens.green,
+                    border: `1px solid ${tokens.borderAlt}`,
+                    background: tokens.panelAlt,
                   }}
                 >
                   {tag}
@@ -452,8 +468,8 @@ export default function ProblemPanel({
           {problem.constraints && (
             <Section title="Constraints">
               <p
-                className="whitespace-pre-line text-[12.5px]"
-                style={{ fontFamily: "ui-monospace, monospace", color: tokens.muted }}
+                className="whitespace-pre-line text-[12.5px] font-mono"
+                style={{ color: tokens.muted }}
               >
                 {problem.constraints}
               </p>
@@ -464,10 +480,10 @@ export default function ProblemPanel({
           {problem.examples.length > 0 && (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <PawnGlyph color={tokens.gold} />
+                <span className="w-1 h-3 rounded-full" style={{ background: tokens.green }} />
                 <h3
-                  className="text-[11px] font-semibold uppercase tracking-[0.14em]"
-                  style={{ color: tokens.gold }}
+                  className="text-[11px] font-mono font-bold uppercase tracking-[0.14em]"
+                  style={{ color: tokens.green }}
                 >
                   Examples
                 </h3>
@@ -484,10 +500,10 @@ export default function ProblemPanel({
           {problem.languages.length > 0 && (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <PawnGlyph color={tokens.gold} />
+                <span className="w-1 h-3 rounded-full" style={{ background: tokens.green }} />
                 <h3
-                  className="text-[11px] font-semibold uppercase tracking-[0.14em]"
-                  style={{ color: tokens.gold }}
+                  className="text-[11px] font-mono font-bold uppercase tracking-[0.14em]"
+                  style={{ color: tokens.green }}
                 >
                   Starter Code
                 </h3>
@@ -499,10 +515,9 @@ export default function ProblemPanel({
                     <Tabs.Trigger
                       key={lang.language}
                       value={lang.language}
-                      className="rounded px-2.5 py-1 text-[11px] font-medium tracking-wide transition-colors data-[state=active]:bg-[#17140d]"
+                      className="rounded px-2.5 py-1 text-[11px] font-mono font-medium tracking-wide transition-colors cursor-pointer data-[state=active]:bg-[#0d0f14]"
                       style={{
-                        fontFamily: "ui-monospace, monospace",
-                        color: lang.language === activeLanguage ? tokens.goldBright : tokens.muted,
+                        color: lang.language === activeLanguage ? tokens.green : tokens.muted,
                       }}
                     >
                       {lang.language}
@@ -517,11 +532,10 @@ export default function ProblemPanel({
                         <CopyButton text={lang.starterCode} />
                       </div>
                       <pre
-                        className="max-h-64 overflow-auto whitespace-pre rounded-md px-3 py-3 text-[12px] leading-relaxed"
+                        className="max-h-64 overflow-auto whitespace-pre rounded-md px-3 py-3 text-[12px] font-mono leading-relaxed"
                         style={{
                           background: tokens.bg,
                           color: tokens.ink,
-                          fontFamily: "ui-monospace, monospace",
                           border: `1px solid ${tokens.border}`,
                         }}
                       >

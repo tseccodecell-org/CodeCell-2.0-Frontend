@@ -26,7 +26,7 @@ interface UseLeaderboardResult {
   error: string | null;
   /** true if the backend rejected a /tsec_student/* request with 403 */
   forbidden: boolean;
-  /** "TSEC" | "OTHER" — currently selected leaderboard segment */
+  /** "TSEC" | "GLOBAL" — currently selected leaderboard segment */
   selectedTab: LeaderboardTab;
   setSelectedTab: (tab: LeaderboardTab) => void;
   /** only true for authenticated TSEC users — controls toggle visibility */
@@ -40,14 +40,14 @@ function buildEndpoint(
   selectedTab: LeaderboardTab
 ) {
   const useTsecEndpoint = role === UserRole.TSEC && selectedTab === "TSEC";
-  const audience = useTsecEndpoint ? "tsec_student" : "other";
+  const audience = useTsecEndpoint ? "tsec_student" : "global";
   return `/${audience}/${kind}_leaderboard`;
 }
 
 /**
  * Fetches weekly or season leaderboard data.
  *
- * Defaults `selectedTab` to "OTHER" — every user sees the Other leaderboard
+ * Defaults `selectedTab` to "GLOBAL" — every user sees the Global leaderboard
  * first. The TSEC toggle (and the tsec_student/* endpoint) only becomes
  * reachable once `showToggle` is true, i.e. once we've confirmed the user
  * is an authenticated TSEC student.
@@ -60,7 +60,7 @@ export function useLeaderboard({
 }: UseLeaderboardOptions): UseLeaderboardResult {
   const { user, isTsecStudent } = useAuth();
 
-  const [selectedTab, setSelectedTab] = useState<LeaderboardTab>("OTHER");
+  const [selectedTab, setSelectedTab] = useState<LeaderboardTab>("GLOBAL");
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +119,7 @@ export function useLeaderboard({
   // somehow got set that way (e.g. role resolves after an optimistic toggle).
   useEffect(() => {
     if (!showToggle && selectedTab === "TSEC") {
-      setSelectedTab("OTHER");
+      setSelectedTab("GLOBAL");
     }
   }, [showToggle, selectedTab]);
 

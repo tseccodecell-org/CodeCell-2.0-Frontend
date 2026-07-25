@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Shield, ArrowLeft } from "lucide-react";
+import { BASE_URL } from "@/lib/api-client";
 
 export default function LoginPage() {
   useEffect(() => {

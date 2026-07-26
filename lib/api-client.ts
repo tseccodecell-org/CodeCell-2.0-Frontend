@@ -1,4 +1,6 @@
+import { ProblemDetail } from "./types/problem";
 import type{ SubmitRequest,RunRequest,RunResponse,RunResult,SubmitResponse,SubmissionResult,} from "./types/submission";
+
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -53,6 +55,16 @@ export interface Event {
   status: EventStatus;
 }
 
+// ---------- Problems ----------
+
+export function getProblem(
+  problemId: string,
+  apiBaseUrl?: string
+): Promise<ProblemDetail> {
+  return apiGetEnveloped<ProblemDetail>(
+    `/api/problems/${problemId}`,
+  );
+}
 
 
 
@@ -62,95 +74,148 @@ export interface Event {
 
  
 // ---------- Shared fetch helper ----------
- 
+
+interface Envelope<T> {
+  success: boolean;
+  data?: T;
+  error?: { message: string; code?: string };
+}
+
 class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  code?: string;
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
     this.name = "ApiError";
   }
 }
  
 // Used by Weeks endpoints — WeekController writes the payload directly,
 // no envelope (e.g. c.JSON(200, weeks)).
-async function apiGet<T>(path: string): Promise<T> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("jwt_token");
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-  }
+// async function apiGet<T>(path: string): Promise<T> {
+//   const headers: Record<string, string> = { "Content-Type": "application/json" };
+//   if (typeof window !== "undefined") {
+//     const token = localStorage.getItem("jwt_token");
+//     if (token) headers["Authorization"] = `Bearer ${token}`;
+//   }
 
+//   const res = await fetch(`${BASE_URL}${path}`, {
+//     method: "GET",
+//     headers,
+//   });
+ 
+//   if (!res.ok) {
+//     let message = res.statusText;
+//     try {
+//       const body = await res.json();
+//       message = body?.error ?? message;
+//     } catch {
+//       // response wasn't JSON, fall back to statusText
+//     }
+//     throw new ApiError(res.status, message);
+//   }
+ 
+//   return res.json() as Promise<T>;
+// }
+ 
+ 
+// async function apiGetEnveloped<T>(path: string): Promise<T> {
+//   const headers: Record<string, string> = { "Content-Type": "application/json" };
+//   if (typeof window !== "undefined") {
+//     const token = localStorage.getItem("jwt_token");
+//     if (token) headers["Authorization"] = `Bearer ${token}`;
+//   }
+
+//   const res = await fetch(`${BASE_URL}${path}`, {
+//     method: "GET",
+//     headers,
+//   });
+ 
+//   const body = (await res.json()) as Envelope<T>;
+ 
+//   if (!res.ok || !body.success) {
+//     throw new ApiError(res.status, body.error?.message ?? res.statusText);
+//   }
+ 
+//   return body.data as T;
+// }
+
+// async function apiPostEnveloped<TRequest,TResponse>(path: string, body: TRequest): Promise<TResponse> {
+//   const headers: Record<string, string> = { "Content-Type": "application/json" };
+//   if (typeof window !== "undefined") {
+//     const token = localStorage.getItem("jwt_token");
+//     if (token) headers["Authorization"] = `Bearer ${token}`;
+//   }
+
+//   const res = await fetch(`${BASE_URL}${path}`, {
+//     method: "POST",
+//     headers,
+//     body: JSON.stringify(body),
+//   });
+ 
+//   const response = (await res.json()) as Envelope<TResponse>;
+ 
+//   if (!res.ok || !response.success) {
+//     throw new ApiError(res.status, response.error?.message ?? res.statusText);
+//   }
+ 
+//   return response.data as TResponse;
+// }
+
+
+async function apiGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "GET",
-    headers,
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
   });
- 
+
   if (!res.ok) {
     let message = res.statusText;
     try {
       const body = await res.json();
       message = body?.error ?? message;
-    } catch {
-      // response wasn't JSON, fall back to statusText
-    }
+    } catch {}
     throw new ApiError(res.status, message);
   }
- 
+
   return res.json() as Promise<T>;
 }
- 
-// Used by Events endpoints — EventController wraps every response in
-// { success: boolean, data?: T, error?: { message: string } }.
-interface Envelope<T> {
-  success: boolean;
-  data?: T;
-  error?: { message: string };
-}
- 
-async function apiGetEnveloped<T>(path: string): Promise<T> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("jwt_token");
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+async function apiGetEnveloped<T>(path: string, baseUrl: string = BASE_URL): Promise<T> {
+  const res = await fetch(`${baseUrl}${path}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  const body = (await res.json()) as Envelope<T>;
+
+  if (!res.ok || !body.success) {
+    throw new ApiError(res.status, body.error?.message ?? res.statusText, body.error?.code);
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "GET",
-    headers,
-  });
- 
-  const body = (await res.json()) as Envelope<T>;
- 
-  if (!res.ok || !body.success) {
-    throw new ApiError(res.status, body.error?.message ?? res.statusText);
-  }
- 
   return body.data as T;
 }
 
-async function apiPostEnveloped<TRequest,TResponse>(path: string, body: TRequest): Promise<TResponse> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("jwt_token");
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-  }
-
+async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: TRequest): Promise<TResponse> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers,
-    body: JSON.stringify(body),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(requestBody),
   });
- 
+
   const response = (await res.json()) as Envelope<TResponse>;
- 
+
   if (!res.ok || !response.success) {
-    throw new ApiError(res.status, response.error?.message ?? res.statusText);
+    throw new ApiError(res.status, response.error?.message ?? res.statusText, response.error?.code);
   }
- 
+
   return response.data as TResponse;
 }
-
 
 // ---------- Weeks ----------
  
@@ -212,6 +277,10 @@ export function getSubmission(
     );
 }
 
-
+export function getSubmissionHistory(
+  problemId: string
+): Promise<SubmissionResult[]> {
+  return apiGetEnveloped(`/api/problems/${problemId}/submissions`);
+}
  
 export { ApiError };

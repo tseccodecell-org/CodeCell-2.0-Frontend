@@ -5,6 +5,8 @@ import ProblemPanel from "@/components/sections/weekly-challenges/solve_page/Pro
 import CodeEditor from "@/components/sections/weekly-challenges/solve_page/CodeEditor";
 import VerdictPanel from "@/components/sections/weekly-challenges/solve_page/VerdictPanel";
 import { GripVertical, GripHorizontal, TriangleAlert } from "lucide-react";
+import SubmissionHistory from "@/components/sections/weekly-challenges/solve_page/SubmissionHistory";
+import { History } from "lucide-react";
 import {
   runCode,
   submitCode,
@@ -47,6 +49,8 @@ export default function Solve({ params }: PageProps) {
   const isMountedRef = useRef(true);
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollErrorCountRef = useRef(0);
+  const [historyOpen, setHistoryOpen] = useState(false);
+const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -88,10 +92,11 @@ export default function Solve({ params }: PageProps) {
       }));
 
       if (result.status === "COMPLETED" || result.status === "FAILED") {
-        setActiveAction(null);
-        stopPolling();
-        return;
-      }
+  setActiveAction(null);
+  stopPolling();
+  setHistoryRefreshKey((k) => k + 1);
+  return;
+}
 
       pollTimeoutRef.current = setTimeout(() => {
         pollSubmission(submissionId);
@@ -121,6 +126,35 @@ export default function Solve({ params }: PageProps) {
       }, POLL_INTERVAL_MS);
     }
   };
+
+  function isApiError(err: unknown): err is { status: number; code?: string; message: string } {
+    return (
+      typeof err === "object" &&
+      err !== null &&
+      "status" in err &&
+      typeof (err as { status: unknown }).status === "number" &&
+      "message" in err &&
+      typeof (err as { message: unknown }).message === "string"
+    );
+  }
+
+  function getSubmitErrorMessage(err: unknown): string {
+    if (isApiError(err)) {
+      if (err.status === 429) {
+        const isRateLimit =
+          err.code === "RATE_LIMIT_EXCEEDED" ||
+          (/limit/i.test(err.message) && !/wait a few seconds|cooldown/i.test(err.message));
+        return isRateLimit
+          ? "You have reached the submission limit. Please wait before submitting again."
+          : "Please wait a few seconds before submitting this problem again.";
+      }
+      if (err.status === 401) return "Your session has expired. Please sign in again.";
+      if (err.status === 404) return "This problem could not be found.";
+      if (err.status === 400) return "There was a problem with your submission. Please check your code and try again.";
+      if (err.status >= 500) return "Something went wrong on our end. Please try again shortly.";
+    }
+    return "Couldn't submit your solution. Check your connection and try again.";
+  }
 
   const handleRun = async (code: string, language: Language) => {
     if (!problemId) return;
@@ -185,23 +219,24 @@ export default function Solve({ params }: PageProps) {
       if (!isMountedRef.current) return;
 
       setSubmission({
-        status: "QUEUED",
-        submissionId: response.submissionId,
-        testResults: [],
-      });
+  status: "QUEUED",
+  submissionId: response.submissionId,
+  queuePosition: response.queuePosition,
+  testResults: [],
+});
 
       pollSubmission(response.submissionId);
     } catch (err) {
-      console.error("Submit failed:", err);
-      if (isMountedRef.current) {
-        setActiveAction(null);
-        setSubmission((prev) => ({
-          ...prev,
-          status: "FAILED",
-          errorMessage: "Couldn't submit your solution. Check your connection and try again.",
-        }));
-      }
-    }
+  console.error("Submit failed:", err);
+  if (isMountedRef.current) {
+    setActiveAction(null);
+    setSubmission((prev) => ({
+      ...prev,
+      status: "FAILED",
+      errorMessage: getSubmitErrorMessage(err),
+    }));
+  }
+}
   };
 
   // ---- Panel layout (draggable, LeetCode-style) ----
@@ -273,12 +308,28 @@ export default function Solve({ params }: PageProps) {
   return (
     <div ref={containerRef} className="flex h-screen overflow-hidden bg-[#06070B]">
       {/* Left Panel - problem */}
-      <div
-        style={{ width: `${leftWidth}%` }}
-        className="h-screen overflow-y-auto flex-shrink-0 border-r border-[#1a1c24]"
-      >
-        <ProblemPanel problemId={problemId} />
-      </div>
+       <div
+         style={{ width: `${leftWidth}%` }}
+         className="relative h-screen overflow-y-auto flex-shrink-0 border-r border-[#1a1c24]"
+       >
+         <ProblemPanel problemId={problemId} />
+
+        <button
+          onClick={() => setHistoryOpen(true)}
+          title="Submission history"
+          className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#22262f] bg-[#0d0f14]/90 backdrop-blur text-[#8B93A7] hover:text-[#34D399] hover:border-[#34D399]/40 font-mono text-[10px] uppercase tracking-wide transition-colors cursor-pointer"
+        >
+          <History size={13} />
+          History
+        </button>
+
+        <SubmissionHistory
+          problemId={problemId}
+          open={historyOpen}
+          onClose={() => setHistoryOpen(false)}
+          refreshKey={historyRefreshKey}
+        />
+       </div>
 
       {/* Horizontal drag handle */}
       <div
@@ -294,6 +345,14 @@ export default function Solve({ params }: PageProps) {
       {/* Right Panel - editor + verdict */}
       <div ref={rightColRef} style={{ width: `${100 - leftWidth}%` }} className="h-screen flex flex-col min-w-0">
         <div style={{ height: `${editorHeight}%` }} className="flex-shrink-0 min-h-0">
+          <button
+    onClick={() => setHistoryOpen(true)}
+    title="Submission history"
+    className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#22262f] bg-[#0d0f14]/90 backdrop-blur text-[#8B93A7] hover:text-[#34D399] hover:border-[#34D399]/40 font-mono text-[10px] uppercase tracking-wide transition-colors cursor-pointer"
+  >
+    <History size={13} />
+    History
+  </button>
           <CodeEditor
             status={submission.status}
             activeAction={activeAction}
@@ -325,6 +384,8 @@ export default function Solve({ params }: PageProps) {
             errorMessage={submission.errorMessage}
             testResults={submission.testResults}
           />
+
+           
         </div>
       </div>
     </div>

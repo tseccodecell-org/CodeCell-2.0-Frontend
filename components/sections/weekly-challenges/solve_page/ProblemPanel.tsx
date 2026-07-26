@@ -15,8 +15,8 @@
  *   <ProblemPanel problemId={id} apiBaseUrl="https://api.example.com" />
  */
 
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { SetStateAction, useEffect, useMemo, useState } from "react";
+import { getProblem, ApiError } from "@/lib/api-client";
 import * as Tabs from "@radix-ui/react-tabs";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -309,7 +309,7 @@ function PanelError({ message, onRetry }: { message: string; onRetry?: () => voi
 // Main component
 // ---------------------------------------------------------------------------
 
-const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 export default function ProblemPanel({
   problem: problemProp,
@@ -329,19 +329,22 @@ export default function ProblemPanel({
     setLoading(true);
     setError(null);
 
-    axios
-      .get<APIResponse<ProblemDetail>>(
-        `${apiBaseUrl.replace(/\/$/, "")}/api/problems/${problemId}`
-      )
-      .then((res) => {
+
+    getProblem(problemId, apiBaseUrl)
+      .then((data: SetStateAction<ProblemDetail | null>) => {
         if (cancelled) return;
-        if (res.data.success) {
-          setProblem(res.data.data);
-        } else {
-          setError(res.data.error.message);
-        }
+        setProblem(data);
       })
-      .catch((err) => {
+       .catch((err: { message: SetStateAction<string | null>; }) => {
+         if (cancelled) return;
+         setError(
+          err instanceof ApiError
+            ? err.message
+            : err?.message ??
+             "Something went wrong fetching this problem. Check your connection and try again."
+         );
+       })
+      .catch((err: { response: { data: { error: { message: any; }; }; }; message: any; }) => {
         if (cancelled) return;
         setError(
           err?.response?.data?.error?.message ??
@@ -452,12 +455,12 @@ export default function ProblemPanel({
           {(problem.inputFormat || problem.outputFormat) && (
             <div className="grid grid-cols-1 gap-4">
               {problem.inputFormat && (
-                <Section title="Input Format">
+                <Section title="Input">
                   <p className="whitespace-pre-line">{problem.inputFormat}</p>
                 </Section>
               )}
               {problem.outputFormat && (
-                <Section title="Output Format">
+                <Section title="Output">
                   <p className="whitespace-pre-line">{problem.outputFormat}</p>
                 </Section>
               )}

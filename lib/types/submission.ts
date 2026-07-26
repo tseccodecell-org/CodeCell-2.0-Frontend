@@ -17,6 +17,14 @@ export interface RunRequest {
 }
 
 export interface RunResponse {
+  testResults: never[];
+  errorMessage: string | undefined;
+  stderr: string | undefined;
+  stdout: string | undefined;
+  memoryUsedKb: number | undefined;
+  executionTimeMs: number | undefined;
+  score: number | undefined;
+  verdict: string | undefined;
   runId: string;
   status: string;
 }
@@ -34,11 +42,6 @@ export interface SubmitRequest {
   sourceCode: string;
 }
 
-export interface SubmitResponse {
-  submissionId: string;
-  status: SubmissionStatus;
-}
-
 export interface SubmissionTestResult {
   passed: unknown;
   testCaseId: string;
@@ -48,42 +51,37 @@ export interface SubmissionTestResult {
   memoryKb?: number;
 }
 
-export interface SubmissionResult {
-  id: string;
-
+export interface SubmitResponse {
+  submissionId: string;
   status: SubmissionStatus;
-
-  verdict: string;
-
-  score: number;
-
-  executionTimeMs: number;
-
-  memoryUsedKb: number;
-
-  errorMessage?: string;
-
-  testResults: SubmissionTestResult[];
+  queuePosition?: number;
 }
 
 export interface SubmissionState {
   status: SubmissionStatus;
-
   verdict?: string;
-
   executionTime?: number;
-
   memoryUsed?: number;
-
   score?: number;
-
   stdout?: string;
-
   stderr?: string;
-
   submissionId?: string;
-
   errorMessage?: string;
-
+  queuePosition?: number;          // new
   testResults: SubmissionTestResult[];
+}
+
+// used by history list — optional so existing single-submission usage is unaffected
+export interface SubmissionResult {
+  id: string;
+  status: SubmissionStatus;
+  verdict: string;
+  score: number;
+  executionTimeMs: number;
+  memoryUsedKb: number;
+  errorMessage?: string;
+  testResults: SubmissionTestResult[];
+  submittedAt?: string;
+  judgedAt?: string;
+  language?: Language;
 }

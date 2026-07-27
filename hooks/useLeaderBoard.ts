@@ -10,6 +10,7 @@ import {
   UserRole,
   WeeklyLeaderboardResponse,
 } from "@/lib/types/leaderboard";
+import { getLeaderboard, ApiError } from "@/lib/api-client";
 
 interface UseLeaderboardOptions {
   kind: LeaderboardKind;
@@ -68,48 +69,30 @@ export function useLeaderboard({
   const [refetchToken, setRefetchToken] = useState(0);
 
   const showToggle = isTsecStudent;
+const fetchLeaderboard = useCallback(async () => {
+  setIsLoading(true);
+  setError(null);
+  setForbidden(false);
 
-  const fetchLeaderboard = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    setForbidden(false);
-
-    //const endpoint = buildEndpoint(kind, user?.role, selectedTab);
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-    const endpoint = `${API_BASE}${buildEndpoint(kind, user?.role, selectedTab)}`;
-
-    const params = new URLSearchParams();
-    params.set("page", String(page));
-    params.set("limit", String(limit));
-    if (kind === "weekly" && weekId) {
-      params.set("week_id", weekId);
-    }
-
-    try {
-      const res = await fetch(`${endpoint}?${params.toString()}`, {
-        credentials: "include",
-      });
-
-      if (res.status === 403) {
-        setForbidden(true);
-        setData(null);
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error(`Failed to load leaderboard (${res.status})`);
-      }
-
-      const json: LeaderboardResponse = await res.json();
-      setData(json);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load leaderboard");
+  try {
+    const json = await getLeaderboard(kind, user?.role, selectedTab, {
+      page,
+      limit,
+      weekId,
+    });
+    setData(json);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 403) {
+      setForbidden(true);
       setData(null);
-    } finally {
-      setIsLoading(false);
+      return;
     }
-  }, [kind, user?.role, selectedTab, page, limit, weekId]);
+    setError(err instanceof Error ? err.message : "Failed to load leaderboard");
+    setData(null);
+  } finally {
+    setIsLoading(false);
+  }
+}, [kind, user?.role, selectedTab, page, limit, weekId]);
 
   useEffect(() => {
     fetchLeaderboard();

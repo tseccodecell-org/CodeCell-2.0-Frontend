@@ -17,7 +17,7 @@ export default function WeeklyChallengesPage() {
   return (
     <main className="flex min-h-screen flex-col bg-[#02040A] text-white selection:bg-[#eab308]/30 selection:text-[#eab308] relative">
       {/* Landing Page Content */}
-      <LoginCard />
+      {/* <LoginCard /> */}
       <Hero onRegisterClick={() => setShowRegisterModal(true)} />
 
       <Prizes />

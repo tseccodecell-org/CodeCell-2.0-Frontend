@@ -345,14 +345,6 @@ const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
       {/* Right Panel - editor + verdict */}
       <div ref={rightColRef} style={{ width: `${100 - leftWidth}%` }} className="h-screen flex flex-col min-w-0">
         <div style={{ height: `${editorHeight}%` }} className="flex-shrink-0 min-h-0">
-          <button
-    onClick={() => setHistoryOpen(true)}
-    title="Submission history"
-    className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#22262f] bg-[#0d0f14]/90 backdrop-blur text-[#8B93A7] hover:text-[#34D399] hover:border-[#34D399]/40 font-mono text-[10px] uppercase tracking-wide transition-colors cursor-pointer"
-  >
-    <History size={13} />
-    History
-  </button>
           <CodeEditor
             status={submission.status}
             activeAction={activeAction}

@@ -145,7 +145,7 @@ export default function LeaderboardTable({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 select-none">
         {controls ?? <div />}
 
-        <div className="relative w-full sm:w-72">
+        {/* <div className="relative w-full sm:w-72">
           <input
             type="text"
             placeholder="Search grandmaster..."
@@ -154,7 +154,7 @@ export default function LeaderboardTable({
             className="w-full bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-2.5 pl-10 text-xs text-[#F0EDE6] focus:outline-none focus:border-[#D4AF37] font-mono shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
           />
           <Search size={14} className="absolute left-3.5 top-3 text-[#8A8880]" />
-        </div>
+        </div> */}
       </div>
 
       {/* States: forbidden / error / loading */}

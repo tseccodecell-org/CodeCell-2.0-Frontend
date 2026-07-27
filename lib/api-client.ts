@@ -1,9 +1,16 @@
 import { ProblemDetail } from "./types/problem";
 import type{ SubmitRequest,RunRequest,RunResponse,RunResult,SubmitResponse,SubmissionResult,} from "./types/submission";
+import {
+  LeaderboardKind,
+  LeaderboardTab,
+  UserRole,
+  WeeklyLeaderboardResponse,
+  SeasonLeaderboardResponse,
+} from "./types/leaderboard";
 
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export interface Week {
   id: string;
@@ -42,6 +49,7 @@ export interface Problem {
   created_at: string;
   updated_at: string;
 }
+
  
 // Backend DTO: EventResponse (camelCase — distinct from the raw Event model)
 export type EventStatus = "UPCOMING" | "LIVE" | "ENDED";
@@ -91,79 +99,6 @@ class ApiError extends Error {
     this.name = "ApiError";
   }
 }
- 
-// Used by Weeks endpoints — WeekController writes the payload directly,
-// no envelope (e.g. c.JSON(200, weeks)).
-// async function apiGet<T>(path: string): Promise<T> {
-//   const headers: Record<string, string> = { "Content-Type": "application/json" };
-//   if (typeof window !== "undefined") {
-//     const token = localStorage.getItem("jwt_token");
-//     if (token) headers["Authorization"] = `Bearer ${token}`;
-//   }
-
-//   const res = await fetch(`${BASE_URL}${path}`, {
-//     method: "GET",
-//     headers,
-//   });
- 
-//   if (!res.ok) {
-//     let message = res.statusText;
-//     try {
-//       const body = await res.json();
-//       message = body?.error ?? message;
-//     } catch {
-//       // response wasn't JSON, fall back to statusText
-//     }
-//     throw new ApiError(res.status, message);
-//   }
- 
-//   return res.json() as Promise<T>;
-// }
- 
- 
-// async function apiGetEnveloped<T>(path: string): Promise<T> {
-//   const headers: Record<string, string> = { "Content-Type": "application/json" };
-//   if (typeof window !== "undefined") {
-//     const token = localStorage.getItem("jwt_token");
-//     if (token) headers["Authorization"] = `Bearer ${token}`;
-//   }
-
-//   const res = await fetch(`${BASE_URL}${path}`, {
-//     method: "GET",
-//     headers,
-//   });
- 
-//   const body = (await res.json()) as Envelope<T>;
- 
-//   if (!res.ok || !body.success) {
-//     throw new ApiError(res.status, body.error?.message ?? res.statusText);
-//   }
- 
-//   return body.data as T;
-// }
-
-// async function apiPostEnveloped<TRequest,TResponse>(path: string, body: TRequest): Promise<TResponse> {
-//   const headers: Record<string, string> = { "Content-Type": "application/json" };
-//   if (typeof window !== "undefined") {
-//     const token = localStorage.getItem("jwt_token");
-//     if (token) headers["Authorization"] = `Bearer ${token}`;
-//   }
-
-//   const res = await fetch(`${BASE_URL}${path}`, {
-//     method: "POST",
-//     headers,
-//     body: JSON.stringify(body),
-//   });
- 
-//   const response = (await res.json()) as Envelope<TResponse>;
- 
-//   if (!res.ok || !response.success) {
-//     throw new ApiError(res.status, response.error?.message ?? res.statusText);
-//   }
- 
-//   return response.data as TResponse;
-// }
-
 
 async function apiGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -184,8 +119,10 @@ async function apiGet<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-async function apiGetEnveloped<T>(path: string, baseUrl: string = BASE_URL): Promise<T> {
-  const res = await fetch(`${baseUrl}${path}`, {
+async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
+  const urlBase = baseUrl ?? BASE_URL;
+  if (!urlBase) throw new ApiError(0, "API base URL is not set");
+  const res = await fetch(`${urlBase}${path}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -282,5 +219,33 @@ export function getSubmissionHistory(
 ): Promise<SubmissionResult[]> {
   return apiGetEnveloped(`/api/problems/${problemId}/submissions`);
 }
- 
+
+function buildLeaderboardEndpoint(
+  kind: LeaderboardKind,
+  role: UserRole | undefined,
+  tab: LeaderboardTab
+) {
+  const useTsecEndpoint = role === UserRole.TSEC && tab === "TSEC";
+  const audience = useTsecEndpoint ? "tsec_student" : "other";
+
+  return `/${audience}/${kind}_leaderboard`;
+}
+
+export function getLeaderboard(
+  kind: LeaderboardKind,
+  role: UserRole | undefined,
+  tab: LeaderboardTab,
+  opts: { page: number; limit: number; weekId?: string }
+): Promise<WeeklyLeaderboardResponse | SeasonLeaderboardResponse> {
+  const params = new URLSearchParams();
+  params.set("page", String(opts.page));
+  params.set("limit", String(opts.limit));
+  if (kind === "weekly" && opts.weekId) params.set("week_id", opts.weekId);
+
+  return apiGetEnveloped(
+    `${buildLeaderboardEndpoint(kind, role, tab)}?${params.toString()}`
+  );
+}
+
+
 export { ApiError };

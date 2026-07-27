@@ -38,10 +38,10 @@ export default function SeasonLeaderboardPage() {
   return (
     <>
       <div className="px-6 md:px-12 lg:px-24 max-w-7xl mx-auto pt-12">
-        <Link href="/events/weekly-challenges">
+        <Link href="/events/weekly-challenges/timeline">
           <button className="flex items-center gap-2 text-xs font-mono text-[#8A8880] hover:text-[#D4AF37] transition-colors mb-2">
             <ChevronLeft size={14} />
-            BACK TO LEADERBOARDS
+            BACK
           </button>
         </Link>
       </div>

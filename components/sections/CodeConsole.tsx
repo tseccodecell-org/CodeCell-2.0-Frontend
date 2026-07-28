@@ -75,7 +75,7 @@ export default function CodeConsole() {
   const [charIdx, setCharIdx] = useState(0);
   const [stage, setStage] = useState<"typing" | "compiling" | "completed">("typing");
   const [compileProgress, setCompileProgress] = useState(0);
-
+  const codeRef = useRef<HTMLDivElement>(null);
   const currentSnippet = snippets[snippetIdx];
 
   // Reset states when changing index
@@ -86,6 +86,12 @@ export default function CodeConsole() {
     setStage("typing");
     setCompileProgress(0);
   };
+
+  useEffect(() => {
+      codeRef.current?.scrollTo({
+      top: codeRef.current.scrollHeight,
+  });
+  }, [typedText]);
 
   useEffect(() => {
     if (stage === "typing") {
@@ -180,12 +186,11 @@ export default function CodeConsole() {
         border-[#2E2E2E]
         font-mono
         text-xs
-        p-6
+        p-4
         relative
-        min-h-[340px]
+        h-[420px]
         flex
         flex-col
-        justify-between
         shadow-[0_0_40px_rgba(232,255,0,0.02)]
       "
     >
@@ -231,7 +236,17 @@ export default function CodeConsole() {
       </div>
 
       {/* Code Area */}
-      <div className="flex-1 font-mono text-[11px] sm:text-xs leading-relaxed text-[#F0EDE6] overflow-x-auto select-text whitespace-pre mb-4 min-h-[140px]">
+
+        <div
+          ref={codeRef}
+          className="flex flex-1 overflow-y-auto overflow-x-auto mb-4 min-h-[140px]"
+        >
+        <div className="w-10 flex-shrink-0 text-right pr-3 text-[#555]">
+          1
+          2
+          3
+        </div>
+        <div className="flex-1">
         <code
           dangerouslySetInnerHTML={{
             __html: highlightSyntax(typedText, currentSnippet.lang),
@@ -240,6 +255,7 @@ export default function CodeConsole() {
         {stage === "typing" && (
           <span className="inline-block w-1.5 h-4 bg-[#E8FF00] ml-0.5 animate-[pulse_1s_infinite] align-middle" />
         )}
+      </div>
       </div>
 
       {/* Compiler Execution Interface overlay */}

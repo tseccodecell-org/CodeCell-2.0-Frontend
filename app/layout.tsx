@@ -3,8 +3,7 @@ import { Space_Grotesk, JetBrains_Mono, Inter, Orbitron, Poppins } from "next/fo
 
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-
+import FooterWrapper from "@/components/layout/FooterWrapper";
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
 import { Providers } from "./providers";
 
@@ -67,7 +66,7 @@ export default function RootLayout({
           <main className="relative z-10 min-h-screen">
             {children}
           </main>
-          <Footer />
+          <FooterWrapper />
         </Providers>
       </body>
     </html>

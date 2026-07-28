@@ -35,6 +35,18 @@ const RUNTIME_LANGUAGE: Record<Language, LanguageKey> = {
   PYTHON: "python",
 };
 
+const LOCAL_VERDICT: Record<string, string> = {
+  "Accepted": "ACCEPTED",
+  "Compile Error": "COMPILATION_ERROR",
+  "Runtime Error": "RUNTIME_ERROR",
+  "Time Limit Exceeded": "TIME_LIMIT_EXCEEDED",
+  "System Error": "SYSTEM_ERROR",
+};
+
+function normalizeLocalVerdict(verdict: string): string {
+  return LOCAL_VERDICT[verdict] ?? verdict.toUpperCase().replace(/ /g, "_");
+}
+
 async function tryLocalRun(
   code: string,
   language: Language,
@@ -311,11 +323,12 @@ export default function Solve({ params }: PageProps) {
       if (!isMountedRef.current) return;
 
       if (local) {
+        const verdict = normalizeLocalVerdict(local.verdict);
         setRunOrigin("local");
         setSubmission((prev) => ({
           ...prev,
           status: "COMPLETED",
-          verdict: local.verdict === "ACCEPTED" ? undefined : local.verdict,
+          verdict: verdict === "ACCEPTED" ? undefined : verdict,
           executionTime: local.execution_time_ms,
           compileTime: local.compile_time_ms,
           stdout: local.stdout,

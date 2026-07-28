@@ -12,11 +12,11 @@ export interface RunPayload {
 
 export interface RunResponse {
   verdict:
-    | "ACCEPTED"
-    | "COMPILE_ERROR"
-    | "TIME_LIMIT_EXCEEDED"
-    | "RUNTIME_ERROR"
-    | "SYSTEM_ERROR";
+    | "Accepted"
+    | "Compile Error"
+    | "Time Limit Exceeded"
+    | "Runtime Error"
+    | "System Error";
   stdout: string;
   stderr: string;
   compile_time_ms: number;
@@ -30,7 +30,11 @@ export interface RunResponse {
 export interface ToolchainInfo {
   available: boolean;
   source: "appdata" | "bundled" | "system" | "missing";
-  executablePath: string;
+  executable_path: string;
+}
+
+interface LanguagesResponse {
+  languages: Record<LanguageKey, ToolchainInfo>;
 }
 
 export interface HealthResponse {
@@ -71,14 +75,15 @@ export async function getLocalToolchainStatus(): Promise<Record<
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-    const res = await fetch(`${RUNTIME_BASE_URL}/api/status`, {
+    const res = await fetch(`${RUNTIME_BASE_URL}/languages`, {
       method: "GET",
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
 
     if (!res.ok) return null;
-    return await res.json();
+    const body = (await res.json()) as LanguagesResponse;
+    return body.languages ?? null;
   } catch {
     return null;
   }

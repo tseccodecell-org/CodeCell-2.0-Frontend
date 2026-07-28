@@ -477,7 +477,7 @@ export default function Solve({ params }: PageProps) {
         <Link
           href="/events/weekly-challenges"
           className="mt-2 rounded-xl px-5 py-2 font-mono text-xs font-bold uppercase tracking-widest text-[#06070B] transition-opacity hover:opacity-90"
-          style={{ background: "linear-gradient(180deg, #6FCF97 0%, #12A87E 100%)" }}
+          style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}
         >
           Back to Challenges
         </Link>
@@ -540,7 +540,7 @@ export default function Solve({ params }: PageProps) {
                 onClick={() => setLeftTab(tab.key)}
                 className={`rounded px-2.5 py-1 font-mono text-[11px] tracking-wide transition-colors cursor-pointer ${
                   leftTab === tab.key
-                    ? "bg-[#151821] text-[#34D399]"
+                    ? "bg-[#151821] text-[#D9A404]"
                     : "text-[#8B93A7] hover:text-[#F4F1EA]"
                 }`}
               >
@@ -560,7 +560,7 @@ export default function Solve({ params }: PageProps) {
 
         <div
           onMouseDown={() => startDrag("horizontal")}
-          className="w-1 shrink-0 cursor-col-resize bg-[#1a1c24] transition-colors hover:bg-[#34D399]/40"
+          className="w-1 shrink-0 cursor-col-resize bg-[#1a1c24] transition-colors hover:bg-[#D9A404]/40"
         />
 
         <div
@@ -584,7 +584,7 @@ export default function Solve({ params }: PageProps) {
 
           <div
             onMouseDown={() => startDrag("vertical")}
-            className="h-1 shrink-0 cursor-row-resize bg-[#1a1c24] transition-colors hover:bg-[#34D399]/40"
+            className="h-1 shrink-0 cursor-row-resize bg-[#1a1c24] transition-colors hover:bg-[#D9A404]/40"
           />
 
           <div className="min-h-0 flex-1">

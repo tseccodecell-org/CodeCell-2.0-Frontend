@@ -144,7 +144,7 @@ export default function CodeEditor({
               onClick={() => setLanguage(lang.id)}
               className={`rounded px-2.5 py-1 font-mono text-[11px] tracking-wide transition-colors cursor-pointer ${
                 lang.id === language
-                  ? "bg-[#151821] text-[#34D399]"
+                  ? "bg-[#151821] text-[#D9A404]"
                   : "text-[#8B93A7] hover:text-[#F4F1EA]"
               }`}
             >
@@ -162,14 +162,14 @@ export default function CodeEditor({
             }
             className="flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-[10px] tracking-wide"
             style={{
-              borderColor: runsLocally ? "#34D39955" : "#22262f",
-              color: runsLocally ? "#34D399" : "#8B93A7",
-              background: runsLocally ? "#34D39912" : "transparent",
+              borderColor: runsLocally ? "#D9A40455" : "#22262f",
+              color: runsLocally ? "#D9A404" : "#8B93A7",
+              background: runsLocally ? "#D9A40412" : "transparent",
             }}
           >
             <span
               className="h-1.5 w-1.5 rounded-full"
-              style={{ background: runsLocally ? "#34D399" : "#5A5850" }}
+              style={{ background: runsLocally ? "#D9A404" : "#5A5850" }}
             />
             {localReady === null
               ? "Checking runtime"
@@ -181,14 +181,14 @@ export default function CodeEditor({
           <button
             onClick={resetCode}
             title="Reset to starter code"
-            className="rounded p-1.5 text-[#8B93A7] transition-colors hover:bg-[#151821] hover:text-[#34D399] cursor-pointer"
+            className="rounded p-1.5 text-[#8B93A7] transition-colors hover:bg-[#151821] hover:text-[#D9A404] cursor-pointer"
           >
             <RotateCcw size={14} />
           </button>
           <button
             onClick={() => setFullscreen((v) => !v)}
             title={fullscreen ? "Exit full screen" : "Full screen"}
-            className="rounded p-1.5 text-[#8B93A7] transition-colors hover:bg-[#151821] hover:text-[#34D399] cursor-pointer"
+            className="rounded p-1.5 text-[#8B93A7] transition-colors hover:bg-[#151821] hover:text-[#D9A404] cursor-pointer"
           >
             {fullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
           </button>
@@ -205,7 +205,7 @@ export default function CodeEditor({
           loading={
             <div className="flex h-full w-full items-center justify-center bg-[#0b0d13]">
               <span className="flex items-center gap-2 font-mono text-xs text-[#8B93A7]">
-                <Loader2 size={14} className="animate-spin text-[#34D399]" />
+                <Loader2 size={14} className="animate-spin text-[#D9A404]" />
                 Loading editor
               </span>
             </div>
@@ -234,7 +234,7 @@ export default function CodeEditor({
             onChange={(e) => setStdin(e.target.value)}
             placeholder="Input passed to your program when you press Run"
             spellCheck={false}
-            className="h-20 w-full resize-none rounded border border-[#22262f] bg-[#0b0d13] px-2.5 py-2 font-mono text-xs text-[#F4F1EA] placeholder:text-[#5A5850] focus:border-[#34D399]/50 focus:outline-none"
+            className="h-20 w-full resize-none rounded border border-[#22262f] bg-[#0b0d13] px-2.5 py-2 font-mono text-xs text-[#F4F1EA] placeholder:text-[#5A5850] focus:border-[#D9A404]/50 focus:outline-none"
           />
         </div>
       )}
@@ -255,7 +255,7 @@ export default function CodeEditor({
           <button
             onClick={() => onRun?.(code, language, stdin)}
             disabled={isBusy}
-            className="flex items-center gap-1.5 rounded border border-[#22262f] px-3.5 py-1.5 font-mono text-xs font-semibold text-[#F4F1EA] transition-colors hover:border-[#34D399]/60 hover:text-[#34D399] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="flex items-center gap-1.5 rounded border border-[#22262f] px-3.5 py-1.5 font-mono text-xs font-semibold text-[#F4F1EA] transition-colors hover:border-[#D9A404]/60 hover:text-[#D9A404] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             {isRunning ? (
               <Loader2 size={14} className="animate-spin" />
@@ -274,7 +274,7 @@ export default function CodeEditor({
                 : undefined
             }
             className="flex items-center gap-1.5 rounded px-4 py-1.5 font-mono text-xs font-bold text-[#06070B] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            style={{ background: "linear-gradient(180deg, #6FCF97 0%, #12A87E 100%)" }}
+            style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}
           >
             {isJudging ? (
               <Loader2 size={14} className="animate-spin" />

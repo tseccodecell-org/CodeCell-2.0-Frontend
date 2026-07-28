@@ -277,9 +277,9 @@ function OriginBadge({ origin }: { origin?: "local" | "server" | null }) {
       }
       className="flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-[10px] tracking-wide"
       style={{
-        borderColor: local ? "#34D39955" : "#22262f",
-        color: local ? "#34D399" : "#8B93A7",
-        background: local ? "#34D39912" : "transparent",
+        borderColor: local ? "#D9A40455" : "#22262f",
+        color: local ? "#D9A404" : "#8B93A7",
+        background: local ? "#D9A40412" : "transparent",
       }}
     >
       {local ? <Cpu size={11} /> : <Server size={11} />}

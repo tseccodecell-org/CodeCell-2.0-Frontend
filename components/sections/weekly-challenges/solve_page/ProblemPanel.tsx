@@ -54,9 +54,8 @@ interface ProblemPanelProps {
 // bg base      #06070B   panel        #0B0D13 / #0D0F14
 // border       #1A1C24   border alt   #22262F
 // text primary #F4F1EA   text muted   #8B93A7   text dim #5A5850
-// accent green #34D399   green soft   #6FCF97   green deep #12A87E
-// accent gold  #D9A404   (used only for "Medium" difficulty, matching the
-//                         Easy/Medium/Hard convention — not a UI accent here)
+// accent gold  #D9A404   gold soft    #F5C451   gold deep  #D97706
+// easy green   #34D399   (difficulty only)
 // error red    #E2574C
 
 const tokens = {
@@ -69,7 +68,8 @@ const tokens = {
   muted: "#8B93A7",
   dim: "#5A5850",
   green: "#34D399",
-  greenSoft: "#6FCF97",
+  goldSoft: "#F5C451",
+  goldDeep: "#D97706",
   gold: "#D9A404",
   red: "#E2574C",
 };
@@ -101,7 +101,7 @@ function StatChip({
         color: tokens.muted,
       }}
     >
-      <span style={{ color: tokens.green }}>{icon}</span>
+      <span style={{ color: tokens.gold }}>{icon}</span>
       <span className="text-[11px] tracking-wide font-mono">{label}</span>
     </div>
   );
@@ -117,10 +117,10 @@ function Section({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <span className="w-1 h-3 rounded-full" style={{ background: tokens.green }} />
+        <span className="w-1 h-3 rounded-full" style={{ background: tokens.gold }} />
         <h3
           className="text-[11px] font-mono font-bold uppercase tracking-[0.14em]"
-          style={{ color: tokens.green }}
+          style={{ color: tokens.gold }}
         >
           {title}
         </h3>
@@ -149,7 +149,7 @@ function CopyButton({ text }: { text: string }) {
         }
       }}
       className="flex items-center gap-1 rounded px-1.5 py-1 text-[10px] font-mono uppercase tracking-wide transition-colors cursor-pointer hover:bg-white/5"
-      style={{ color: copied ? tokens.green : tokens.muted }}
+      style={{ color: copied ? tokens.gold : tokens.muted }}
       aria-label="Copy to clipboard"
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
@@ -169,7 +169,7 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between px-3 py-2.5 cursor-pointer"
-        style={{ background: "rgba(52,211,153,0.05)" }}
+        style={{ background: "rgba(217,164,4,0.05)" }}
       >
         <span
           className="text-[11px] font-mono font-semibold uppercase tracking-wide"
@@ -203,7 +203,7 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
                   className="whitespace-pre-wrap break-words rounded-md px-2.5 py-2 text-[12px] font-mono"
                   style={{
                     background: tokens.bg,
-                    color: tokens.green,
+                    color: tokens.gold,
                     border: `1px solid ${tokens.border}`,
                   }}
                 >
@@ -222,7 +222,7 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
                   className="whitespace-pre-wrap break-words rounded-md px-2.5 py-2 text-[12px] font-mono"
                   style={{
                     background: tokens.bg,
-                    color: tokens.green,
+                    color: tokens.gold,
                     border: `1px solid ${tokens.border}`,
                   }}
                 >
@@ -256,7 +256,7 @@ function PanelSkeleton() {
   const bar = (w: string) => (
     <div
       className="h-3 rounded animate-pulse"
-      style={{ width: w, background: "rgba(52,211,153,0.08)" }}
+      style={{ width: w, background: "rgba(217,164,4,0.08)" }}
     />
   );
   return (
@@ -293,7 +293,7 @@ function PanelError({ message, onRetry }: { message: string; onRetry?: () => voi
         <button
           onClick={onRetry}
           className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-lg transition-opacity hover:opacity-90 cursor-pointer"
-          style={{ color: tokens.bg, background: `linear-gradient(180deg, ${tokens.greenSoft} 0%, #12A87E 100%)` }}
+          style={{ color: tokens.bg, background: `linear-gradient(180deg, ${tokens.goldSoft} 0%, ${tokens.goldDeep} 100%)` }}
         >
           Try Again
         </button>
@@ -414,7 +414,7 @@ export default function ProblemPanel({
                   key={tag}
                   className="rounded-full px-2.5 py-0.5 text-[10.5px] font-mono tracking-wide"
                   style={{
-                    color: tokens.green,
+                    color: tokens.gold,
                     border: `1px solid ${tokens.borderAlt}`,
                     background: tokens.panelAlt,
                   }}
@@ -464,10 +464,10 @@ export default function ProblemPanel({
           {problem.examples.length > 0 && (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="w-1 h-3 rounded-full" style={{ background: tokens.green }} />
+                <span className="w-1 h-3 rounded-full" style={{ background: tokens.gold }} />
                 <h3
                   className="text-[11px] font-mono font-bold uppercase tracking-[0.14em]"
-                  style={{ color: tokens.green }}
+                  style={{ color: tokens.gold }}
                 >
                   Examples
                 </h3>

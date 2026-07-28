@@ -84,7 +84,7 @@ export default function SubmissionHistory({
               <div
                 key={i}
                 className="h-14 animate-pulse rounded"
-                style={{ background: "rgba(52,211,153,0.06)" }}
+                style={{ background: "rgba(217,164,4,0.06)" }}
               />
             ))}
           </div>

@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import { motion, useScroll, useMotionValueEvent, useTransform } from "framer-motion";
@@ -34,17 +35,17 @@ export function Timeline({ weeks }: TimelineComponentProps) {
   return (
     <section className="relative bg-[#0a0a0a] overflow-clip border-b border-[#eab308]/20" ref={containerRef}>
       
-      {/* 3D Background - Sticky to stay in view during scroll */}
+      
       <div className="absolute inset-0 z-0">
         <div className="sticky top-0 w-full h-screen">
           <TimelineSceneDynamic scrollProgress={scrollYProgress} weeksData={weeks} />
         </div>
       </div>
 
-      {/* The Scroll Driver - This empty div is 800vh tall to force scrolling */}
+      
       <div className="h-[800vh] w-full relative z-10 pointer-events-none">
         
-        {/* Header Title - fades out smoothly on scroll so it doesn't overlap the cards */}
+      
         <motion.div 
           className="sticky top-0 pt-32 text-center pointer-events-none"
           style={{ opacity: headerOpacity, scale: headerScale }}
@@ -60,11 +61,9 @@ export function Timeline({ weeks }: TimelineComponentProps) {
           <p className="text-white/80 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)]">Scroll down to command your piece across the 3D board.</p>
         </motion.div>
         
-        {/* We no longer render HTML text cards here. 
-            They are rendered entirely inside TimelineScene.tsx using the <Html> component 
-            so they can physically follow the 3D piece! */}
-            
+  
       </div>
     </section>
   );
 }
+*/

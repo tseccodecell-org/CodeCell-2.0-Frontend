@@ -87,7 +87,7 @@
   #root {
     height: 100%;
   }
-
+}
   body {
     background: var(--bg);
     color: #e8f5e8;
@@ -242,7 +242,7 @@
       display: none !important
     }
   }
-}
+
 
 @media (min-width: 768px) {
   .page-grid {

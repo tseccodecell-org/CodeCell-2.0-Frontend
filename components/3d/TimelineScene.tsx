@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -99,19 +100,19 @@ export const TIMELINE_DATA: TimelineEntry[] = [
 function StandardBoard() {
   return (
     <group position={[0, -2, 0]} rotation={[0, Math.PI / 4, 0]} scale={[1.2, 1.2, 1.2]}>
-      {/* Base Platform */}
+      
       <mesh position={[0, -0.4, 0]}>
         <boxGeometry args={[17, 0.8, 17]} />
         <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
       </mesh>
       
-      {/* Glowing Edge */}
+      
       <mesh position={[0, -0.4, 0]}>
         <boxGeometry args={[17.2, 0.6, 17.2]} />
         <meshBasicMaterial color="#D4AF37" wireframe={true} transparent opacity={0.3} />
       </mesh>
 
-      {/* Board Squares */}
+      
       <group position={[0, 0.01, 0]}>
         {[...Array(8)].map((_, x) =>
           [...Array(8)].map((_, z) => (
@@ -230,13 +231,13 @@ function AnimatedMovingPiece({ scrollProgress, stageIndex, timelineData }: Timel
           <ChessPiece type={types[stageIndex]} color="gold" scale={[1, 1, 1]} />
         </group>
         
-        {/* Glow effect that intensifies for the final King */}
+      
         <mesh position={[0, 1, 0]}>
           <sphereGeometry args={[2, 16, 16]} />
           <meshBasicMaterial color="#D4AF37" transparent opacity={isKing ? 0.4 : 0.15} />
         </mesh>
 
-        {/* Cinematic God-Rays for the Final Week */}
+      
         {isKing && (
           <SpotLight
             position={[0, 20, 0]}
@@ -250,7 +251,7 @@ function AnimatedMovingPiece({ scrollProgress, stageIndex, timelineData }: Timel
         )}
       </group>
       
-      {/* Floating HTML Card attached to a separate group to prevent spinning and bouncing */}
+      
       <group ref={htmlGroupRef}>
         <Html center zIndexRange={[100, 0]}>
           <div className="w-72 md:w-[26rem] pointer-events-none transform translate-x-4">
@@ -283,7 +284,7 @@ function AnimatedMovingPiece({ scrollProgress, stageIndex, timelineData }: Timel
         </Html>
       </group>
 
-      {/* Epic Sparkles for the Final Week */}
+      
       {isKing && (
         <Sparkles count={500} scale={15} size={6} speed={0.8} color="#FFD700" opacity={0.8} />
       )}
@@ -389,7 +390,7 @@ export default function TimelineScene({ scrollProgress, weeksData }: TimelineSce
           <directionalLight position={[10, 20, 10]} intensity={4} color="#FFD700" />
           <directionalLight position={[-10, 20, -10]} intensity={2} color="#ffffff" />
           
-          {/* Fill light */}
+      
           <spotLight position={[0, 20, 0]} intensity={20} color="#D4AF37" angle={1} penumbra={1} distance={100} />
           
           <Environment preset="city" />
@@ -401,13 +402,14 @@ export default function TimelineScene({ scrollProgress, weeksData }: TimelineSce
           
           <CameraTracker scrollProgress={scrollProgress} />
           
-          {/* Background ambient sparkles */}
+      
           <Sparkles count={150} scale={30} size={3} speed={0.2} color="#D4AF37" opacity={0.3} />
         </Suspense>
       </Canvas>
       
-      {/* Vignette overlay */}
+ 
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#0a0a0a]/40 to-[#0a0a0a]" />
     </div>
   );
 }
+  */

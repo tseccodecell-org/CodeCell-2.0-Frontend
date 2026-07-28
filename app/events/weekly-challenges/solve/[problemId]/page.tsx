@@ -8,6 +8,13 @@ import VerdictPanel from "@/components/sections/weekly-challenges/solve_page/Ver
 import SubmissionHistory from "@/components/sections/weekly-challenges/solve_page/SubmissionHistory";
 import { ArrowLeft, TriangleAlert } from "lucide-react";
 import { runCode, submitCode, getSubmission, getRun } from "@/lib/api-client";
+import {
+  checkRuntimeHealth,
+  getLocalToolchainStatus,
+  executeLocalCode,
+} from "@/lib/runtime-api";
+
+import type { LanguageKey, RunResponse } from "@/lib/runtime-api";
 
 import type { ProblemDetail } from "@/lib/types/problem";
 import type { SubmissionState, Language } from "@/lib/types/submission";
@@ -18,6 +25,37 @@ type PageProps = {
 
 const POLL_INTERVAL_MS = 1000;
 const MAX_POLL_ERRORS = 3;
+const LOCAL_TIME_LIMIT_MS = 3000;
+
+const RUNTIME_LANGUAGE: Record<Language, LanguageKey> = {
+  CPP: "cpp",
+  JAVA: "java",
+  PYTHON: "python",
+};
+
+async function tryLocalRun(
+  code: string,
+  language: Language,
+  stdin: string
+): Promise<RunResponse | null> {
+  try {
+    if (!(await checkRuntimeHealth())) return null;
+
+    const toolchains = await getLocalToolchainStatus();
+    const info = toolchains?.[RUNTIME_LANGUAGE[language]];
+    if (!info?.available) return null;
+
+    return await executeLocalCode({
+      language: RUNTIME_LANGUAGE[language],
+      source: code,
+      stdin,
+      time_limit_ms: LOCAL_TIME_LIMIT_MS,
+    });
+  } catch (err) {
+    console.warn("Local runtime unavailable, falling back to the judge:", err);
+    return null;
+  }
+}
 
 const difficultyColor = (difficulty?: string) => {
   const d = (difficulty ?? "").toUpperCase();
@@ -39,6 +77,7 @@ export default function Solve({ params }: PageProps) {
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [resultMode, setResultMode] = useState<"RUN" | "SUBMIT" | null>(null);
   const [lastInput, setLastInput] = useState("");
+  const [runOrigin, setRunOrigin] = useState<string | null>(null);
 
   const isMountedRef = useRef(true);
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -220,6 +259,29 @@ export default function Solve({ params }: PageProps) {
         stderr: undefined,
         testResults: [],
       });
+
+      const local = await tryLocalRun(code, language, stdin);
+
+      if (!isMountedRef.current) return;
+
+      if (local) {
+        setRunOrigin("local runtime");
+        setSubmission((prev) => ({
+          ...prev,
+          status: "COMPLETED",
+          verdict: local.verdict === "ACCEPTED" ? undefined : local.verdict,
+          executionTime: local.execution_time_ms,
+          compileTime: local.compile_time_ms,
+          stdout: local.stdout,
+          stderr: local.stderr,
+          errorMessage: local.error,
+          testResults: [],
+        }));
+        setActiveAction(null);
+        return;
+      }
+
+      setRunOrigin("judge");
 
       const response = await runCode(problemId, { language, sourceCode: code, stdin });
 
@@ -460,6 +522,8 @@ export default function Solve({ params }: PageProps) {
               status={submission.status}
               mode={resultMode}
               input={lastInput}
+              origin={resultMode === "RUN" ? runOrigin : null}
+              compileTime={submission.compileTime}
               verdict={submission.verdict}
               executionTime={submission.executionTime}
               memoryUsed={submission.memoryUsed}

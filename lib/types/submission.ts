@@ -61,6 +61,7 @@ export interface SubmissionState {
   status: SubmissionStatus;
   verdict?: string;
   executionTime?: number;
+  compileTime?: number;
   memoryUsed?: number;
   score?: number;
   stdout?: string;

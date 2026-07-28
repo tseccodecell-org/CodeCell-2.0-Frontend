@@ -12,7 +12,9 @@ export interface VerdictPanelProps {
   verdict?: string;
   score?: number;
   executionTime?: number;
+  compileTime?: number;
   memoryUsed?: number;
+  origin?: string | null;
   stdout?: string;
   stderr?: string;
   errorMessage?: string;
@@ -51,7 +53,9 @@ export default function VerdictPanel({
   verdict,
   score,
   executionTime,
+  compileTime,
   memoryUsed,
+  origin,
   stdout,
   stderr,
   errorMessage,
@@ -127,7 +131,13 @@ export default function VerdictPanel({
 
       <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 px-4 py-3 font-mono text-xs">
         <Metric label="Time" value={executionTime !== undefined ? `${executionTime} ms` : "--"} />
-        <Metric label="Memory" value={formatMemory(memoryUsed)} />
+        {compileTime !== undefined && (
+          <Metric label="Compile" value={`${compileTime} ms`} />
+        )}
+        {memoryUsed !== undefined && (
+          <Metric label="Memory" value={formatMemory(memoryUsed)} />
+        )}
+        {origin && <Metric label="Ran on" value={origin} />}
       </div>
 
       {mode === "SUBMIT" ? (

@@ -67,12 +67,6 @@
   line-height: 0.88;
 }
 
-.text-h1-scale {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3.6vw, 2.75rem);
-  font-weight: 600;
-}
-
 :root {
   --bg: #080c08;
   --accent: #4BE2C4;
@@ -84,6 +78,12 @@ html,
 body,
 #root {
   height: 100%;
+}
+
+.text-h1-scale {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.6vw, 2.75rem);
+  font-weight: 600;
 }
 
   body {

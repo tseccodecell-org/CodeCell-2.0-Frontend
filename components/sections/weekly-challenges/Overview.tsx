@@ -9,17 +9,9 @@ const FEATURES = [
   {
     icon: "♟",
     subtitle: "PAWN",
-    title: "Weekly DSA Problems",
+    title: "Weekly CP/DSA Problems",
     description: "Each week drops CP/DSA problems spanning Easy → Hard. Problems reset every Sunday. Your solutions are judged on runtime, memory, and correctness.",
     badge: "Problems / Week",
-    highlightIcon: false
-  },
-  {
-    icon: "♞",
-    subtitle: "KNIGHT",
-    title: "N-Queens Narrative",
-    description: "This isn't a standard contest. You're challenged — each week with new constraint. Miss a placement and lose path bonus points. Survive all 6 weeks to claim checkmate.",
-    badge: "Story-Driven",
     highlightIcon: true
   },
   {
@@ -36,7 +28,7 @@ const FEATURES = [
     title: "Editorial Deep-Dives",
     description: "Every problem ships with a full editorial after the week closes. Annotated code, complexity analysis, the two approaches that almost worked — and why they failed.",
     badge: "Post-Week Analysis",
-    highlightIcon: false
+    highlightIcon: true
   },
   {
     icon: "♝",
@@ -52,6 +44,14 @@ const FEATURES = [
     title: "Certificates & Prizes",
     description: "Top season finalists win prizes from the prize pool. Top participants who clears both rounds earns a certificate of excellence and exciting prizes.",
     badge: "Cash Prizes",
+    highlightIcon: true
+  },
+  {
+    icon: "♞",
+    subtitle: "KNIGHT",
+    title: "Internship Opportunities",
+    description: "Top 20 participants on the season leaderboard get a shot at an internship with Engaze. Your grind on the board translates straight into a real-world opportunity.",
+    badge: "Top 20 Perk",
     highlightIcon: true
   }
 ];

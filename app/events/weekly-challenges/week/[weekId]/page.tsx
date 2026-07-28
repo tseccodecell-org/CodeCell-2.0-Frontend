@@ -119,7 +119,7 @@ export default function WeekPage() {
       </span>
 
       <button
-        onClick={() => router.push("/events/weekly-challenges")}
+        onClick={() => router.push("/events/weekly-challenges/timeline")}
         className="flex items-center gap-2 font-mono text-xs text-[#8B93A7] hover:text-[#D9A404] transition-colors mb-8 relative z-10"
       >
         <ChevronLeft size={14} />

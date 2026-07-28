@@ -1966,3 +1966,45 @@ body,
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
 }
+/* ========================================================
+   MARKDOWN + KATEX (problem statements)
+   ======================================================== */
+
+.markdown-content .katex {
+  font-size: 1.05em;
+}
+
+.markdown-content .katex-display {
+  margin: 0.85rem 0;
+  padding: 0.15rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.markdown-content .katex-display > .katex {
+  white-space: nowrap;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #22262f;
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+}

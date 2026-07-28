@@ -29,6 +29,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import type { ProblemDetail, ProblemExample } from "@/lib/types/problem";
+import { MarkdownRenderer } from "@/components/layout/MarkdownRenderer";
 
 // ---------------------------------------------------------------------------
 // Public props
@@ -235,9 +236,9 @@ function ExampleCard({ example, index }: { example: ProblemExample; index: numbe
                   <span className="text-[10px] font-mono uppercase tracking-wide" style={{ color: tokens.muted }}>
                     Explanation
                   </span>
-                  <p className="mt-1 text-[12.5px] leading-relaxed font-sans" style={{ color: tokens.ink, opacity: 0.85 }}>
-                    {example.explanation}
-                  </p>
+                  <div className="mt-1 text-[12.5px] leading-relaxed font-sans" style={{ color: tokens.ink, opacity: 0.85 }}>
+                    <MarkdownRenderer content={example.explanation} />
+                  </div>
                 </div>
               )}
             </div>
@@ -429,7 +430,7 @@ export default function ProblemPanel({
 
           {/* Description */}
           <Section title="Description">
-            <p className="whitespace-pre-line">{problem.description}</p>
+            <MarkdownRenderer content={problem.description} />
           </Section>
 
           {/* Input / Output format */}
@@ -437,12 +438,12 @@ export default function ProblemPanel({
             <div className="grid grid-cols-1 gap-4">
               {problem.inputFormat && (
                 <Section title="Input">
-                  <p className="whitespace-pre-line">{problem.inputFormat}</p>
+                  <MarkdownRenderer content={problem.inputFormat} />
                 </Section>
               )}
               {problem.outputFormat && (
                 <Section title="Output">
-                  <p className="whitespace-pre-line">{problem.outputFormat}</p>
+                  <MarkdownRenderer content={problem.outputFormat} />
                 </Section>
               )}
             </div>
@@ -451,12 +452,9 @@ export default function ProblemPanel({
           {/* Constraints */}
           {problem.constraints && (
             <Section title="Constraints">
-              <p
-                className="whitespace-pre-line text-[12.5px] font-mono"
-                style={{ color: tokens.muted }}
-              >
-                {problem.constraints}
-              </p>
+              <div className="text-[12.5px]" style={{ color: tokens.muted }}>
+                <MarkdownRenderer content={problem.constraints} />
+              </div>
             </Section>
           )}
 

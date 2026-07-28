@@ -13,53 +13,83 @@ import {
 } from "lucide-react";
 
 import type { SubmissionStatus, Language } from "@/lib/types/submission";
-
-/**
- * CodeCell brand palette (kept in sync with VerdictPanel.tsx / Solve page)
- * ------------------------------------------------------------------
- * bg base      #06070B   panel        #0B0D13 / #0D0F14
- * border       #1A1C24   border alt   #22262F
- * text primary #F4F1EA   text muted   #8B93A7   text dim #5A5850
- * accent green #34D399   green soft   #6FCF97   green deep #12A87E
- * accent gold  #D9A404   (status only: queued / running)
- */
+import { runCode, LanguageKey, RunResponse } from "@/lib/runtime-api";
 
 interface CodeEditorProps {
   status: SubmissionStatus;
-
   activeAction: "RUN" | "SUBMIT" | null;
+  stdin?: string;
   onRun?: (code: string, language: Language) => Promise<void>;
-
+  onRunResult?: (result: RunResponse) => void;
   onSubmit?: (code: string, language: Language) => Promise<void>;
 }
 
-const LANG_CONFIG = {
+const LANG_CONFIG: Record<
+  Language,
+  { label: string; monaco: string; runtimeKey: LanguageKey }
+> = {
   CPP: {
     label: "C++",
     monaco: "cpp",
+    runtimeKey: "cpp",
   },
   JAVA: {
     label: "Java",
     monaco: "java",
+    runtimeKey: "java",
   },
   PYTHON: {
     label: "Python",
     monaco: "python",
+    runtimeKey: "python",
   },
-} as const;
+};
 
 export default function CodeEditor({
   status,
   activeAction,
+  stdin = "",
   onRun,
+  onRunResult,
   onSubmit,
 }: CodeEditorProps) {
   const [language, setLanguage] = useState<Language>("CPP");
   const [code, setCode] = useState("");
+  const [isInternalRunning, setIsInternalRunning] = useState(false);
 
-  const isRunning = activeAction === "RUN";
+  const isRunning = activeAction === "RUN" || isInternalRunning;
   const isJudging = activeAction === "SUBMIT";
-  const isBusy = status === "QUEUED" || status === "RUNNING";
+  const isBusy = status === "QUEUED" || status === "RUNNING" || isRunning || isJudging;
+
+  const handleRunClick = async () => {
+    if (isBusy) return;
+
+    // 1. If custom parent handler is provided, trigger it
+    if (onRun) {
+      await onRun(code, language);
+      return;
+    }
+
+    // 2. Direct execution via smart runCode (Daemon local vs Cloud fallback)
+    setIsInternalRunning(true);
+    try {
+      const runtimeLang = LANG_CONFIG[language].runtimeKey;
+      const res = await runCode({
+        language: runtimeLang,
+        source: code,
+        stdin: stdin,
+        time_limit_ms: 3000,
+      });
+
+      if (onRunResult) {
+        onRunResult(res);
+      }
+    } catch (err) {
+      console.error("Run execution failed:", err);
+    } finally {
+      setIsInternalRunning(false);
+    }
+  };
 
   return (
     <div className="bg-[#0b0d13] border border-[#1a1c24] shadow-xl overflow-hidden flex flex-col h-full">
@@ -141,14 +171,15 @@ export default function CodeEditor({
         </button>
 
         <div className="flex gap-2">
+          {/* Run Button hooked to handleRunClick */}
           <button
-            onClick={() => onRun?.(code, language)}
+            onClick={handleRunClick}
             disabled={isBusy}
             className="flex items-center gap-2 font-mono text-xs font-bold tracking-wide border border-[#22262f] hover:border-[#34D399]/60 hover:text-[#34D399] disabled:opacity-50 disabled:cursor-not-allowed text-[#F4F1EA] px-4 py-2 rounded transition-colors cursor-pointer"
           >
             {isRunning ? (
               <>
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin text-[#34D399]" />
                 Running...
               </>
             ) : (
@@ -159,6 +190,7 @@ export default function CodeEditor({
             )}
           </button>
 
+          {/* Submit Button */}
           <button
             onClick={() => onSubmit?.(code, language)}
             disabled={isBusy}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Clock,
   MemoryStick,
@@ -13,6 +13,8 @@ import {
   X,
   ListChecks,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import type {
@@ -20,18 +22,7 @@ import type {
   SubmissionTestResult,
 } from "@/lib/types/submission";
 
-/**
- * CodeCell brand palette (kept in sync with CodeEditor.tsx / Solve page)
- * ------------------------------------------------------------------
- * bg base      #06070B   panel        #0B0D13 / #0D0F14
- * border       #1A1C24   border alt   #22262F
- * text primary #F4F1EA   text muted   #8B93A7   text dim #5A5850
- * accent green #34D399   green soft   #6FCF97   green deep #12A87E
- * accent gold  #D9A404   (status only: queued / running)
- * error red    #E2574C
- */
-
-interface VerdictPanelProps {
+export interface VerdictPanelProps {
   status?: SubmissionStatus;
   verdict?: string;
   score?: number;
@@ -50,6 +41,7 @@ const ERROR_VERDICTS = [
   "WRONG_ANSWER",
   "RUNTIME_ERROR",
   "COMPILE_ERROR",
+  "COMPILATION_ERROR",
   "TIME_LIMIT_EXCEEDED",
   "MEMORY_LIMIT_EXCEEDED",
   "INTERNAL_ERROR",
@@ -74,22 +66,73 @@ export default function VerdictPanel({
   const isAccepted = verdict === "ACCEPTED" || verdict === "SUCCESS";
   const isErrorVerdict = !!verdict && ERROR_VERDICTS.includes(verdict);
 
+  // Auto-switch tabs on execution failure or errors
+  useEffect(() => {
+    if (
+      status === "FAILED" ||
+      verdict === "COMPILE_ERROR" ||
+      verdict === "COMPILATION_ERROR" ||
+      verdict === "RUNTIME_ERROR" ||
+      (stderr && stderr.trim().length > 0 && !stdout)
+    ) {
+      setActiveTab("stderr");
+    } else if (testResults.length > 0 && isErrorVerdict) {
+      setActiveTab("testcases");
+    }
+  }, [status, verdict, stderr, stdout, testResults.length, isErrorVerdict]);
+
   const passedCount = useMemo(
-    () => testResults.filter((t) => t.passed).length,
+    () =>
+      testResults.filter(
+        (t) =>
+          (t as any).passed ??
+          (t.verdict === "ACCEPTED" || t.verdict === "SUCCESS")
+      ).length,
     [testResults]
   );
   const totalCount = testResults.length;
+
+  const firstFailedIdx = useMemo(
+    () =>
+      testResults.findIndex(
+        (t) =>
+          !(
+            (t as any).passed ??
+            (t.verdict === "ACCEPTED" || t.verdict === "SUCCESS")
+          )
+      ),
+    [testResults]
+  );
 
   const resolvedScore =
     status === "COMPLETED"
       ? score ?? (totalCount > 0 ? Math.round((passedCount / totalCount) * 100) : undefined)
       : undefined;
 
-  const copyToClipboard = (text: string) => {
+  const formatMemory = (kb?: number) => {
+    if (kb === undefined || kb === null) return "--";
+    if (kb >= 1024) return `${(kb / 1024).toFixed(1)} MB`;
+    return `${kb} KB`;
+  };
+
+  const copyToClipboard = async (text: string) => {
     if (!text) return;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
   };
 
   const getVerdictBadge = () => {
@@ -142,11 +185,9 @@ export default function VerdictPanel({
     );
   };
 
-  // ---- Per-tab fallback copy: always explain what happened, never leave a blank box ----
-
   const getStdoutText = () => {
     if (status === "IDLE") {
-      return "Click \"Run\" to test your code against the sample input, or \"Submit\" to grade it against all test cases.";
+      return 'Click "Run" to test your code against the sample input, or "Submit" to grade it against all test cases.';
     }
     if (status === "QUEUED") {
       return "Waiting in the judge queue...";
@@ -238,7 +279,7 @@ export default function VerdictPanel({
           </div>
           <span className="text-xs font-bold text-[#F4F1EA]">
             {status === "COMPLETED" && memoryUsed !== undefined
-              ? `${(memoryUsed / 1024).toFixed(1)} MB`
+              ? formatMemory(memoryUsed)
               : "--"}
           </span>
         </div>
@@ -254,15 +295,16 @@ export default function VerdictPanel({
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Navigation Tabs */}
       <div className="flex items-center gap-1 px-4 pt-3 bg-[#06070B] border-b border-[#1a1c24] flex-shrink-0">
-        {(
-          [
-            { key: "stdout" as Tab, label: "Stdout & Logs" },
-            { key: "stderr" as Tab, label: "Stderr" },
-            { key: "testcases" as Tab, label: `Test Cases${totalCount ? ` (${passedCount}/${totalCount})` : ""}` },
-          ]
-        ).map((tab) => (
+        {[
+          { key: "stdout" as Tab, label: "Stdout & Logs" },
+          { key: "stderr" as Tab, label: "Stderr" },
+          {
+            key: "testcases" as Tab,
+            label: `Test Cases${totalCount ? ` (${passedCount}/${totalCount})` : ""}`,
+          },
+        ].map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
@@ -277,7 +319,7 @@ export default function VerdictPanel({
         ))}
       </div>
 
-      {/* Output Content */}
+      {/* Output Content Area */}
       <div className="p-4 bg-[#06070B] flex-1 min-h-0 overflow-y-auto">
         {activeTab !== "testcases" ? (
           <>
@@ -293,14 +335,16 @@ export default function VerdictPanel({
 
             <div
               className={`bg-[#0b0d13] border border-[#1a1c24] rounded-xl p-4 font-mono text-xs leading-relaxed shadow-inner min-h-[160px] ${
-                activeTab === "stderr" && (stderr || errorMessage) ? "text-[#E2574C]" : "text-[#34D399]"
+                activeTab === "stderr" && (stderr || errorMessage)
+                  ? "text-[#E2574C]"
+                  : "text-[#34D399]"
               }`}
             >
               <pre className="whitespace-pre-wrap break-words">{activeTabText}</pre>
             </div>
           </>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {totalCount === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 py-10 text-center bg-[#0b0d13] border border-[#1a1c24] rounded-xl">
                 <AlertTriangle size={18} className="text-[#5A5850]" />
@@ -312,29 +356,19 @@ export default function VerdictPanel({
               </div>
             ) : (
               testResults.map((test, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-2.5 font-mono text-xs ${
-                    test.passed
-                      ? "border-[#34D399]/30 bg-[#34D399]/5 text-[#34D399]"
-                      : "border-[#E2574C]/30 bg-[#E2574C]/5 text-[#E2574C]"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    {test.passed ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                    Test Case {idx + 1}
-                  </span>
-                  <span className="text-[#8B93A7]">
-                    {test.passed ? "Passed" : "Failed"}
-                  </span>
-                </div>
+                <TestCaseCard
+                  key={test.testCaseId || idx}
+                  test={test}
+                  index={idx}
+                  defaultOpen={idx === (firstFailedIdx !== -1 ? firstFailedIdx : 0)}
+                />
               ))
             )}
           </div>
         )}
       </div>
 
-      {/* Footer Close CTA (only rendered when used as a dialog) */}
+      {/* Footer Close CTA */}
       {onClose && (
         <div className="p-4 bg-[#0d0f14] border-t border-[#1a1c24] flex justify-end flex-shrink-0">
           <button
@@ -349,5 +383,119 @@ export default function VerdictPanel({
         </div>
       )}
     </motion.div>
+  );
+}
+
+/* ============================================================================
+   Collapsible Accordion Item for Individual Test Cases
+   ============================================================================ */
+
+interface TestCaseCardProps {
+  test: SubmissionTestResult;
+  index: number;
+  defaultOpen?: boolean;
+}
+
+function TestCaseCard({ test, index, defaultOpen = false }: TestCaseCardProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  const testData = test as Record<string, any>;
+  const passed = testData.passed ?? (test.verdict === "ACCEPTED" || test.verdict === "SUCCESS");
+
+  const formatMemory = (kb?: number) => {
+    if (kb === undefined || kb === null) return "--";
+    if (kb >= 1024) return `${(kb / 1024).toFixed(1)} MB`;
+    return `${kb} KB`;
+  };
+
+  return (
+    <div
+      className={`rounded-xl border font-mono text-xs transition-all overflow-hidden ${
+        passed
+          ? "border-[#34D399]/30 bg-[#34D399]/5"
+          : "border-[#E2574C]/30 bg-[#E2574C]/5"
+      }`}
+    >
+      {/* Accordion Header */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-3 flex items-center justify-between cursor-pointer select-none text-left"
+      >
+        <div className="flex items-center gap-3">
+          {passed ? (
+            <CheckCircle2 size={16} className="text-[#34D399] flex-shrink-0" />
+          ) : (
+            <XCircle size={16} className="text-[#E2574C] flex-shrink-0" />
+          )}
+          <span className="font-bold text-[#F4F1EA]">
+            Test Case {test.orderNum !== undefined ? test.orderNum + 1 : index + 1}
+          </span>
+          {test.verdict && (
+            <span
+              className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold ${
+                passed
+                  ? "bg-[#34D399]/20 text-[#34D399]"
+                  : "bg-[#E2574C]/20 text-[#E2574C]"
+              }`}
+            >
+              {test.verdict.replace(/_/g, " ")}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-4 text-[#8B93A7] text-[11px]">
+          {test.timeMs !== undefined && <span>{test.timeMs} ms</span>}
+          {test.memoryKb !== undefined && <span>{formatMemory(test.memoryKb)}</span>}
+          <div className="text-[#8B93A7] hover:text-[#F4F1EA]">
+            {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </div>
+        </div>
+      </button>
+
+      {/* Accordion Body: Input / Expected Output / Actual Output Diffs */}
+      {isOpen && (
+        <div className="px-4 pb-4 pt-2 border-t border-[#1a1c24] space-y-3 bg-[#0b0d13]/90">
+          {testData.input && (
+            <div>
+              <span className="text-[10px] text-[#8B93A7] uppercase tracking-wider block mb-1">
+                Input
+              </span>
+              <pre className="p-2.5 rounded-lg bg-[#06070B] border border-[#1a1c24] text-[#F4F1EA] overflow-x-auto whitespace-pre-wrap">
+                {testData.input}
+              </pre>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <span className="text-[10px] text-[#8B93A7] uppercase tracking-wider block mb-1">
+                Your Output
+              </span>
+              <pre
+                className={`p-2.5 rounded-lg border overflow-x-auto whitespace-pre-wrap ${
+                  passed
+                    ? "bg-[#06070B] border-[#34D399]/30 text-[#34D399]"
+                    : "bg-[#06070B] border-[#E2574C]/30 text-[#E2574C]"
+                }`}
+              >
+                {testData.actualOutput || "No output"}
+              </pre>
+            </div>
+
+            {testData.expectedOutput && (
+              <div>
+                <span className="text-[10px] text-[#8B93A7] uppercase tracking-wider block mb-1">
+                  Expected Output
+                </span>
+                <pre className="p-2.5 rounded-lg bg-[#06070B] border border-[#1a1c24] text-[#34D399] overflow-x-auto whitespace-pre-wrap">
+                  {testData.expectedOutput}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

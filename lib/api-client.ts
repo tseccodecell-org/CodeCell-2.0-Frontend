@@ -8,7 +8,6 @@ import {
   SeasonLeaderboardResponse,
 } from "./types/leaderboard";
 
-
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -71,6 +70,7 @@ export function getProblem(
 ): Promise<ProblemDetail> {
   return apiGetEnveloped<ProblemDetail>(
     `/api/problems/${problemId}`,
+    apiBaseUrl
   );
 }
 

@@ -124,7 +124,7 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
   if (!urlBase) throw new ApiError(0, "API base URL is not set");
   const res = await fetch(`${urlBase}${path}`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Accept": "application/json" },
     credentials: "include",
   });
 

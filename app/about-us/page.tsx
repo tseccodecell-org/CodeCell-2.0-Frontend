@@ -126,12 +126,13 @@ const teamCrew = [
   },
   {
     name: "Rucha Sinkar",
-    role: "Tech & Social Media",
+    role: "Tech (Backend) & Design",
     handle: "@rucha.s",
     photo: "/Scoms%20pics/Rucha.jpg",
     team: "Scom",
     github: "https://github.com/RuchaSinkar",
     linkedin: "https://www.linkedin.com/in/rucha-sinkar-b81003322/",
+    position: "object-[35%_5%]",
   },
   {
     name: "Sanket Bhandari",

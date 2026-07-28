@@ -107,16 +107,45 @@ async function apiGet<T>(path: string): Promise<T> {
     credentials: "include",
   });
 
+  const body = await readBody(res);
+
   if (!res.ok) {
-    let message = res.statusText;
-    try {
-      const body = await res.json();
-      message = body?.error ?? message;
-    } catch {}
-    throw new ApiError(res.status, message);
+    throw errorFrom(res, body);
   }
 
-  return res.json() as Promise<T>;
+  return body as T;
+}
+
+async function readBody(res: Response): Promise<unknown> {
+  const text = await res.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function errorFrom(res: Response, body: unknown): ApiError {
+  const shape = body as { error?: unknown };
+
+  if (typeof shape?.error === "string") {
+    return new ApiError(res.status, shape.error);
+  }
+
+  const enveloped = shape?.error as { message?: string; code?: string } | undefined;
+  if (enveloped?.message) {
+    return new ApiError(res.status, enveloped.message, enveloped.code);
+  }
+
+  if (res.status >= 502 && res.status <= 504) {
+    return new ApiError(
+      res.status,
+      "The server is temporarily unavailable. Please try again in a moment."
+    );
+  }
+
+  return new ApiError(res.status, res.statusText || "Request failed");
 }
 
 async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
@@ -128,10 +157,10 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
     credentials: "include",
   });
 
-  const body = (await res.json()) as Envelope<T>;
+  const body = (await readBody(res)) as Envelope<T> | null;
 
-  if (!res.ok || !body.success) {
-    throw new ApiError(res.status, body.error?.message ?? res.statusText, body.error?.code);
+  if (!res.ok || !body?.success) {
+    throw errorFrom(res, body);
   }
 
   return body.data as T;
@@ -145,10 +174,10 @@ async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: 
     body: JSON.stringify(requestBody),
   });
 
-  const response = (await res.json()) as Envelope<TResponse>;
+  const response = (await readBody(res)) as Envelope<TResponse> | null;
 
-  if (!res.ok || !response.success) {
-    throw new ApiError(res.status, response.error?.message ?? res.statusText, response.error?.code);
+  if (!res.ok || !response?.success) {
+    throw errorFrom(res, response);
   }
 
   return response.data as TResponse;

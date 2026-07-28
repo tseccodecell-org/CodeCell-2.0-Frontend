@@ -24,8 +24,10 @@ type PageProps = {
 };
 
 const POLL_INTERVAL_MS = 1000;
+const RUN_POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ERRORS = 3;
 const LOCAL_TIME_LIMIT_MS = 3000;
+const SUBMIT_COOLDOWN_SECONDS = 10;
 
 const RUNTIME_LANGUAGE: Record<Language, LanguageKey> = {
   CPP: "cpp",
@@ -77,7 +79,15 @@ export default function Solve({ params }: PageProps) {
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [resultMode, setResultMode] = useState<"RUN" | "SUBMIT" | null>(null);
   const [lastInput, setLastInput] = useState("");
-  const [runOrigin, setRunOrigin] = useState<string | null>(null);
+  const [runOrigin, setRunOrigin] = useState<"local" | "server" | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [cooldownLeft, setCooldownLeft] = useState(0);
+
+  useEffect(() => {
+    if (cooldownLeft <= 0) return;
+    const timer = setTimeout(() => setCooldownLeft((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldownLeft]);
 
   const isMountedRef = useRef(true);
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -141,9 +151,21 @@ export default function Solve({ params }: PageProps) {
       }, POLL_INTERVAL_MS);
     } catch (err) {
       console.error("Polling failed:", err);
-      pollErrorCountRef.current += 1;
 
       if (!isMountedRef.current) return;
+
+      if (isApiError(err) && err.status === 404) {
+        setSubmission((prev) => ({
+          ...prev,
+          status: "FAILED",
+          errorMessage: "The judge lost track of this submission. Please submit again.",
+        }));
+        setActiveAction(null);
+        stopPolling();
+        return;
+      }
+
+      pollErrorCountRef.current += 1;
 
       if (pollErrorCountRef.current >= MAX_POLL_ERRORS) {
         setSubmission((prev) => ({
@@ -188,12 +210,24 @@ export default function Solve({ params }: PageProps) {
         return;
       }
 
-      pollTimeoutRef.current = setTimeout(() => pollRun(runId), POLL_INTERVAL_MS);
+      pollTimeoutRef.current = setTimeout(() => pollRun(runId), RUN_POLL_INTERVAL_MS);
     } catch (err) {
       console.error("Run polling failed:", err);
-      pollErrorCountRef.current += 1;
 
       if (!isMountedRef.current) return;
+
+      if (isApiError(err) && err.status === 404) {
+        setSubmission((prev) => ({
+          ...prev,
+          status: "FAILED",
+          errorMessage: "The judge lost track of this run. Please try again.",
+        }));
+        setActiveAction(null);
+        stopPolling();
+        return;
+      }
+
+      pollErrorCountRef.current += 1;
 
       if (pollErrorCountRef.current >= MAX_POLL_ERRORS) {
         setSubmission((prev) => ({
@@ -206,7 +240,7 @@ export default function Solve({ params }: PageProps) {
         return;
       }
 
-      pollTimeoutRef.current = setTimeout(() => pollRun(runId), POLL_INTERVAL_MS);
+      pollTimeoutRef.current = setTimeout(() => pollRun(runId), RUN_POLL_INTERVAL_MS);
     }
   };
 
@@ -223,16 +257,28 @@ export default function Solve({ params }: PageProps) {
     );
   }
 
+  function getCooldownSeconds(err: { code?: string; message: string }): number {
+    const stated = /(\d+)\s*second/i.exec(err.message);
+    if (stated) return Math.min(90, parseInt(stated[1], 10));
+    if (err.code === "RATE_LIMIT_EXCEEDED") return 60;
+    return SUBMIT_COOLDOWN_SECONDS;
+  }
+
+  function getRunErrorMessage(err: unknown): string {
+    if (isApiError(err)) {
+      if (err.code === "VALIDATION_ERROR" || err.code === "PROBLEM_NOT_FOUND") {
+        return err.message;
+      }
+      if (err.status === 429) return err.message;
+      if (err.status === 400) return err.message || "Your code could not be accepted.";
+      if (err.status >= 500)
+        return "The judge is having trouble right now. Please try again shortly.";
+    }
+    return "Couldn't run your code. Check your connection and try again.";
+  }
+
   function getSubmitErrorMessage(err: unknown): string {
     if (isApiError(err)) {
-      if (err.status === 429) {
-        const isRateLimit =
-          err.code === "RATE_LIMIT_EXCEEDED" ||
-          (/limit/i.test(err.message) && !/wait a few seconds|cooldown/i.test(err.message));
-        return isRateLimit
-          ? "You have reached the submission limit. Please wait before submitting again."
-          : "Please wait a few seconds before submitting this problem again.";
-      }
       if (err.status === 401) return "Your session has expired. Please sign in again.";
       if (err.status === 404) return "This problem could not be found.";
       if (err.status === 400)
@@ -265,7 +311,7 @@ export default function Solve({ params }: PageProps) {
       if (!isMountedRef.current) return;
 
       if (local) {
-        setRunOrigin("local runtime");
+        setRunOrigin("local");
         setSubmission((prev) => ({
           ...prev,
           status: "COMPLETED",
@@ -281,7 +327,7 @@ export default function Solve({ params }: PageProps) {
         return;
       }
 
-      setRunOrigin("judge");
+      setRunOrigin("server");
 
       const response = await runCode(problemId, { language, sourceCode: code, stdin });
 
@@ -315,7 +361,7 @@ export default function Solve({ params }: PageProps) {
         setSubmission((prev) => ({
           ...prev,
           status: "FAILED",
-          errorMessage: "Couldn't run your code. Check your connection and try again.",
+          errorMessage: getRunErrorMessage(err),
         }));
       }
     }
@@ -326,13 +372,15 @@ export default function Solve({ params }: PageProps) {
 
     try {
       setActiveAction("SUBMIT");
-      setResultMode("SUBMIT");
+      setNotice(null);
       pollErrorCountRef.current = 0;
 
       const response = await submitCode(problemId, { language, sourceCode: code });
 
       if (!isMountedRef.current) return;
 
+      setResultMode("SUBMIT");
+      setCooldownLeft(SUBMIT_COOLDOWN_SECONDS);
       setSubmission({
         status: "QUEUED",
         submissionId: response.submissionId,
@@ -343,14 +391,22 @@ export default function Solve({ params }: PageProps) {
       pollSubmission(response.submissionId);
     } catch (err) {
       console.error("Submit failed:", err);
-      if (isMountedRef.current) {
-        setActiveAction(null);
-        setSubmission((prev) => ({
-          ...prev,
-          status: "FAILED",
-          errorMessage: getSubmitErrorMessage(err),
-        }));
+      if (!isMountedRef.current) return;
+
+      setActiveAction(null);
+
+      if (isApiError(err) && err.status === 429) {
+        setCooldownLeft(getCooldownSeconds(err));
+        setNotice(err.message || "Please wait a few seconds before submitting again.");
+        return;
       }
+
+      setResultMode("SUBMIT");
+      setSubmission((prev) => ({
+        ...prev,
+        status: "FAILED",
+        errorMessage: getSubmitErrorMessage(err),
+      }));
     }
   };
 
@@ -507,6 +563,7 @@ export default function Solve({ params }: PageProps) {
               status={submission.status}
               activeAction={activeAction}
               starterCode={starterCode}
+              cooldownLeft={cooldownLeft}
               onRun={handleRun}
               onSubmit={handleSubmit}
             />
@@ -523,6 +580,7 @@ export default function Solve({ params }: PageProps) {
               mode={resultMode}
               input={lastInput}
               origin={resultMode === "RUN" ? runOrigin : null}
+              notice={notice}
               compileTime={submission.compileTime}
               verdict={submission.verdict}
               executionTime={submission.executionTime}

@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, XCircle, Loader2, Terminal } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Terminal, Clock, Cpu, Server } from "lucide-react";
 import type {
   SubmissionStatus,
   SubmissionTestResult,
@@ -14,7 +14,8 @@ export interface VerdictPanelProps {
   executionTime?: number;
   compileTime?: number;
   memoryUsed?: number;
-  origin?: string | null;
+  origin?: "local" | "server" | null;
+  notice?: string | null;
   stdout?: string;
   stderr?: string;
   errorMessage?: string;
@@ -56,6 +57,7 @@ export default function VerdictPanel({
   compileTime,
   memoryUsed,
   origin,
+  notice,
   stdout,
   stderr,
   errorMessage,
@@ -68,7 +70,7 @@ export default function VerdictPanel({
 
   if (status === "IDLE") {
     return (
-      <Shell>
+      <Shell notice={notice}>
         <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
           <Terminal size={18} className="text-[#5A5850]" />
           <p className="font-mono text-xs text-[#5A5850]">
@@ -81,7 +83,7 @@ export default function VerdictPanel({
 
   if (isBusy) {
     return (
-      <Shell>
+      <Shell notice={notice}>
         <Banner
           color="#D9A404"
           icon={<Loader2 size={15} className="animate-spin" />}
@@ -121,11 +123,14 @@ export default function VerdictPanel({
         }
         text={bannerText}
         right={
-          mode === "SUBMIT" && totalScore !== undefined ? (
-            <span className="font-mono text-[11px] text-[#8B93A7]">
-              Score <span style={{ color: bannerColor }}>{totalScore}%</span>
-            </span>
-          ) : undefined
+          <span className="flex items-center gap-3">
+            {mode === "SUBMIT" && totalScore !== undefined && (
+              <span className="font-mono text-[11px] text-[#8B93A7]">
+                Score <span style={{ color: bannerColor }}>{totalScore}%</span>
+              </span>
+            )}
+            <OriginBadge origin={mode === "SUBMIT" ? "server" : origin} />
+          </span>
         }
       />
 
@@ -137,7 +142,6 @@ export default function VerdictPanel({
         {memoryUsed !== undefined && (
           <Metric label="Memory" value={formatMemory(memoryUsed)} />
         )}
-        {origin && <Metric label="Ran on" value={origin} />}
       </div>
 
       {mode === "SUBMIT" ? (
@@ -211,9 +215,23 @@ export default function VerdictPanel({
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({
+  children,
+  notice,
+}: {
+  children: React.ReactNode;
+  notice?: string | null;
+}) {
   return (
-    <div className="h-full overflow-y-auto bg-[#0b0d13] text-[#F4F1EA]">{children}</div>
+    <div className="h-full overflow-y-auto bg-[#0b0d13] text-[#F4F1EA]">
+      {notice && (
+        <div className="flex items-center gap-2 border-b border-[#D9A404]/30 bg-[#D9A404]/10 px-4 py-2 font-mono text-[11px] text-[#D9A404]">
+          <Clock size={13} />
+          {notice}
+        </div>
+      )}
+      {children}
+    </div>
   );
 }
 
@@ -242,6 +260,31 @@ function Banner({
       </span>
       {right}
     </div>
+  );
+}
+
+function OriginBadge({ origin }: { origin?: "local" | "server" | null }) {
+  if (!origin) return null;
+
+  const local = origin === "local";
+
+  return (
+    <span
+      title={
+        local
+          ? "Executed by the CodeCell runtime on this machine"
+          : "Executed by the server judge"
+      }
+      className="flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-[10px] tracking-wide"
+      style={{
+        borderColor: local ? "#34D39955" : "#22262f",
+        color: local ? "#34D399" : "#8B93A7",
+        background: local ? "#34D39912" : "transparent",
+      }}
+    >
+      {local ? <Cpu size={11} /> : <Server size={11} />}
+      {local ? "CodeCell Runtime" : "Server Judge"}
+    </span>
   );
 }
 

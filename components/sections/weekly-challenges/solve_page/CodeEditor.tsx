@@ -13,20 +13,25 @@ import {
 } from "lucide-react";
 
 import type { SubmissionStatus, Language } from "@/lib/types/submission";
+import { checkRuntimeHealth, getLocalToolchainStatus } from "@/lib/runtime-api";
+import type { LanguageKey } from "@/lib/runtime-api";
 
 interface CodeEditorProps {
   status: SubmissionStatus;
   activeAction: "RUN" | "SUBMIT" | null;
   starterCode?: Partial<Record<Language, string>>;
+  cooldownLeft?: number;
   onRun?: (code: string, language: Language, stdin: string) => Promise<void>;
   onSubmit?: (code: string, language: Language) => Promise<void>;
 }
 
-const LANGUAGES: { id: Language; label: string; monaco: string }[] = [
-  { id: "CPP", label: "C++", monaco: "cpp" },
-  { id: "JAVA", label: "Java", monaco: "java" },
-  { id: "PYTHON", label: "Python", monaco: "python" },
+const LANGUAGES: { id: Language; label: string; monaco: string; runtime: LanguageKey }[] = [
+  { id: "CPP", label: "C++", monaco: "cpp", runtime: "cpp" },
+  { id: "JAVA", label: "Java", monaco: "java", runtime: "java" },
+  { id: "PYTHON", label: "Python", monaco: "python", runtime: "python" },
 ];
+
+const RUNTIME_PROBE_MS = 20000;
 
 const EMPTY: Record<Language, string> = { CPP: "", JAVA: "", PYTHON: "" };
 
@@ -34,6 +39,7 @@ export default function CodeEditor({
   status,
   activeAction,
   starterCode,
+  cooldownLeft = 0,
   onRun,
   onSubmit,
 }: CodeEditorProps) {
@@ -50,6 +56,42 @@ export default function CodeEditor({
 
   const current = LANGUAGES.find((l) => l.id === language) ?? LANGUAGES[0];
   const code = codeByLang[language];
+
+  const [localReady, setLocalReady] = useState<Partial<Record<Language, boolean>> | null>(
+    null
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const probe = async () => {
+      const healthy = await checkRuntimeHealth();
+      if (cancelled) return;
+
+      if (!healthy) {
+        setLocalReady({});
+        return;
+      }
+
+      const toolchains = await getLocalToolchainStatus();
+      if (cancelled) return;
+
+      const ready: Partial<Record<Language, boolean>> = {};
+      for (const lang of LANGUAGES) {
+        ready[lang.id] = !!toolchains?.[lang.runtime]?.available;
+      }
+      setLocalReady(ready);
+    };
+
+    probe();
+    const interval = setInterval(probe, RUNTIME_PROBE_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const runsLocally = !!localReady?.[language];
 
   useEffect(() => {
     if (!starterCode) return;
@@ -111,7 +153,31 @@ export default function CodeEditor({
           ))}
         </div>
 
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-2">
+          <span
+            title={
+              runsLocally
+                ? "Run executes on the CodeCell runtime on this machine"
+                : "CodeCell runtime not detected, Run executes on the server judge"
+            }
+            className="flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-[10px] tracking-wide"
+            style={{
+              borderColor: runsLocally ? "#34D39955" : "#22262f",
+              color: runsLocally ? "#34D399" : "#8B93A7",
+              background: runsLocally ? "#34D39912" : "transparent",
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ background: runsLocally ? "#34D399" : "#5A5850" }}
+            />
+            {localReady === null
+              ? "Checking runtime"
+              : runsLocally
+                ? "CodeCell Runtime"
+                : "Server Judge"}
+          </span>
+
           <button
             onClick={resetCode}
             title="Reset to starter code"
@@ -201,7 +267,12 @@ export default function CodeEditor({
 
           <button
             onClick={() => onSubmit?.(code, language)}
-            disabled={isBusy}
+            disabled={isBusy || cooldownLeft > 0}
+            title={
+              cooldownLeft > 0
+                ? `The judge allows one submission every 10 seconds`
+                : undefined
+            }
             className="flex items-center gap-1.5 rounded px-4 py-1.5 font-mono text-xs font-bold text-[#06070B] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             style={{ background: "linear-gradient(180deg, #6FCF97 0%, #12A87E 100%)" }}
           >
@@ -210,7 +281,7 @@ export default function CodeEditor({
             ) : (
               <Send size={14} />
             )}
-            Submit
+            {cooldownLeft > 0 ? `Submit in ${cooldownLeft}s` : "Submit"}
           </button>
         </div>
       </div>

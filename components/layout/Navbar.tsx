@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
+import AuthStatus from "@/components/layout/AuthStatus";
 
 interface NavItem {
   label: string;
@@ -270,9 +271,11 @@ export default function Navbar() {
           </nav>
 
           {/* =====================================
-              DESKTOP LOGIN BUTTON (Removed)
+              DESKTOP AUTH STATUS
           ===================================== */}
-          <div className="hidden lg:block flex-1"></div>
+          <div className="hidden lg:flex flex-1 justify-end">
+            <AuthStatus accent={primaryAccent} />
+          </div>
 
           {/* =====================================
               MOBILE HAMBURGER
@@ -415,7 +418,9 @@ export default function Navbar() {
                 );
               })}
 
-              {/* LOGIN MOBILE BUTTON REMOVED */}
+              <div className="pt-4">
+                <AuthStatus accent={primaryAccent} />
+              </div>
             </nav>
           </div>
         )}

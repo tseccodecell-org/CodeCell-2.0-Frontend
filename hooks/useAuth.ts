@@ -1,72 +1,48 @@
-// hooks/useAuth.ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getProfile, ApiError } from "@/lib/api-client";
+import type { UserProfile } from "@/lib/api-client";
 import { AuthUser, UserRole } from "@/lib/types/leaderboard";
-
 
 interface UseAuthResult {
   user: AuthUser | null;
+  profile: UserProfile | null;
   isLoading: boolean;
+  isAuthenticated: boolean;
   error: string | null;
-  /** true only when the authenticated user's role is TSEC */
   isTsecStudent: boolean;
+  refresh: () => void;
 }
 
-/**
- * Reads the current authenticated user and derives `isTsecStudent`.
- *
- * Wire this up to however auth already works in the app:
- *  - If you have a session/JWT cookie, point `fetch` at your "/me" endpoint.
- *  - If you already have an AuthContext / NextAuth session elsewhere,
- *    swap the body of this hook to read from that instead of fetching.
- *
- * Defaults to `isTsecStudent: false` while loading and on any error, so
- * the TSEC toggle never flashes visible before we actually know the role
- * — the leaderboard silently falls back to the "Other" endpoints.
- */
 export function useAuth(): UseAuthResult {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
+
+  const refresh = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadUser() {
+      setIsLoading(true);
       try {
-        const res = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to load session (${res.status})`);
-        }
-
-        const json = await res.json();
-        
-        if (!json.success || !json.data) {
-          throw new Error("Invalid profile response");
-        }
-
-        const authUser: AuthUser = {
-          id: json.data.id,
-          name: json.data.name,
-          role: json.data.is_tsec_user ? UserRole.TSEC : UserRole.OTHER,
-        };
-
-        if (!cancelled) {
-          setUser(authUser);
-        }
+        const data = await getProfile();
+        if (cancelled) return;
+        setProfile(data);
+        setError(null);
       } catch (err) {
-        if (!cancelled) {
-          setUser(null);
+        if (cancelled) return;
+        setProfile(null);
+        if (err instanceof ApiError && err.status === 401) {
+          setError(null);
+        } else {
           setError(err instanceof Error ? err.message : "Failed to load session");
         }
       } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
+        if (!cancelled) setIsLoading(false);
       }
     }
 
@@ -75,9 +51,23 @@ export function useAuth(): UseAuthResult {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [tick]);
 
-  const isTsecStudent = !isLoading && user?.role === UserRole.TSEC;
+  const user: AuthUser | null = profile
+    ? {
+        id: profile.id,
+        name: profile.username,
+        role: profile.is_tsec_user ? UserRole.TSEC : UserRole.OTHER,
+      }
+    : null;
 
-  return { user, isLoading, error, isTsecStudent };
+  return {
+    user,
+    profile,
+    isLoading,
+    isAuthenticated: !!profile,
+    error,
+    isTsecStudent: !isLoading && user?.role === UserRole.TSEC,
+    refresh,
+  };
 }

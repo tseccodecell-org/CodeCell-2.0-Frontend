@@ -62,6 +62,26 @@ export interface Event {
   status: EventStatus;
 }
 
+// ---------- Profile ----------
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  rating: number;
+  total_problems_solved: number;
+  college_name: string;
+  year: string;
+  is_tsec_user: boolean;
+}
+
+export function getProfile(): Promise<UserProfile> {
+  return apiGetEnveloped<UserProfile>("/profile");
+}
+
+export const LOGIN_URL = `${BASE_URL}/oauth/google/login`;
+export const LOGOUT_URL = `${BASE_URL}/oauth/logout`;
+
 // ---------- Problems ----------
 
 export function getProblem(

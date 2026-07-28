@@ -172,12 +172,12 @@ const teamCrew = [
   },
   {
     name: "Shreya Awari",
-    role: "Publicity Head",
+    role: "Logistics & Coordination",
     handle: "@shreya.a",
     photo: "/Scoms%20pics/Shreya.jpg",
     team: "Scom",
     github: "https://github.com/shreyaawari28",
-    linkedin: "https://www.linkedin.com/in/shreya-awari-/",
+    linkedin: "https://www.linkedin.com/in/shreya-awari-"
   },
   {
     name: "Soham Keswani",

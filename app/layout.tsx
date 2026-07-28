@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono, Inter, Orbitron, Poppins } from "next/font/google";
 
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-
-import InteractiveGrid from "@/components/layout/InteractiveGrid";
+import SiteChrome from "@/components/layout/SiteChrome";
 import { Providers } from "./providers";
 
 const spaceGrotesk = Space_Grotesk({
@@ -59,15 +56,7 @@ export default function RootLayout({
     >
       <body className="antialiased" suppressHydrationWarning>
         <Providers>
-          <InteractiveGrid />
-
-          <Navbar />
-
-          {/* Prevent navbar overlap */}
-          <main className="relative z-10 min-h-screen">
-            {children}
-          </main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
         </Providers>
       </body>
     </html>

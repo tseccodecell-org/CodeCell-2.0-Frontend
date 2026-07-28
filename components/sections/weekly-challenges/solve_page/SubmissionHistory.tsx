@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { CheckCircle2, XCircle, Clock, RotateCw, History, X } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, RotateCw } from "lucide-react";
 import { getSubmissionHistory, ApiError } from "@/lib/api-client";
 import type { SubmissionResult } from "@/lib/types/submission";
 
 const tokens = {
-  bg: "#06070B",
-  panel: "#0b0d13",
   panelAlt: "#0d0f14",
-  border: "#1a1c24",
   borderAlt: "#22262f",
   ink: "#F4F1EA",
   muted: "#8B93A7",
@@ -21,8 +18,6 @@ const tokens = {
 
 interface SubmissionHistoryProps {
   problemId: string;
-  open: boolean;
-  onClose: () => void;
   /** bump this after a new submission completes to force a refetch */
   refreshKey?: number;
 }
@@ -36,8 +31,6 @@ function verdictColor(status: SubmissionResult["status"], verdict: string) {
 
 export default function SubmissionHistory({
   problemId,
-  open,
-  onClose,
   refreshKey = 0,
 }: SubmissionHistoryProps) {
   const [items, setItems] = useState<SubmissionResult[]>([]);
@@ -62,125 +55,103 @@ export default function SubmissionHistory({
   }, [problemId]);
 
   useEffect(() => {
-    if (open) fetchHistory();
-  }, [open, refreshKey, fetchHistory]);
-
-  if (!open) return null;
+    fetchHistory();
+  }, [refreshKey, fetchHistory]);
 
   return (
-    <div className="absolute inset-0 z-20 flex justify-end bg-black/40">
-      <div
-        className="h-full w-full max-w-sm flex flex-col border-l"
-        style={{ background: tokens.panel, borderColor: tokens.border }}
-      >
-        <div
-          className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0"
-          style={{ borderColor: tokens.border, background: tokens.panelAlt }}
+    <div className="flex h-full flex-col">
+      <div className="flex shrink-0 items-center justify-between px-4 pt-4">
+        <span
+          className="font-mono text-[11px] uppercase tracking-wide"
+          style={{ color: tokens.dim }}
         >
-          <div className="flex items-center gap-2">
-            <History size={15} style={{ color: tokens.green }} />
-            <h3
-              className="font-mono text-xs font-bold uppercase tracking-widest"
-              style={{ color: tokens.ink }}
-            >
-              Submission History
-            </h3>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={fetchHistory}
-              title="Refresh"
-              className="p-1.5 rounded hover:bg-white/5 transition-colors cursor-pointer"
-              style={{ color: tokens.muted }}
-            >
-              <RotateCw size={14} className={loading ? "animate-spin" : ""} />
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded hover:bg-white/5 transition-colors cursor-pointer"
-              style={{ color: tokens.muted }}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
+          {items.length} submission{items.length === 1 ? "" : "s"}
+        </span>
+        <button
+          onClick={fetchHistory}
+          title="Refresh"
+          className="rounded p-1.5 transition-colors hover:bg-white/5 cursor-pointer"
+          style={{ color: tokens.muted }}
+        >
+          <RotateCw size={13} className={loading ? "animate-spin" : ""} />
+        </button>
+      </div>
 
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {loading && items.length === 0 && (
-            <div className="space-y-2">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="h-14 rounded-lg animate-pulse"
-                  style={{ background: "rgba(52,211,153,0.06)" }}
-                />
-              ))}
-            </div>
-          )}
-
-          {!loading && error && (
-            <p className="font-mono text-xs px-1" style={{ color: tokens.red }}>
-              {error}
-            </p>
-          )}
-
-          {!loading && !error && items.length === 0 && (
-            <p className="font-mono text-xs px-1" style={{ color: tokens.dim }}>
-              No submissions yet for this problem.
-            </p>
-          )}
-
-          {items.map((item) => {
-            const color = verdictColor(item.status, item.verdict);
-            const isBusy = item.status === "QUEUED" || item.status === "RUNNING";
-            return (
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-4 pt-3">
+        {loading && items.length === 0 && (
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => (
               <div
-                key={item.id}
-                className="rounded-lg border px-3 py-2.5"
-                style={{ borderColor: tokens.borderAlt, background: tokens.panelAlt }}
-              >
-                <div className="flex items-center justify-between">
-                  <span
-                    className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wide"
-                    style={{ color }}
-                  >
-                    {isBusy ? (
-                      <Clock size={12} />
-                    ) : color === tokens.green ? (
-                      <CheckCircle2 size={12} />
-                    ) : (
-                      <XCircle size={12} />
-                    )}
-                    {isBusy ? item.status : item.verdict?.replace(/_/g, " ") || item.status}
-                  </span>
-                  {item.language && (
-                    <span
-                      className="font-mono text-[10px] uppercase tracking-wide"
-                      style={{ color: tokens.muted }}
-                    >
-                      {item.language}
-                    </span>
-                  )}
-                </div>
+                key={i}
+                className="h-14 animate-pulse rounded"
+                style={{ background: "rgba(52,211,153,0.06)" }}
+              />
+            ))}
+          </div>
+        )}
 
-                <div
-                  className="mt-1.5 flex items-center gap-3 font-mono text-[10px]"
-                  style={{ color: tokens.muted }}
+        {!loading && error && (
+          <p className="font-mono text-xs" style={{ color: tokens.red }}>
+            {error}
+          </p>
+        )}
+
+        {!loading && !error && items.length === 0 && (
+          <p className="font-mono text-xs" style={{ color: tokens.dim }}>
+            No submissions yet for this problem.
+          </p>
+        )}
+
+        {items.map((item) => {
+          const color = verdictColor(item.status, item.verdict);
+          const isBusy = item.status === "QUEUED" || item.status === "RUNNING";
+          return (
+            <div
+              key={item.id}
+              className="rounded border px-3 py-2.5"
+              style={{ borderColor: tokens.borderAlt, background: tokens.panelAlt }}
+            >
+              <div className="flex items-center justify-between">
+                <span
+                  className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wide"
+                  style={{ color }}
                 >
-                  {item.status === "COMPLETED" && (
-                    <>
-                      <span>{item.score ?? 0} pts</span>
-                      <span>{item.executionTimeMs} ms</span>
-                    </>
+                  {isBusy ? (
+                    <Clock size={12} />
+                  ) : color === tokens.green ? (
+                    <CheckCircle2 size={12} />
+                  ) : (
+                    <XCircle size={12} />
                   )}
-                  {item.submittedAt && (
-                    <span>{new Date(item.submittedAt).toLocaleString()}</span>
-                  )}
-                </div>
+                  {isBusy ? item.status : item.verdict?.replace(/_/g, " ") || item.status}
+                </span>
+                {item.language && (
+                  <span
+                    className="font-mono text-[10px] uppercase tracking-wide"
+                    style={{ color: tokens.muted }}
+                  >
+                    {item.language}
+                  </span>
+                )}
               </div>
-            );
-          })}
-        </div>
+
+              <div
+                className="mt-1.5 flex items-center gap-3 font-mono text-[10px]"
+                style={{ color: tokens.muted }}
+              >
+                {item.status === "COMPLETED" && (
+                  <>
+                    <span>{item.score ?? 0} pts</span>
+                    <span>{item.executionTimeMs} ms</span>
+                  </>
+                )}
+                {item.submittedAt && (
+                  <span>{new Date(item.submittedAt).toLocaleString()}</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

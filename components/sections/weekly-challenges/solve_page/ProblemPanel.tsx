@@ -15,9 +15,8 @@
  *   <ProblemPanel problemId={id} apiBaseUrl="https://api.example.com" />
  */
 
-import { SetStateAction, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getProblem, ApiError } from "@/lib/api-client";
-import * as Tabs from "@radix-ui/react-tabs";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Clock,
@@ -29,11 +28,7 @@ import {
   Tag as TagIcon,
   AlertTriangle,
 } from "lucide-react";
-import type {
-  ProblemDetail,
-  ProblemExample,
-  APIResponse,
-} from "@/lib/types/problem";
+import type { ProblemDetail, ProblemExample } from "@/lib/types/problem";
 
 // ---------------------------------------------------------------------------
 // Public props
@@ -46,6 +41,8 @@ interface ProblemPanelProps {
   problemId?: string;
   /** Base URL to prefix onto /api/problems/{id}. Defaults to same-origin. */
   apiBaseUrl?: string;
+  /** Called once the problem has been fetched, so the page can share it. */
+  onLoaded?: (problem: ProblemDetail) => void;
   /** Extra class names for the outer panel. */
   className?: string;
 }
@@ -315,6 +312,7 @@ export default function ProblemPanel({
   problem: problemProp,
   problemId,
   apiBaseUrl = DEFAULT_API_BASE_URL,
+  onLoaded,
   className = "",
 }: ProblemPanelProps) {
   const [problem, setProblem] = useState<ProblemDetail | null>(problemProp ?? null);
@@ -331,25 +329,18 @@ export default function ProblemPanel({
 
 
     getProblem(problemId, apiBaseUrl)
-      .then((data: SetStateAction<ProblemDetail | null>) => {
+      .then((data) => {
         if (cancelled) return;
         setProblem(data);
+        onLoaded?.(data);
       })
-       .catch((err: { message: SetStateAction<string | null>; }) => {
-         if (cancelled) return;
-         setError(
+      .catch((err) => {
+        if (cancelled) return;
+        setError(
           err instanceof ApiError
             ? err.message
             : err?.message ??
-             "Something went wrong fetching this problem. Check your connection and try again."
-         );
-       })
-      .catch((err: { response: { data: { error: { message: any; }; }; }; message: any; }) => {
-        if (cancelled) return;
-        setError(
-          err?.response?.data?.error?.message ??
-            err?.message ??
-            "Something went wrong fetching this problem. Check your connection and try again."
+                "Something went wrong fetching this problem. Check your connection and try again."
         );
       })
       .finally(() => {
@@ -359,17 +350,7 @@ export default function ProblemPanel({
     return () => {
       cancelled = true;
     };
-  }, [problemId, problemProp, apiBaseUrl, retryTick]);
-
-  const defaultLanguage = useMemo(
-    () => problem?.languages?.[0]?.language,
-    [problem]
-  );
-  const [activeLanguage, setActiveLanguage] = useState<string | undefined>(defaultLanguage);
-
-  useEffect(() => {
-    setActiveLanguage(defaultLanguage);
-  }, [defaultLanguage]);
+  }, [problemId, problemProp, apiBaseUrl, retryTick, onLoaded]);
 
   return (
     <aside
@@ -499,57 +480,6 @@ export default function ProblemPanel({
             </div>
           )}
 
-          {/* Languages */}
-          {problem.languages.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="w-1 h-3 rounded-full" style={{ background: tokens.green }} />
-                <h3
-                  className="text-[11px] font-mono font-bold uppercase tracking-[0.14em]"
-                  style={{ color: tokens.green }}
-                >
-                  Starter Code
-                </h3>
-              </div>
-
-              <Tabs.Root value={activeLanguage} onValueChange={setActiveLanguage}>
-                <Tabs.List className="flex gap-1 rounded-md p-1" style={{ background: tokens.bg }}>
-                  {problem.languages.map((lang) => (
-                    <Tabs.Trigger
-                      key={lang.language}
-                      value={lang.language}
-                      className="rounded px-2.5 py-1 text-[11px] font-mono font-medium tracking-wide transition-colors cursor-pointer data-[state=active]:bg-[#0d0f14]"
-                      style={{
-                        color: lang.language === activeLanguage ? tokens.green : tokens.muted,
-                      }}
-                    >
-                      {lang.language}
-                    </Tabs.Trigger>
-                  ))}
-                </Tabs.List>
-
-                {problem.languages.map((lang) => (
-                  <Tabs.Content key={lang.language} value={lang.language} className="mt-2">
-                    <div className="relative">
-                      <div className="absolute right-2 top-2 z-10">
-                        <CopyButton text={lang.starterCode} />
-                      </div>
-                      <pre
-                        className="max-h-64 overflow-auto whitespace-pre rounded-md px-3 py-3 text-[12px] font-mono leading-relaxed"
-                        style={{
-                          background: tokens.bg,
-                          color: tokens.ink,
-                          border: `1px solid ${tokens.border}`,
-                        }}
-                      >
-                        {lang.starterCode || "// No starter code yet"}
-                      </pre>
-                    </div>
-                  </Tabs.Content>
-                ))}
-              </Tabs.Root>
-            </div>
-          )}
         </motion.div>
       )}
     </aside>

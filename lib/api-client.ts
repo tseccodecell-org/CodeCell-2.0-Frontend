@@ -252,8 +252,15 @@ export async function getWeek(id: string): Promise<Week | null> {
   }
 }
  
-export function getWeekProblems(id: string): Promise<Problem[]> {
-  return apiGet<Problem[]>(`/weeks/${id}/problems`);
+export async function getWeekProblems(id: string): Promise<Problem[]> {
+  try {
+    const res = await fetch(`/api/weeks/${id}/problems`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : (data?.data ?? []);
+  } catch {
+    return [];
+  }
 }
  
 // ---------- Events ----------

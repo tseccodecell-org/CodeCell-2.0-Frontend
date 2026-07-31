@@ -1,17 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { Sparkles, Award, ExternalLink, ShieldCheck } from "lucide-react";
+import { Sparkles, Award, ShieldCheck } from "lucide-react";
 
 interface Sponsor {
   name: string;
   category: string;
   logo: string;
   description?: string;
-  featured?: boolean;
-  invert?: boolean;
-  scale?: number;
+  lightBg?: boolean;
 }
 
 const featuredSponsors: Sponsor[] = [
@@ -19,55 +16,47 @@ const featuredSponsors: Sponsor[] = [
     name: "Engaze",
     category: "Career Partner",
     logo: "/sponsors/engaze.png",
-    description: "Your official career partner empowering students with opportunities and tech placement.",
-    featured: true,
-    invert: true,
-    scale: 1.2,
+    description: "Your official career partner empowering students with placement preparation and tech roles.",
+    lightBg: true,
   },
   {
     name: "VisionX",
     category: "Tech Sponsor",
     logo: "/sponsors/visionx.png",
     description: "Empowering Next-Gen AI & Visual Intelligence solutions for competitive developers.",
-    featured: true,
-    invert: true,
-    scale: 1.3,
+    lightBg: true,
   },
   {
     name: "Wolfram Alpha",
     category: "Computation & AI Partner",
     logo: "/sponsors/wolfram.png",
     description: "Computational intelligence & mathematical algorithms platform.",
-    featured: true,
-    invert: true,
-    scale: 1.1,
+    lightBg: true,
   },
   {
     name: "CodeCrafters",
     category: "Dev Platform Partner",
     logo: "/sponsors/codecrafters.png",
     description: "Practice building complex software systems from scratch with real-world feedback.",
-    featured: true,
-    invert: true,
-    scale: 1.2,
+    lightBg: true,
   },
 ];
 
 const ecosystemSponsors: Sponsor[] = [
-  { name: "Devfolio", category: "Hackathon Partner", logo: "/sponsors/devfolio.png", invert: true },
-  { name: "Polygon", category: "Web3 Infrastructure", logo: "/sponsors/polygon.png", invert: true },
-  { name: "ETHIndia", category: "Ecosystem Partner", logo: "/sponsors/ethindia.png", invert: true },
-  { name: "GitHub", category: "Developer Tools", logo: "/sponsors/github.png", invert: true },
-  { name: "Postman", category: "API Platform", logo: "/sponsors/postman.png", invert: true },
-  { name: "Replit", category: "Cloud IDE", logo: "/sponsors/replit.png", invert: true },
-  { name: "Appwrite", category: "Backend Platform", logo: "/sponsors/appwrite.png", invert: true },
-  { name: "FOSS United", category: "Open Source", logo: "/sponsors/foss.png", invert: true },
-  { name: "Orkes", category: "Workflow Orchestration", logo: "/sponsors/orkes.png", invert: true },
-  { name: "Patil Kaki", category: "Snacks Partner", logo: "/sponsors/patilkaki.png" },
-  { name: "Smaaash", category: "Entertainment Partner", logo: "/sponsors/smaaash.png" },
-  { name: "JDoodle", category: "Online Compiler", logo: "/sponsors/jdoodle.png", invert: true },
-  { name: "Crosscope", category: "HealthTech Partner", logo: "/sponsors/crosscope.png", invert: true },
-  { name: "ScrollConnect", category: "Community Partner", logo: "/sponsors/scrollconnect.png", invert: true },
+  { name: "Devfolio", category: "Hackathon Partner", logo: "/sponsors/devfolio.png", lightBg: true },
+  { name: "Polygon", category: "Web3 Infrastructure", logo: "/sponsors/polygon.png", lightBg: true },
+  { name: "ETHIndia", category: "Ecosystem Partner", logo: "/sponsors/ethindia.png", lightBg: true },
+  { name: "GitHub", category: "Developer Tools", logo: "/sponsors/github.png", lightBg: true },
+  { name: "Postman", category: "API Platform", logo: "/sponsors/postman.png", lightBg: true },
+  { name: "Replit", category: "Cloud IDE", logo: "/sponsors/replit.png", lightBg: true },
+  { name: "Appwrite", category: "Backend Platform", logo: "/sponsors/appwrite.png", lightBg: true },
+  { name: "FOSS United", category: "Open Source", logo: "/sponsors/foss.png", lightBg: true },
+  { name: "Orkes", category: "Workflow Orchestration", logo: "/sponsors/orkes.png", lightBg: true },
+  { name: "Patil Kaki", category: "Snacks Partner", logo: "/sponsors/patilkaki.png", lightBg: true },
+  { name: "Smaaash", category: "Entertainment Partner", logo: "/sponsors/smaaash.png", lightBg: true },
+  { name: "JDoodle", category: "Online Compiler", logo: "/sponsors/jdoodle.png", lightBg: true },
+  { name: "Crosscope", category: "HealthTech Partner", logo: "/sponsors/crosscope.png", lightBg: true },
+  { name: "ScrollConnect", category: "Community Partner", logo: "/sponsors/scrollconnect.png", lightBg: true },
 ];
 
 export function Sponsors() {
@@ -128,7 +117,7 @@ export function Sponsors() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="group relative bg-[#07090E]/90 border border-[#eab308]/25 rounded-2xl p-6 hover:border-[#eab308] hover:shadow-[0_0_35px_rgba(234,179,8,0.2)] transition-all duration-300 flex flex-col justify-between"
+                className="group relative bg-[#07090E]/90 border border-[#eab308]/30 rounded-2xl p-6 hover:border-[#eab308] hover:shadow-[0_0_35px_rgba(234,179,8,0.25)] transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Ambient Top Glow */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-[#eab308] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -142,17 +131,13 @@ export function Sponsors() {
                     <ShieldCheck size={16} className="text-[#eab308]/60 group-hover:text-[#eab308] transition-colors" />
                   </div>
 
-                  {/* Logo Container */}
-                  <div className="h-24 w-full bg-[#0A0D14] rounded-xl border border-white/5 p-4 flex items-center justify-center mb-6 group-hover:bg-[#0F1420] transition-colors">
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      <img
-                        src={sponsor.logo}
-                        alt={sponsor.name}
-                        className={`max-h-16 max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-110 ${
-                          sponsor.invert ? "brightness-0 invert drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" : ""
-                        }`}
-                      />
-                    </div>
+                  {/* Logo Container with Clean Bright Card */}
+                  <div className="h-28 w-full bg-white rounded-xl p-4 flex items-center justify-center mb-6 shadow-inner border border-white/20 group-hover:scale-[1.02] transition-transform duration-300">
+                    <img
+                      src={sponsor.logo}
+                      alt={sponsor.name}
+                      className="max-h-20 max-w-[90%] object-contain"
+                    />
                   </div>
 
                   {/* Sponsor Name & Description */}
@@ -184,19 +169,17 @@ export function Sponsors() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.04 }}
-                className="group bg-[#07090E]/60 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center hover:border-[#eab308]/50 hover:bg-[#0C101A] transition-all duration-300"
+                transition={{ delay: idx * 0.03 }}
+                className="group bg-white rounded-xl p-3 flex flex-col items-center justify-center hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 border border-white/20 hover:scale-105"
               >
-                <div className="h-12 w-full flex items-center justify-center mb-2">
+                <div className="h-12 w-full flex items-center justify-center mb-1">
                   <img
                     src={sponsor.logo}
                     alt={sponsor.name}
-                    className={`max-h-10 max-w-[80%] object-contain transition-transform duration-300 group-hover:scale-105 ${
-                      sponsor.invert ? "brightness-0 invert opacity-80 group-hover:opacity-100" : "opacity-90 group-hover:opacity-100"
-                    }`}
+                    className="max-h-10 max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
-                <span className="font-mono text-[10px] text-zinc-500 group-hover:text-zinc-300 truncate w-full text-center transition-colors">
+                <span className="font-mono text-[9px] font-bold text-zinc-700 group-hover:text-black truncate w-full text-center transition-colors">
                   {sponsor.name}
                 </span>
               </motion.div>

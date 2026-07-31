@@ -23,7 +23,7 @@ type LeaderboardResponse = WeeklyLeaderboardResponse | SeasonLeaderboardResponse
 export function useLeaderboard({
   kind,
   page = 1,
-  limit = 20,
+  limit = 25,
   weekId,
 }: UseLeaderboardOptions) {
   const { user, isTsecStudent, isAuthenticated } = useAuth();

@@ -21,7 +21,7 @@ export default function SeasonLeaderboardPage() {
     selectedTab,
     setSelectedTab,
     showToggle,
-  } = useLeaderboard({ kind: "season", page, limit: 20 });
+  } = useLeaderboard({ kind: "season", page, limit: 25 });
 
   const response = data as SeasonLeaderboardResponse | null;
 

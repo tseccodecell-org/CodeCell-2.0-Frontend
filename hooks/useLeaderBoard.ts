@@ -36,7 +36,7 @@ export function useLeaderboard({
   const [unauthorized, setUnauthorized] = useState(false);
   const [refetchToken, setRefetchToken] = useState(0);
 
-  const showToggle = isTsecStudent;
+  const showToggle = true;
 
   const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);

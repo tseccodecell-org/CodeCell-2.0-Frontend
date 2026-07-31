@@ -18,10 +18,10 @@ export default function LoginCard() {
   if (isAuthenticated) {
     return (
       <Link
-        href="/events/weekly-challenges/leaderboard/weekly"
+        href="/events/weekly-challenges/timeline"
         className="px-10 py-4 rounded-full bg-black border-2 border-[#D4AF37] text-[#D4AF37] font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] hover:bg-[#D4AF37]/15 hover:shadow-[0_0_25px_rgba(212,175,55,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
       >
-        <span>VIEW LEADERBOARD</span>
+        <span>GO TO TIMELINE</span>
         <span className="group-hover:translate-x-1 transition-transform">→</span>
       </Link>
     );

@@ -1,7 +1,7 @@
 // app/leaderboard/weekly/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { useLeaderboard } from "@/hooks/useLeaderBoard";
@@ -25,16 +25,19 @@ export default function WeeklyLeaderboardPage() {
 
   const response = data as WeeklyLeaderboardResponse | null;
 
-  const rows: LeaderboardRow[] =
-    response?.data.map((entry) => ({
-      rank: entry.rank,
-      id: entry.user_id,
-      name: entry.name,
-      primaryValue: entry.weekly_score,
-      primaryLabel: "WEEKLY SCORE",
-      secondaryValue: entry.problems_solved,
-      secondaryLabel: "SOLVED",
-    })) ?? [];
+  const rows: LeaderboardRow[] = useMemo(
+    () =>
+      response?.data.map((entry) => ({
+        rank: entry.rank,
+        id: entry.user_id,
+        name: entry.name,
+        primaryValue: entry.weekly_score,
+        primaryLabel: "WEEKLY SCORE",
+        secondaryValue: entry.problems_solved,
+        secondaryLabel: "SOLVED",
+      })) ?? [],
+    [response?.data]
+  );
 
   return (
     <>

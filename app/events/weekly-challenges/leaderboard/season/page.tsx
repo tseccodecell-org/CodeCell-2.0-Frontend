@@ -17,6 +17,7 @@ export default function SeasonLeaderboardPage() {
     isLoading,
     error,
     forbidden,
+    unauthorized,
     selectedTab,
     setSelectedTab,
     showToggle,
@@ -54,6 +55,7 @@ export default function SeasonLeaderboardPage() {
         isLoading={isLoading}
         error={error}
         forbidden={forbidden}
+        unauthorized={unauthorized}
         page={page}
         hasNext={response?.has_next ?? false}
         onPageChange={setPage}

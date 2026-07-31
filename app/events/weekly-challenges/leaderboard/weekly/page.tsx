@@ -7,7 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import { useLeaderboard } from "@/hooks/useLeaderBoard";
 import LeaderboardToggle from "@/components/sections/leaderboard/LeaderboardToggle";
 import LeaderboardTable, { LeaderboardRow } from "@/components/sections/leaderboard/LeaderboardTable";
-import { SeasonLeaderboardResponse, WeeklyLeaderboardResponse } from "@/lib/types/leaderboard";
+import { WeeklyLeaderboardResponse } from "@/lib/types/leaderboard";
 
 export default function WeeklyLeaderboardPage() {
   const [page, setPage] = useState(1);
@@ -17,6 +17,7 @@ export default function WeeklyLeaderboardPage() {
     isLoading,
     error,
     forbidden,
+    unauthorized,
     selectedTab,
     setSelectedTab,
     showToggle,
@@ -54,6 +55,7 @@ export default function WeeklyLeaderboardPage() {
         isLoading={isLoading}
         error={error}
         forbidden={forbidden}
+        unauthorized={unauthorized}
         page={page}
         hasNext={response?.has_next ?? false}
         onPageChange={setPage}

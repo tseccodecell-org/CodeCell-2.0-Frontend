@@ -64,8 +64,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isEventPage = pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/leaderboard") ||
+  const isEventPage = pathname.startsWith("/leaderboard") ||
     pathname.startsWith("/events") ||
     pathname.startsWith("/register");
 

@@ -13,7 +13,7 @@ import PrivacyPolicyModal from "./PrivacyPolicyModal";
 export default function Footer() {
   const pathname = usePathname();
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
-  const isEventPage = pathname.startsWith("/dashboard");
+  const isEventPage = pathname.startsWith("/events");
 
   const primaryAccent = isEventPage ? "#D4AF37" : "#4BE2C4";
   const secondaryAccent = isEventPage ? "#F5E6A3" : "#E8FF00";

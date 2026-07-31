@@ -6,10 +6,8 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("jwt_token")?.value;
 
   if (
-  pathname.startsWith("/admin") ||
-  pathname.startsWith("/dashboard") ||
-  pathname.startsWith("/events/weekly-challenges/")
-  //all routes starting with weekly_challenges should be protected except this one events/weekly-challenges
-) 
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/events/weekly-challenges/")
+  ) 
   return NextResponse.next();
 }

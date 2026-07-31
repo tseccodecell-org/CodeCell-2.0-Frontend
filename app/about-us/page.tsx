@@ -657,7 +657,7 @@ export default function AboutUsPage() {
               </p>
             </div>
             <Link
-              href="/dashboard"
+              href="/events/weekly-challenges/leaderboard/weekly"
               className={`${orbitron.className} group inline-flex items-center gap-2 mt-10 text-xs tracking-widest text-[#4BE2C4] hover:text-[#E8FF00] transition-colors duration-300`}
             >
               ENTER SANDBOX

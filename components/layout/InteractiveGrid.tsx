@@ -40,7 +40,7 @@ export default function InteractiveGrid() {
           radial-gradient(
             circle 300px at var(--mouse-x, -500px) var(--mouse-y, -500px),
             ${
-              pathname.startsWith("/dashboard") || 
+              pathname.startsWith("/events") || 
               pathname.startsWith("/leaderboard")
                 ? "rgba(212, 175, 55, 0.08) 0%, rgba(245, 230, 163, 0.03) 50%," // Gold theme
                 : "rgba(75, 226, 196, 0.08) 0%, rgba(232, 255, 0, 0.03) 50%," // Teal/Yellow theme

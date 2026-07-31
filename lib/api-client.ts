@@ -75,8 +75,37 @@ export interface UserProfile {
   is_tsec_user: boolean;
 }
 
-export function getProfile(): Promise<UserProfile> {
-  return apiGetEnveloped<UserProfile>("/profile");
+export async function getProfile(): Promise<UserProfile | null> {
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
+    if (token) {
+      headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+    }
+  }
+
+  try {
+    const res = await fetch("/api/profile", {
+      method: "GET",
+      headers,
+      credentials: "include",
+      cache: "no-store",
+    });
+
+    if (res.status === 401) {
+      return null;
+    }
+
+    const body = (await readBody(res)) as Envelope<UserProfile> | null;
+
+    if (!res.ok || !body?.success) {
+      return null;
+    }
+
+    return body.data as UserProfile;
+  } catch {
+    return null;
+  }
 }
 
 export const LOGIN_URL = `${BASE_URL}/oauth/google/login`;
@@ -203,14 +232,24 @@ async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: 
   return response.data as TResponse;
 }
 
-// ---------- Weeks ----------
- 
-export function getWeeks(): Promise<Week[]> {
-  return apiGet<Week[]>("/weeks");
+export async function getWeeks(): Promise<Week[]> {
+  try {
+    const res = await fetch("/api/weeks", { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : (data?.data ?? []);
+  } catch {
+    return [];
+  }
 }
- 
-export function getWeek(id: string): Promise<Week> {
-  return apiGet<Week>(`/weeks/${id}`);
+
+export async function getWeek(id: string): Promise<Week | null> {
+  try {
+    const weeks = await getWeeks();
+    return weeks.find((w) => w.id === id) || null;
+  } catch {
+    return null;
+  }
 }
  
 export function getWeekProblems(id: string): Promise<Problem[]> {
@@ -280,7 +319,7 @@ function buildLeaderboardEndpoint(
   return `/${audience}/${kind}_leaderboard`;
 }
 
-export function getLeaderboard(
+export async function getLeaderboard(
   kind: LeaderboardKind,
   role: UserRole | undefined,
   tab: LeaderboardTab,
@@ -291,9 +330,31 @@ export function getLeaderboard(
   params.set("limit", String(opts.limit));
   if (kind === "weekly" && opts.weekId) params.set("week_id", opts.weekId);
 
-  return apiGetEnveloped(
-    `${buildLeaderboardEndpoint(kind, role, tab)}?${params.toString()}`
-  );
+  const endpoint = buildLeaderboardEndpoint(kind, role, tab);
+  const headers: Record<string, string> = { Accept: "application/json" };
+
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
+    if (token) {
+      headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+    }
+  }
+
+  // Route through the Next.js API proxy to avoid CORS issues
+  const res = await fetch(`/api/leaderboard${endpoint}?${params.toString()}`, {
+    method: "GET",
+    headers,
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  const body = await readBody(res);
+
+  if (!res.ok) {
+    throw errorFrom(res, body);
+  }
+
+  return body as WeeklyLeaderboardResponse | SeasonLeaderboardResponse;
 }
 
 

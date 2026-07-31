@@ -1,9 +1,19 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { CheckCircle2, XCircle, Clock, RotateCw } from "lucide-react";
-import { getSubmissionHistory, ApiError } from "@/lib/api-client";
-import type { SubmissionResult } from "@/lib/types/submission";
+import {
+  CheckCircle2,
+  XCircle,
+  Clock,
+  RotateCw,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Check,
+  FileCode2,
+} from "lucide-react";
+import { getSubmissionHistory, getSubmission, ApiError } from "@/lib/api-client";
+import type { SubmissionResult, Language } from "@/lib/types/submission";
 
 const tokens = {
   panelAlt: "#0d0f14",
@@ -20,6 +30,7 @@ interface SubmissionHistoryProps {
   problemId: string;
   /** bump this after a new submission completes to force a refetch */
   refreshKey?: number;
+  onLoadCode?: (language: Language, code: string) => void;
 }
 
 function verdictColor(status: SubmissionResult["status"], verdict: string) {
@@ -32,10 +43,59 @@ function verdictColor(status: SubmissionResult["status"], verdict: string) {
 export default function SubmissionHistory({
   problemId,
   refreshKey = 0,
+  onLoadCode,
 }: SubmissionHistoryProps) {
   const [items, setItems] = useState<SubmissionResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [details, setDetails] = useState<Record<string, SubmissionResult>>({});
+  const [detailLoading, setDetailLoading] = useState<string | null>(null);
+  const [detailError, setDetailError] = useState<Record<string, string>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const toggleExpanded = useCallback(
+    async (id: string) => {
+      if (expandedId === id) {
+        setExpandedId(null);
+        return;
+      }
+      setExpandedId(id);
+      if (details[id]) return;
+
+      setDetailLoading(id);
+      setDetailError((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      try {
+        const full = await getSubmission(id);
+        setDetails((prev) => ({ ...prev, [id]: full }));
+      } catch (err) {
+        setDetailError((prev) => ({
+          ...prev,
+          [id]:
+            err instanceof ApiError
+              ? err.message
+              : "Couldn't load this submission's code.",
+        }));
+      } finally {
+        setDetailLoading(null);
+      }
+    },
+    [expandedId, details]
+  );
+
+  const copyCode = useCallback(async (id: string, code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
+    } catch {
+      setDetailError((prev) => ({ ...prev, [id]: "Couldn't copy to clipboard." }));
+    }
+  }, []);
 
   const fetchHistory = useCallback(async () => {
     setLoading(true);
@@ -105,50 +165,128 @@ export default function SubmissionHistory({
         {items.map((item) => {
           const color = verdictColor(item.status, item.verdict);
           const isBusy = item.status === "QUEUED" || item.status === "RUNNING";
+          const isOpen = expandedId === item.id;
+          const detail = details[item.id];
+          const rowError = detailError[item.id];
+          const language = detail?.language ?? item.language;
+
           return (
             <div
               key={item.id}
-              className="rounded border px-3 py-2.5"
+              className="rounded border"
               style={{ borderColor: tokens.borderAlt, background: tokens.panelAlt }}
             >
-              <div className="flex items-center justify-between">
-                <span
-                  className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wide"
-                  style={{ color }}
-                >
-                  {isBusy ? (
-                    <Clock size={12} />
-                  ) : color === tokens.green ? (
-                    <CheckCircle2 size={12} />
-                  ) : (
-                    <XCircle size={12} />
-                  )}
-                  {isBusy ? item.status : item.verdict?.replace(/_/g, " ") || item.status}
-                </span>
-                {item.language && (
-                  <span
-                    className="font-mono text-[10px] uppercase tracking-wide"
-                    style={{ color: tokens.muted }}
-                  >
-                    {item.language}
-                  </span>
-                )}
-              </div>
-
-              <div
-                className="mt-1.5 flex items-center gap-3 font-mono text-[10px]"
-                style={{ color: tokens.muted }}
+              <button
+                onClick={() => toggleExpanded(item.id)}
+                className="w-full cursor-pointer px-3 py-2.5 text-left transition-colors hover:bg-white/3"
               >
-                {item.status === "COMPLETED" && (
-                  <>
-                    <span>{item.score ?? 0} pts</span>
-                    <span>{item.executionTimeMs} ms</span>
-                  </>
-                )}
-                {item.submittedAt && (
-                  <span>{new Date(item.submittedAt).toLocaleString()}</span>
-                )}
-              </div>
+                <div className="flex items-center justify-between">
+                  <span
+                    className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wide"
+                    style={{ color }}
+                  >
+                    {isOpen ? (
+                      <ChevronDown size={12} style={{ color: tokens.muted }} />
+                    ) : (
+                      <ChevronRight size={12} style={{ color: tokens.muted }} />
+                    )}
+                    {isBusy ? (
+                      <Clock size={12} />
+                    ) : color === tokens.green ? (
+                      <CheckCircle2 size={12} />
+                    ) : (
+                      <XCircle size={12} />
+                    )}
+                    {isBusy ? item.status : item.verdict?.replace(/_/g, " ") || item.status}
+                  </span>
+                  {item.language && (
+                    <span
+                      className="font-mono text-[10px] uppercase tracking-wide"
+                      style={{ color: tokens.muted }}
+                    >
+                      {item.language}
+                    </span>
+                  )}
+                </div>
+
+                <div
+                  className="mt-1.5 flex items-center gap-3 pl-4.5 font-mono text-[10px]"
+                  style={{ color: tokens.muted }}
+                >
+                  {item.status === "COMPLETED" && (
+                    <>
+                      <span>{item.score ?? 0} pts</span>
+                      <span>{item.executionTimeMs} ms</span>
+                    </>
+                  )}
+                  {item.submittedAt && (
+                    <span>{new Date(item.submittedAt).toLocaleString()}</span>
+                  )}
+                </div>
+              </button>
+
+              {isOpen && (
+                <div
+                  className="border-t px-3 py-2.5"
+                  style={{ borderColor: tokens.borderAlt }}
+                >
+                  {detailLoading === item.id && (
+                    <div
+                      className="h-16 animate-pulse rounded"
+                      style={{ background: "rgba(217,164,4,0.06)" }}
+                    />
+                  )}
+
+                  {rowError && (
+                    <p className="font-mono text-[11px]" style={{ color: tokens.red }}>
+                      {rowError}
+                    </p>
+                  )}
+
+                  {detail && !detail.sourceCode && (
+                    <p className="font-mono text-[11px]" style={{ color: tokens.dim }}>
+                      No code stored for this submission.
+                    </p>
+                  )}
+
+                  {detail?.sourceCode && (
+                    <>
+                      <div className="mb-2 flex items-center gap-2">
+                        <button
+                          onClick={() => copyCode(item.id, detail.sourceCode as string)}
+                          className="flex cursor-pointer items-center gap-1 rounded border px-2 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors hover:bg-white/5"
+                          style={{ borderColor: tokens.borderAlt, color: tokens.muted }}
+                        >
+                          {copiedId === item.id ? (
+                            <Check size={11} style={{ color: tokens.green }} />
+                          ) : (
+                            <Copy size={11} />
+                          )}
+                          {copiedId === item.id ? "Copied" : "Copy"}
+                        </button>
+                        {onLoadCode && language && (
+                          <button
+                            onClick={() =>
+                              onLoadCode(language, detail.sourceCode as string)
+                            }
+                            className="flex cursor-pointer items-center gap-1 rounded border px-2 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors hover:bg-white/5"
+                            style={{ borderColor: tokens.gold, color: tokens.gold }}
+                          >
+                            <FileCode2 size={11} />
+                            Load into editor
+                          </button>
+                        )}
+                      </div>
+                      <pre
+                        className="max-h-72 overflow-auto rounded p-2.5 font-mono text-[11px] leading-relaxed"
+                        style={{ background: "#0a0c11", color: tokens.ink }}
+                      >
+                        {detail.sourceCode}
+                      </pre>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

@@ -26,6 +26,8 @@ const tokens = {
   gold: "#D9A404",
 };
 
+const PENDING_POLL_MS = 3000;
+
 interface SubmissionHistoryProps {
   problemId: string;
   /** bump this after a new submission completes to force a refetch */
@@ -117,6 +119,16 @@ export default function SubmissionHistory({
   useEffect(() => {
     fetchHistory();
   }, [refreshKey, fetchHistory]);
+
+  const hasPending = items.some(
+    (i) => i.status === "QUEUED" || i.status === "RUNNING"
+  );
+
+  useEffect(() => {
+    if (!hasPending) return;
+    const timer = setInterval(fetchHistory, PENDING_POLL_MS);
+    return () => clearInterval(timer);
+  }, [hasPending, fetchHistory]);
 
   return (
     <div className="flex h-full flex-col">
@@ -218,6 +230,16 @@ export default function SubmissionHistory({
                       <span>{item.score ?? 0} pts</span>
                       <span>{item.executionTimeMs} ms</span>
                     </>
+                  )}
+                  {item.status === "QUEUED" && (
+                    <span style={{ color: tokens.gold }}>
+                      {item.queuePosition
+                        ? `#${item.queuePosition} in queue`
+                        : "waiting for the judge"}
+                    </span>
+                  )}
+                  {item.status === "RUNNING" && (
+                    <span style={{ color: tokens.gold }}>judging now</span>
                   )}
                   {item.submittedAt && (
                     <span>{new Date(item.submittedAt).toLocaleString()}</span>

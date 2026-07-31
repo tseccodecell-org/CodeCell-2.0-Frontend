@@ -86,4 +86,5 @@ export interface SubmissionResult {
   judgedAt?: string;
   language?: Language;
   sourceCode?: string;
+  queuePosition?: number;
 }

@@ -1,28 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ExternalLink } from "lucide-react";
 
 interface Sponsor {
   name: string;
   logo: string;
+  url: string;
 }
 
 const sponsors: Sponsor[] = [
   {
     name: "Engaze",
     logo: "/sponsors/engaze.png",
+    url: "https://engaze.in/",
   },
   {
     name: "VisionX",
     logo: "/sponsors/visionx.png",
+    url: "https://www.visionxtechnologies.com/",
   },
   {
     name: "Wolfram Alpha",
     logo: "/sponsors/wolfram.png",
+    url: "https://www.wolframalpha.com/",
   },
   {
     name: "CodeCrafters",
     logo: "/sponsors/codecrafters.png",
+    url: "https://codecrafters.io/",
   },
 ];
 
@@ -75,24 +81,35 @@ export function Sponsors() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.08 }}
-              className="group relative bg-[#07090E]/90 border border-[#eab308]/30 rounded-2xl p-6 hover:border-[#eab308] hover:shadow-[0_0_35px_rgba(234,179,8,0.3)] transition-all duration-300 flex flex-col items-center justify-center text-center"
             >
-              {/* Top Gold Bar Highlight on Hover */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-1 bg-[#eab308] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-[0_0_12px_#eab308]" />
+              <a
+                href={sponsor.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative bg-[#07090E]/90 border border-[#eab308]/30 rounded-2xl p-6 hover:border-[#eab308] hover:shadow-[0_0_35px_rgba(234,179,8,0.3)] transition-all duration-300 flex flex-col items-center justify-center text-center cursor-pointer block h-full"
+              >
+                {/* Top Gold Bar Highlight on Hover */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-1 bg-[#eab308] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-[0_0_12px_#eab308]" />
 
-              {/* White Contrast Logo Card inside Gold Cyber Container */}
-              <div className="h-28 w-full bg-white rounded-xl p-4 flex items-center justify-center mb-5 border-2 border-[#eab308]/20 group-hover:border-[#eab308] group-hover:shadow-[0_0_20px_rgba(234,179,8,0.25)] transition-all duration-300">
-                <img
-                  src={sponsor.logo}
-                  alt={sponsor.name}
-                  className="max-h-20 max-w-[90%] object-contain transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
+                {/* External Link Icon on Top Right */}
+                <div className="absolute top-4 right-4 text-zinc-500 group-hover:text-[#eab308] transition-colors">
+                  <ExternalLink size={16} />
+                </div>
 
-              {/* Sponsor Name in Gold / White */}
-              <span className="font-mono text-sm font-black tracking-wider uppercase text-zinc-200 group-hover:text-[#eab308] transition-colors">
-                {sponsor.name}
-              </span>
+                {/* White Contrast Logo Card inside Gold Cyber Container */}
+                <div className="h-28 w-full bg-white rounded-xl p-4 flex items-center justify-center mb-5 border-2 border-[#eab308]/20 group-hover:border-[#eab308] group-hover:shadow-[0_0_20px_rgba(234,179,8,0.25)] transition-all duration-300">
+                  <img
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    className="max-h-20 max-w-[90%] object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+
+                {/* Sponsor Name in Gold / White */}
+                <span className="font-mono text-sm font-black tracking-wider uppercase text-zinc-200 group-hover:text-[#eab308] transition-colors flex items-center gap-1.5">
+                  {sponsor.name}
+                </span>
+              </a>
             </motion.div>
           ))}
         </div>

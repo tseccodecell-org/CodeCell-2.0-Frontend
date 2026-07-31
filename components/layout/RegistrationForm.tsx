@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+
 import {
     User, School, BookOpen, MapPin,
     ArrowLeft, Send, CheckCircle2, AlertTriangle
 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
+import { LOGIN_URL } from "@/lib/api-client";
 
 export function RegistrationForm() {
     const { data: session, status } = useSession();
@@ -255,11 +257,7 @@ export function RegistrationForm() {
 
                                     <button
                                         type="button"
-                                        onClick={() =>
-                                            signIn("google", {
-                                                callbackUrl: "/register",
-                                            })
-                                        }
+                                        onClick={() => (window.location.href = LOGIN_URL)}
                                         className="w-full max-w-sm flex items-center justify-center gap-3 rounded-xl border border-zinc-800 bg-[#141414] hover:border-zinc-700 hover:bg-[#1a1a1a] py-3.5 px-5 transition-all duration-300 cursor-pointer shadow-md"
                                     >
                                         <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48">

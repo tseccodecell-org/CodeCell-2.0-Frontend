@@ -168,6 +168,8 @@ export default function CodeEditor({
     editedRef.current[target] = true;
     setLanguage(target);
     setCodeByLang((prev) => ({ ...prev, [target]: loadRequest.code }));
+    persistCode(target, loadRequest.code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadRequest]);
 
   useEffect(() => {

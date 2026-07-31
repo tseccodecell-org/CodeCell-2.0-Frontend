@@ -7,8 +7,8 @@ const playfair = Playfair_Display({ subsets: ["latin"] });
 
 export function FinalCTA() {
   return (
-    <section className="relative py-24 px-6 w-full flex flex-col items-center justify-center">
-      <div className="relative w-full max-w-7xl mx-auto border border-[#1A1A1A] bg-[#070707] overflow-hidden flex flex-col md:flex-row items-center justify-between p-12 md:p-16 lg:px-24 mb-32">
+    <section className="relative py-16 sm:py-24 px-4 sm:px-6 w-full flex flex-col items-center justify-center">
+      <div className="relative w-full max-w-7xl mx-auto border border-[#1A1A1A] bg-[#070707] overflow-hidden flex flex-col md:flex-row items-center justify-between p-6 sm:p-8 md:p-16 lg:px-24 mb-16 sm:mb-32">
         
         {/* Abstract Knight visual representation for background */}
         <div className="absolute right-0 md:right-10 top-1/2 -translate-y-1/2 z-0 opacity-5 pointer-events-none select-none">

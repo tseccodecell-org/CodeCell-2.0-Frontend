@@ -9,7 +9,7 @@ export default function LoginCard() {
 
   if (isLoading) {
     return (
-      <div className="px-10 py-4 rounded-full bg-black/50 border-2 border-[#f59e0b]/30 text-[#f59e0b]/50 font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] animate-pulse">
+      <div className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-black/50 border-2 border-[#f59e0b]/30 text-[#f59e0b]/50 font-mono font-black text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] animate-pulse text-center">
         LOADING...
       </div>
     );
@@ -19,7 +19,7 @@ export default function LoginCard() {
     return (
       <Link
         href="/events/weekly-challenges/timeline"
-        className="px-10 py-4 rounded-full bg-black border-2 border-[#D4AF37] text-[#D4AF37] font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] hover:bg-[#D4AF37]/15 hover:shadow-[0_0_25px_rgba(212,175,55,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
+        className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-black border-2 border-[#D4AF37] text-[#D4AF37] font-mono font-black text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] hover:bg-[#D4AF37]/15 hover:shadow-[0_0_25px_rgba(212,175,55,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center gap-3 group"
       >
         <span>GO TO TIMELINE</span>
         <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -30,7 +30,7 @@ export default function LoginCard() {
   return (
     <button
       onClick={() => (window.location.href = LOGIN_URL)}
-      className="px-10 py-4 rounded-full bg-black border-2 border-[#f59e0b] text-[#f59e0b] font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] hover:bg-[#f59e0b]/10 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
+      className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-black border-2 border-[#f59e0b] text-[#f59e0b] font-mono font-black text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] hover:bg-[#f59e0b]/10 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center gap-3 group"
     >
       <span>LOGIN</span>
       <span className="group-hover:translate-x-1 transition-transform">→</span>

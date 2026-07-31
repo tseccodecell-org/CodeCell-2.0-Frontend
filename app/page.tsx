@@ -217,11 +217,11 @@ export default function Home() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.82, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 sm:mt-12 flex justify-center items-center w-full"
+            className="mt-8 sm:mt-10 md:mt-12 flex justify-center items-center w-full px-4 sm:px-0"
           >
             <Link
               href={isAuthenticated ? "/events/weekly-challenges/timeline" : "/events/weekly-challenges"}
-              className="relative group inline-flex items-center justify-center font-mono text-xs sm:text-sm font-bold tracking-[0.16em] uppercase transition-all duration-300"
+              className="relative group inline-flex items-center justify-center font-mono text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.1em] sm:tracking-[0.16em] uppercase transition-all duration-300 w-full sm:w-auto"
             >
               {/* Organic, subtle burnt orange shadow */}
               <div 
@@ -229,12 +229,12 @@ export default function Home() {
               />
 
               {/* Sleek, human-crafted pill button */}
-              <div className="relative z-10 flex items-center justify-center px-7 sm:px-9 py-3.5 rounded-full bg-[#0E0604] border border-[#FF5500]/60 group-hover:border-[#FF7700] text-white transition-all duration-300 shadow-[0_4px_25px_rgba(255,85,0,0.25)] group-hover:shadow-[0_4px_35px_rgba(255,85,0,0.5)] group-hover:scale-[1.02]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FF5500] mr-3 animate-pulse shadow-[0_0_8px_#FF5500]" />
-                <span className="text-[#F0EDE6] group-hover:text-white font-extrabold transition-colors">
-                  {isAuthenticated ? "GO TO TIMELINE" : "REGISTRATIONS FOR WEEKLY CHALLENGES LIVE NOW"}
+              <div className="relative z-10 flex items-center justify-center px-5 sm:px-7 md:px-9 py-3 sm:py-3.5 rounded-full bg-[#0E0604] border border-[#FF5500]/60 group-hover:border-[#FF7700] text-white transition-all duration-300 shadow-[0_4px_25px_rgba(255,85,0,0.25)] group-hover:shadow-[0_4px_35px_rgba(255,85,0,0.5)] group-hover:scale-[1.02] w-full sm:w-auto">
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#FF5500] mr-2 sm:mr-3 animate-pulse shadow-[0_0_8px_#FF5500] shrink-0" />
+                <span className="text-[#F0EDE6] group-hover:text-white font-extrabold transition-colors text-center leading-tight">
+                  {isAuthenticated ? "GO TO TIMELINE" : "WEEKLY CHALLENGES LIVE NOW"}
                 </span>
-                <span className="text-[#FF7700] ml-2 group-hover:translate-x-1.5 transition-transform duration-300 font-bold">→</span>
+                <span className="text-[#FF7700] ml-2 group-hover:translate-x-1.5 transition-transform duration-300 font-bold shrink-0">→</span>
               </div>
             </Link>
           </motion.div>

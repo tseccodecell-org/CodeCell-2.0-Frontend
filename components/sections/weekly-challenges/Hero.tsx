@@ -15,7 +15,7 @@ export function Hero({ onRegisterClick }: HeroProps) {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden bg-[#02040A] border-b border-[#eab308]/20">
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#02040A] border-b border-[#eab308]/20 py-20 md:py-0">
       {/* Grid Background */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
@@ -64,7 +64,7 @@ export function Hero({ onRegisterClick }: HeroProps) {
       </motion.div>
 
       {/* Inner Hero Card */}
-      <div className="relative z-10 w-[95%] max-w-7xl mx-auto bg-[#070707] border border-[#1A1A1A] py-24 flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+      <div className="relative z-10 w-[95%] max-w-7xl mx-auto bg-[#070707] border border-[#1A1A1A] py-12 sm:py-16 md:py-24 flex flex-col items-center justify-center text-center px-4 overflow-hidden">
 
         {/* Subtle Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gold/5 blur-[100px] rounded-full pointer-events-none" />
@@ -113,7 +113,7 @@ export function Hero({ onRegisterClick }: HeroProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className={`relative ${playfair.className} text-4xl md:text-6xl lg:text-[6rem] font-black leading-none tracking-wide flex flex-col items-center`}
+          className={`relative ${playfair.className} text-3xl sm:text-4xl md:text-6xl lg:text-[6rem] font-black leading-none tracking-wide flex flex-col items-center`}
         >
           <div className="text-[#F3F3F3] drop-shadow-2xl">WEEKLY</div>
           <div className="text-gold drop-shadow-[0_0_40px_rgba(212,175,55,0.15)] -mt-1 md:-mt-3 lg:-mt-5">CHALLENGES</div>
@@ -137,12 +137,12 @@ export function Hero({ onRegisterClick }: HeroProps) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="relative mt-8 flex items-center gap-4"
+          className="relative mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0"
         >
           {!isAuthenticated && (
             <button
               onClick={onRegisterClick}
-              className="px-10 py-4 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] shadow-[0_0_35px_rgba(234,179,8,0.5)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
+              className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] shadow-[0_0_35px_rgba(234,179,8,0.5)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center gap-3 group"
             >
               <span>REGISTER NOW</span>
               <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -157,16 +157,16 @@ export function Hero({ onRegisterClick }: HeroProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-          className="relative mt-12 md:mt-14 text-[#B0B0B0] text-xs md:text-sm tracking-[0.2em] font-mono flex flex-col justify-center items-center gap-y-3 md:gap-y-4 pb-6 md:pb-0 font-medium px-4 w-full"
+          className="relative mt-8 sm:mt-10 md:mt-14 text-[#B0B0B0] text-[10px] sm:text-xs md:text-sm tracking-[0.15em] sm:tracking-[0.2em] font-mono flex flex-col justify-center items-center gap-y-2 sm:gap-y-3 md:gap-y-4 pb-4 md:pb-0 font-medium px-2 sm:px-4 w-full"
         >
-          {/* Top Line */}
-          <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-5 gap-y-2 text-center">
+          {/* Top Line — stacks into two rows on mobile */}
+          <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-3 md:gap-x-5 gap-y-1.5 sm:gap-y-2 text-center">
             <span>6 WEEKS</span>
             <span className="text-[#eab308]/60">•</span>
-            <span>1 CHALLENGE EVERY WEEK</span>
+            <span>1 CHALLENGE / WEEK</span>
             <span className="text-[#eab308]/60">•</span>
-            <span>30 HOUR WINDOW</span>
-            <span className="text-[#eab308]/60">•</span>
+            <span>30 HR WINDOW</span>
+            <span className="text-[#eab308]/60 hidden sm:inline">•</span>
             <span>TOP 20 FINALISTS</span>
             <span className="text-[#eab308]/60">•</span>
             <span>OFFLINE FINALE @ TSEC</span>
@@ -180,9 +180,9 @@ export function Hero({ onRegisterClick }: HeroProps) {
           </div> */}
 
           {/* Bottom Line Tagline */}
-          <div className="flex flex-wrap justify-center items-center gap-x-4 md:gap-x-6 gap-y-2 mt-2 md:mt-3 text-center">
-            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] font-bold text-sm md:text-base tracking-[0.3em] ml-[0.3em]">
-              CODE <span className="text-[#eab308] mx-2 md:mx-4">/</span> COMPETE <span className="text-[#eab308] mx-2 md:mx-4">/</span> CONQUER
+          <div className="flex flex-wrap justify-center items-center gap-x-3 md:gap-x-6 gap-y-2 mt-2 md:mt-3 text-center">
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] font-bold text-xs sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em]">
+              CODE <span className="text-[#eab308] mx-1.5 sm:mx-2 md:mx-4">/</span> COMPETE <span className="text-[#eab308] mx-1.5 sm:mx-2 md:mx-4">/</span> CONQUER
             </span>
           </div>
         </motion.div>

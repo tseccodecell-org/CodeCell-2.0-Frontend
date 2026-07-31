@@ -79,7 +79,7 @@ const PRIZES = [
 
 export function Prizes() {
   return (
-    <section className="relative py-24 bg-[#050505] overflow-hidden border-b border-[#eab308]/20">
+    <section className="relative py-16 sm:py-24 bg-[#050505] overflow-hidden border-b border-[#eab308]/20">
       {/* Subtle grid background */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none opacity-20"

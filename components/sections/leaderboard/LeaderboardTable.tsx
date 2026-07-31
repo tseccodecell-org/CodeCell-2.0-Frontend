@@ -20,7 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { signIn } from "next-auth/react";
+import { LOGIN_URL } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
 export interface LeaderboardRow {

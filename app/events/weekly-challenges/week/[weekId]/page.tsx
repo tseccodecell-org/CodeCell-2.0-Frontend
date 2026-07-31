@@ -64,6 +64,10 @@ export default function WeekPage() {
     Promise.all([getWeek(weekId), getWeekProblems(weekId)])
       .then(([weekRes, problemsRes]) => {
         if (cancelled) return;
+        if (!weekRes) {
+          setError(true);
+          return;
+        }
         setWeek({
           weekId: weekRes.id,
           weekNumber: weekRes.week_number,

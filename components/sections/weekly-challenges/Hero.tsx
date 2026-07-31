@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Playfair_Display } from "next/font/google";
+import { useAuth } from "@/hooks/useAuth";
 import LoginCard from "../login/LoginCard";
 
 const playfair = Playfair_Display({ subsets: ["latin"] });
@@ -11,6 +12,8 @@ interface HeroProps {
 }
 
 export function Hero({ onRegisterClick }: HeroProps) {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden bg-[#02040A] border-b border-[#eab308]/20">
       {/* Grid Background */}
@@ -129,23 +132,25 @@ export function Hero({ onRegisterClick }: HeroProps) {
           <span className="inline-block w-2 h-4 ml-3 bg-[#4ADE80] animate-pulse" />
         </motion.div>
 
-        {/* CTA Register Now Button */}
+        {/* CTA Register / Go to Timeline Button */}
         <motion.div
-  initial={{ opacity: 0, y: 15 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, delay: 0.5 }}
-  className="relative mt-8 flex items-center gap-4"
->
-  <button
-    onClick={onRegisterClick}
-    className="px-10 py-4 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] shadow-[0_0_35px_rgba(234,179,8,0.5)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
-  >
-    <span>REGISTER NOW</span>
-    <span className="group-hover:translate-x-1 transition-transform">→</span>
-  </button>
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="relative mt-8 flex items-center gap-4"
+        >
+          {!isAuthenticated && (
+            <button
+              onClick={onRegisterClick}
+              className="px-10 py-4 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs md:text-sm uppercase tracking-[0.25em] shadow-[0_0_35px_rgba(234,179,8,0.5)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-3 group"
+            >
+              <span>REGISTER NOW</span>
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+          )}
 
-  <LoginCard />
-</motion.div>
+          <LoginCard />
+        </motion.div>
 
         {/* Bottom Features */}
         <motion.div

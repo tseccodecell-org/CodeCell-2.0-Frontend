@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 import HomeSections from "@/components/sections/HomeSections";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
   // Rich density of 70 glowing star dots across the background canvas
   const glowingStars = [
     { x: '4%',  y: '8%',  s: 2.2, color: '#4BE2C4', opacity: 0.8, dur: 3.1, delay: 0 },
@@ -218,7 +220,7 @@ export default function Home() {
             className="mt-10 sm:mt-12 flex justify-center items-center w-full"
           >
             <Link
-              href="/events/weekly-challenges"
+              href={isAuthenticated ? "/events/weekly-challenges/timeline" : "/events/weekly-challenges"}
               className="relative group inline-flex items-center justify-center font-mono text-xs sm:text-sm font-bold tracking-[0.16em] uppercase transition-all duration-300"
             >
               {/* Organic, subtle burnt orange shadow */}
@@ -230,7 +232,7 @@ export default function Home() {
               <div className="relative z-10 flex items-center justify-center px-7 sm:px-9 py-3.5 rounded-full bg-[#0E0604] border border-[#FF5500]/60 group-hover:border-[#FF7700] text-white transition-all duration-300 shadow-[0_4px_25px_rgba(255,85,0,0.25)] group-hover:shadow-[0_4px_35px_rgba(255,85,0,0.5)] group-hover:scale-[1.02]">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FF5500] mr-3 animate-pulse shadow-[0_0_8px_#FF5500]" />
                 <span className="text-[#F0EDE6] group-hover:text-white font-extrabold transition-colors">
-                  REGISTRATIONS FOR WEEKLY CHALLENGES LIVE NOW
+                  {isAuthenticated ? "GO TO TIMELINE" : "REGISTRATIONS FOR WEEKLY CHALLENGES LIVE NOW"}
                 </span>
                 <span className="text-[#FF7700] ml-2 group-hover:translate-x-1.5 transition-transform duration-300 font-bold">→</span>
               </div>

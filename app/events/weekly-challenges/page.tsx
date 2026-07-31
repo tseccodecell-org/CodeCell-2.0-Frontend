@@ -12,8 +12,11 @@ import { FinalCTA } from "@/components/sections/weekly-challenges/FinalCTA";
 import { Sponsors } from "@/components/sections/weekly-challenges/Sponsors";
 import LoginCard from "@/components/sections/login/LoginCard";
 
+import { useAuth } from "@/hooks/useAuth";
+
 export default function WeeklyChallengesPage() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <main className="flex min-h-screen flex-col bg-[#02040A] text-white selection:bg-[#eab308]/30 selection:text-[#eab308] relative">
@@ -28,25 +31,44 @@ export default function WeeklyChallengesPage() {
 
       {/* Bottom CTA with Trigger */}
       <div className="relative pb-16 flex justify-center">
-        <button
-          onClick={() => setShowRegisterModal(true)}
-          className="px-10 py-4 rounded-full border border-[#eab308]/60 bg-[#eab308]/15 text-[#eab308] hover:bg-[#eab308] hover:text-black font-mono font-black text-xs md:text-sm tracking-[0.25em] transition-all duration-300 shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:shadow-[0_0_50px_rgba(234,179,8,0.7)] transform active:scale-95 cursor-pointer"
-        >
-          [ CLAIM YOUR SPOT – REGISTER NOW ]
-        </button>
+        {isAuthenticated ? (
+          <Link
+            href="/events/weekly-challenges/timeline"
+            className="px-10 py-4 rounded-full border border-[#D4AF37] bg-black text-[#D4AF37] hover:bg-[#D4AF37]/15 font-mono font-black text-xs md:text-sm tracking-[0.25em] transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            [ GO TO TIMELINE → ]
+          </Link>
+        ) : (
+          <button
+            onClick={() => setShowRegisterModal(true)}
+            className="px-10 py-4 rounded-full border border-[#eab308]/60 bg-[#eab308]/15 text-[#eab308] hover:bg-[#eab308] hover:text-black font-mono font-black text-xs md:text-sm tracking-[0.25em] transition-all duration-300 shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:shadow-[0_0_50px_rgba(234,179,8,0.7)] transform active:scale-95 cursor-pointer"
+          >
+            [ CLAIM YOUR SPOT – REGISTER NOW ]
+          </button>
+        )}
       </div>
 
       <FinalCTA />
 
       {/* Floating Glowing CTA Button (Sticky Bottom Right) */}
       <div className="fixed bottom-6 right-6 z-40">
-        <button
-          onClick={() => setShowRegisterModal(true)}
-          className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
-        >
-          <span>Register Now</span>
-          <ArrowRight size={16} />
-        </button>
+        {isAuthenticated ? (
+          <Link
+            href="/events/weekly-challenges/timeline"
+            className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
+          >
+            <span>Go to Timeline</span>
+            <ArrowRight size={16} />
+          </Link>
+        ) : (
+          <button
+            onClick={() => setShowRegisterModal(true)}
+            className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
+          >
+            <span>Register Now</span>
+            <ArrowRight size={16} />
+          </button>
+        )}
       </div>
 
       {/* Registration Dialog Modal */}

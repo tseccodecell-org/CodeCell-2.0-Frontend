@@ -17,6 +17,7 @@ import { checkRuntimeHealth, getLocalToolchainStatus } from "@/lib/runtime-api";
 import type { LanguageKey } from "@/lib/runtime-api";
 
 interface CodeEditorProps {
+  problemId?: string;
   status: SubmissionStatus;
   activeAction: "RUN" | "SUBMIT" | null;
   starterCode?: Partial<Record<Language, string>>;
@@ -32,10 +33,10 @@ const LANGUAGES: { id: Language; label: string; monaco: string; runtime: Languag
 ];
 
 const RUNTIME_PROBE_MS = 20000;
-
 const EMPTY: Record<Language, string> = { CPP: "", JAVA: "", PYTHON: "" };
 
 export default function CodeEditor({
+  problemId,
   status,
   activeAction,
   starterCode,
@@ -60,6 +61,48 @@ export default function CodeEditor({
   const [localReady, setLocalReady] = useState<Partial<Record<Language, boolean>> | null>(
     null
   );
+
+  // Helper to persist code to localStorage for a given language
+  const persistCode = (lang: Language, val: string) => {
+    if (typeof window === "undefined" || !problemId) return;
+    try {
+      const cacheKey = `codecell_code_${problemId}`;
+      const cachedRaw = localStorage.getItem(cacheKey);
+      const existing = cachedRaw ? JSON.parse(cachedRaw) : {};
+      existing[lang] = val;
+      localStorage.setItem(cacheKey, JSON.stringify(existing));
+    } catch {
+      // Ignore localStorage errors
+    }
+  };
+
+  // ── Load cached code from localStorage on mount or problemId change ──
+  useEffect(() => {
+    if (typeof window === "undefined" || !problemId) return;
+    try {
+      const cacheKey = `codecell_code_${problemId}`;
+      const cachedRaw = localStorage.getItem(cacheKey);
+      if (cachedRaw) {
+        const cachedMap: Partial<Record<Language, string>> = JSON.parse(cachedRaw);
+        if (cachedMap && typeof cachedMap === "object") {
+          setCodeByLang((prev) => {
+            const next = { ...prev };
+            let changed = false;
+            for (const langId of ["CPP", "JAVA", "PYTHON"] as Language[]) {
+              if (cachedMap[langId]) {
+                next[langId] = cachedMap[langId]!;
+                editedRef.current[langId] = true;
+                changed = true;
+              }
+            }
+            return changed ? next : prev;
+          });
+        }
+      }
+    } catch {
+      // Ignore JSON parse error
+    }
+  }, [problemId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,11 +164,38 @@ export default function CodeEditor({
   const setCode = (value: string) => {
     editedRef.current[language] = true;
     setCodeByLang((prev) => ({ ...prev, [language]: value }));
+    persistCode(language, value);
   };
 
   const resetCode = () => {
     editedRef.current[language] = false;
-    setCodeByLang((prev) => ({ ...prev, [language]: starterCode?.[language] ?? "" }));
+    const template = starterCode?.[language] ?? "";
+    setCodeByLang((prev) => ({ ...prev, [language]: template }));
+    if (typeof window !== "undefined" && problemId) {
+      try {
+        const cacheKey = `codecell_code_${problemId}`;
+        const cachedRaw = localStorage.getItem(cacheKey);
+        if (cachedRaw) {
+          const existing = JSON.parse(cachedRaw);
+          delete existing[language];
+          localStorage.setItem(cacheKey, JSON.stringify(existing));
+        }
+      } catch {
+        // Ignore errors
+      }
+    }
+  };
+
+  const handleRunClick = async () => {
+    if (!onRun || isBusy) return;
+    persistCode(language, code);
+    await onRun(code, language, stdin);
+  };
+
+  const handleSubmitClick = async () => {
+    if (!onSubmit || isBusy) return;
+    persistCode(language, code);
+    await onSubmit(code, language);
   };
 
   return (
@@ -253,7 +323,7 @@ export default function CodeEditor({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onRun?.(code, language, stdin)}
+            onClick={handleRunClick}
             disabled={isBusy}
             className="flex items-center gap-1.5 rounded border border-[#22262f] px-3.5 py-1.5 font-mono text-xs font-semibold text-[#F4F1EA] transition-colors hover:border-[#D9A404]/60 hover:text-[#D9A404] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
@@ -266,7 +336,7 @@ export default function CodeEditor({
           </button>
 
           <button
-            onClick={() => onSubmit?.(code, language)}
+            onClick={handleSubmitClick}
             disabled={isBusy || cooldownLeft > 0}
             title={
               cooldownLeft > 0

@@ -573,6 +573,7 @@ export default function Solve({ params }: PageProps) {
             className="min-h-0 shrink-0 overflow-hidden"
           >
             <CodeEditor
+              problemId={problemId}
               status={submission.status}
               activeAction={activeAction}
               starterCode={starterCode}

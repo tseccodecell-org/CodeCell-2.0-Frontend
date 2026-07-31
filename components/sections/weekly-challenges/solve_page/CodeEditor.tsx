@@ -21,6 +21,7 @@ interface CodeEditorProps {
   status: SubmissionStatus;
   activeAction: "RUN" | "SUBMIT" | null;
   starterCode?: Partial<Record<Language, string>>;
+  loadRequest?: { language: Language; code: string; nonce: number } | null;
   cooldownLeft?: number;
   onRun?: (code: string, language: Language, stdin: string) => Promise<void>;
   onSubmit?: (code: string, language: Language) => Promise<void>;
@@ -40,6 +41,7 @@ export default function CodeEditor({
   status,
   activeAction,
   starterCode,
+  loadRequest,
   cooldownLeft = 0,
   onRun,
   onSubmit,
@@ -151,6 +153,22 @@ export default function CodeEditor({
       return changed ? next : prev;
     });
   }, [starterCode]);
+
+  useEffect(() => {
+    if (!loadRequest) return;
+    const target = loadRequest.language;
+
+    if (editedRef.current[target]) {
+      const ok = window.confirm(
+        `Replace your current ${target} code with this submission? Your unsaved changes will be lost.`
+      );
+      if (!ok) return;
+    }
+
+    editedRef.current[target] = true;
+    setLanguage(target);
+    setCodeByLang((prev) => ({ ...prev, [target]: loadRequest.code }));
+  }, [loadRequest]);
 
   useEffect(() => {
     if (!fullscreen) return;

@@ -93,6 +93,11 @@ export default function Solve({ params }: PageProps) {
   const [lastInput, setLastInput] = useState("");
   const [runOrigin, setRunOrigin] = useState<"local" | "server" | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [loadRequest, setLoadRequest] = useState<{
+    language: Language;
+    code: string;
+    nonce: number;
+  } | null>(null);
   const [cooldownLeft, setCooldownLeft] = useState(0);
 
   useEffect(() => {
@@ -123,6 +128,10 @@ export default function Solve({ params }: PageProps) {
     }
     return map;
   }, [problem]);
+
+  const handleLoadCode = useCallback((language: Language, code: string) => {
+    setLoadRequest({ language, code, nonce: Date.now() });
+  }, []);
 
   const stopPolling = () => {
     if (pollTimeoutRef.current) {
@@ -554,7 +563,11 @@ export default function Solve({ params }: PageProps) {
           </div>
 
           <div className={leftTab === "submissions" ? "min-h-0 flex-1" : "hidden"}>
-            <SubmissionHistory problemId={problemId} refreshKey={historyRefreshKey} />
+            <SubmissionHistory
+              problemId={problemId}
+              refreshKey={historyRefreshKey}
+              onLoadCode={handleLoadCode}
+            />
           </div>
         </div>
 
@@ -577,6 +590,7 @@ export default function Solve({ params }: PageProps) {
               status={submission.status}
               activeAction={activeAction}
               starterCode={starterCode}
+              loadRequest={loadRequest}
               cooldownLeft={cooldownLeft}
               onRun={handleRun}
               onSubmit={handleSubmit}

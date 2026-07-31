@@ -174,9 +174,6 @@ export default function LeaderboardTable({
   controls,
 }: LeaderboardTableProps) {
   const [search, setSearch] = useState("");
-  const [showTokenInput, setShowTokenInput] = useState(false);
-  const [tokenValue, setTokenValue] = useState("");
-  const { setAuthToken } = useAuth();
 
   const filteredRows = rows.filter((row) =>
     row.name.toLowerCase().includes(search.toLowerCase())
@@ -188,13 +185,6 @@ export default function LeaderboardTable({
 
   const highestScore = rows.length > 0 ? Math.max(...rows.map((r) => r.primaryValue)) : 0;
   const topContestant = rows[0]?.name || "N/A";
-
-  const handleApplyToken = () => {
-    if (!tokenValue.trim()) return;
-    setAuthToken(tokenValue.trim());
-    setShowTokenInput(false);
-    setTokenValue("");
-  };
 
   return (
     <div className="min-h-screen bg-[#070707] text-[#F0EDE6] relative overflow-hidden">

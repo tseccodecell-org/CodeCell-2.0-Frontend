@@ -156,6 +156,7 @@ export default function Solve({ params }: PageProps) {
         score: result.score,
         executionTime: result.executionTimeMs,
         memoryUsed: result.memoryUsedKb,
+        queuePosition: result.queuePosition,
         testResults: result.testResults ?? [],
         errorMessage: result.errorMessage,
       }));
@@ -402,14 +403,16 @@ export default function Solve({ params }: PageProps) {
       if (!isMountedRef.current) return;
 
       setResultMode("SUBMIT");
-      setCooldownLeft(SUBMIT_COOLDOWN_SECONDS);
+      setActiveAction(null);
       setSubmission({
         status: "QUEUED",
         submissionId: response.submissionId,
         queuePosition: response.queuePosition,
         testResults: [],
       });
+      setHistoryRefreshKey((k) => k + 1);
 
+      stopPolling();
       pollSubmission(response.submissionId);
     } catch (err) {
       console.error("Submit failed:", err);
@@ -419,7 +422,7 @@ export default function Solve({ params }: PageProps) {
 
       if (isApiError(err) && err.status === 429) {
         setCooldownLeft(getCooldownSeconds(err));
-        setNotice(err.message || "Please wait a few seconds before submitting again.");
+        setNotice(err.message || "You have hit the submission limit. Try again shortly.");
         return;
       }
 

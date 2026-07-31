@@ -56,6 +56,7 @@ export default function CodeEditor({
   const isRunning = activeAction === "RUN";
   const isJudging = activeAction === "SUBMIT";
   const isBusy = status === "QUEUED" || status === "RUNNING" || activeAction !== null;
+  const submitBusy = activeAction !== null || cooldownLeft > 0;
 
   const current = LANGUAGES.find((l) => l.id === language) ?? LANGUAGES[0];
   const code = codeByLang[language];
@@ -213,7 +214,7 @@ export default function CodeEditor({
   };
 
   const handleSubmitClick = async () => {
-    if (!onSubmit || isBusy) return;
+    if (!onSubmit || submitBusy) return;
     persistCode(language, code);
     await onSubmit(code, language);
   };
@@ -357,10 +358,10 @@ export default function CodeEditor({
 
           <button
             onClick={handleSubmitClick}
-            disabled={isBusy || cooldownLeft > 0}
+            disabled={submitBusy}
             title={
               cooldownLeft > 0
-                ? `The judge allows one submission every 10 seconds`
+                ? `You have hit the submission limit, try again in ${cooldownLeft}s`
                 : undefined
             }
             className="flex items-center gap-1.5 rounded px-4 py-1.5 font-mono text-xs font-bold text-[#06070B] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"

@@ -21,7 +21,7 @@ export default function WeeklyLeaderboardPage() {
     selectedTab,
     setSelectedTab,
     showToggle,
-  } = useLeaderboard({ kind: "weekly", page, limit: 20 });
+  } = useLeaderboard({ kind: "weekly", page, limit: 25 });
 
   const response = data as WeeklyLeaderboardResponse | null;
 

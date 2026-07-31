@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
-import { getProfile, ApiError } from "@/lib/api-client";
+import { getProfile } from "@/lib/api-client";
 import type { UserProfile } from "@/lib/api-client";
 import { AuthUser, UserRole } from "@/lib/types/leaderboard";
 
@@ -35,6 +35,19 @@ function setCachedProfile(profile: UserProfile | null) {
   }
 }
 
+/** Check if JWT token exists in cookies or localStorage */
+function hasAuthToken(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const token = localStorage.getItem(TOKEN_CACHE_KEY) || localStorage.getItem("codecell_token");
+    if (token) return true;
+    if (document.cookie.includes("jwt_token=")) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 interface UseAuthResult {
   user: AuthUser | null;
   profile: UserProfile | null;
@@ -61,6 +74,7 @@ export function useAuth(): UseAuthResult {
     if (typeof window !== "undefined") {
       localStorage.removeItem(TOKEN_CACHE_KEY);
       localStorage.removeItem("codecell_token");
+      document.cookie = "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }
     setProfile(null);
     nextAuthSignOut({ redirect: false });
@@ -119,23 +133,25 @@ export function useAuth(): UseAuthResult {
     };
   }, [tick]);
 
-  // NextAuth fallback profile if NextAuth session exists
-  const nextAuthUser: UserProfile | null = session?.user
+  const tokenPresent = hasAuthToken();
+
+  // NextAuth fallback profile if NextAuth session exists or token exists
+  const fallbackUser: UserProfile | null = (session?.user || tokenPresent)
     ? {
         id: 1,
-        username: session.user.name || session.user.email?.split("@")[0] || "User",
-        email: session.user.email || "",
+        username: session?.user?.name || session?.user?.email?.split("@")[0] || "Contestant",
+        email: session?.user?.email || "",
         rating: 1400,
         total_problems_solved: 0,
-        college_name: session.user.email?.endsWith("@tsec.edu") || session.user.email?.includes("tsec")
+        college_name: session?.user?.email?.endsWith("@tsec.edu") || session?.user?.email?.includes("tsec")
           ? "Thadomal Shahani Engineering College"
           : "TSEC",
         year: "BE",
-        is_tsec_user: true,
+        is_tsec_user: session?.user?.email?.endsWith("@tsec.edu") || session?.user?.email?.includes("tsec") || false,
       }
     : null;
 
-  const activeProfile = profile || nextAuthUser;
+  const activeProfile = profile || fallbackUser;
 
   const user: AuthUser | null = activeProfile
     ? {
@@ -151,7 +167,7 @@ export function useAuth(): UseAuthResult {
     user,
     profile: activeProfile,
     isLoading: isSessionLoading,
-    isAuthenticated: !!activeProfile,
+    isAuthenticated: Boolean(activeProfile),
     error,
     isTsecStudent: !isSessionLoading && user?.role === UserRole.TSEC,
     refresh,

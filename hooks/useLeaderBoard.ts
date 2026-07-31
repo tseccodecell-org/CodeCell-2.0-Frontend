@@ -7,7 +7,6 @@ import {
   LeaderboardKind,
   LeaderboardTab,
   SeasonLeaderboardResponse,
-  UserRole,
   WeeklyLeaderboardResponse,
 } from "@/lib/types/leaderboard";
 import { getLeaderboard, ApiError } from "@/lib/api-client";
@@ -16,7 +15,7 @@ interface UseLeaderboardOptions {
   kind: LeaderboardKind;
   page?: number;
   limit?: number;
-  weekId?: string; // weekly only, omit for the currently active week
+  weekId?: string; // weekly only, omit for active week
 }
 
 type LeaderboardResponse = WeeklyLeaderboardResponse | SeasonLeaderboardResponse;
@@ -53,19 +52,28 @@ export function useLeaderboard({
       });
       setData(json);
     } catch (err) {
-      setData(null);
       if (err instanceof ApiError) {
         if (err.status === 403) {
-          setForbidden(true);
-          return;
-        }
-        if (err.status === 401) {
-          if (!isAuthenticated) {
-            setUnauthorized(true);
+          // If TSEC segment was 403 forbidden, automatically fallback to GLOBAL
+          if (selectedTab === "TSEC") {
+            setSelectedTab("GLOBAL");
             return;
           }
         }
+        if (err.status === 401 && !isAuthenticated) {
+          setUnauthorized(true);
+          setData(null);
+          return;
+        }
       }
+
+      // Final fallback: try fetching GLOBAL tab directly if TSEC tab failed
+      if (selectedTab === "TSEC") {
+        setSelectedTab("GLOBAL");
+        return;
+      }
+
+      setData(null);
       setError(err instanceof Error ? err.message : "Failed to load real-time leaderboard data");
     } finally {
       setIsLoading(false);

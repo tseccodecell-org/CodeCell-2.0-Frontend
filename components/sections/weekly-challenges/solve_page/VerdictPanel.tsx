@@ -20,6 +20,7 @@ export interface VerdictPanelProps {
   stderr?: string;
   errorMessage?: string;
   input?: string;
+  queuePosition?: number;
   testResults?: SubmissionTestResult[];
 }
 
@@ -62,6 +63,7 @@ export default function VerdictPanel({
   stderr,
   errorMessage,
   input,
+  queuePosition,
   testResults = [],
 }: VerdictPanelProps) {
   const isBusy = status === "QUEUED" || status === "RUNNING";
@@ -87,7 +89,13 @@ export default function VerdictPanel({
         <Banner
           color="#D9A404"
           icon={<Loader2 size={15} className="animate-spin" />}
-          text={status === "QUEUED" ? "Waiting in queue" : "Executing"}
+          text={
+            status === "QUEUED"
+              ? queuePosition
+                ? `Waiting in queue, position ${queuePosition}`
+                : "Waiting in queue"
+              : "Executing"
+          }
         />
       </Shell>
     );

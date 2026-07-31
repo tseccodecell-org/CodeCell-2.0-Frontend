@@ -620,6 +620,7 @@ export default function Solve({ params }: PageProps) {
               stdout={submission.stdout}
               stderr={submission.stderr}
               errorMessage={submission.errorMessage}
+              queuePosition={submission.queuePosition}
               testResults={submission.testResults}
             />
           </div>

@@ -310,25 +310,7 @@ export default function LeaderboardTable({
             </motion.div>
           )}
 
-          {!unauthorized && forbidden && (
-            <motion.div
-              key="forbidden"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="py-24 flex flex-col items-center justify-center text-center font-mono select-none rounded-xl border border-[#1E1E1E] bg-[#0A0A0A]"
-            >
-              <div className="w-16 h-16 rounded-full bg-[#FF4D00]/10 flex items-center justify-center mb-5">
-                <Shield className="text-[#FF4D00]" size={28} />
-              </div>
-              <span className="text-xs text-[#6A6860] tracking-widest">
-                ACCESS RESTRICTED
-              </span>
-              <span className="text-[10px] text-[#3E3E3C] mt-2 max-w-xs">
-                You do not have permission to view this leaderboard segment.
-              </span>
-            </motion.div>
-          )}
+
 
           {!unauthorized && !forbidden && error && (
             <motion.div

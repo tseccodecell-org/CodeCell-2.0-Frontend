@@ -9,6 +9,7 @@ import { Overview } from "@/components/sections/weekly-challenges/Overview";
 import { Prizes } from "@/components/sections/weekly-challenges/Prizes";
 import { FAQ } from "@/components/sections/weekly-challenges/FAQ";
 import { FinalCTA } from "@/components/sections/weekly-challenges/FinalCTA";
+import { Sponsors } from "@/components/sections/weekly-challenges/Sponsors";
 import LoginCard from "@/components/sections/login/LoginCard";
 
 export default function WeeklyChallengesPage() {
@@ -21,6 +22,7 @@ export default function WeeklyChallengesPage() {
       <Hero onRegisterClick={() => setShowRegisterModal(true)} />
 
       <Prizes />
+      <Sponsors />
       <Overview />
       <FAQ />
 

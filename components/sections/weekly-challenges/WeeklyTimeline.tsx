@@ -52,7 +52,7 @@ function mapWeek(week: BackendWeek, index: number): Week {
     weekId: week.id,
     weekNumber: week.week_number,
     title: week.chapter_name || `Chapter 0${week.week_number}`,
-    description: week.description || "Algorithmic problem-solving match with ELO rating evaluation.",
+    description: week.description || "",
     glyph: GLYPHS[index % GLYPHS.length],
     dateRange: formatDateRange(week.starts_at, week.ends_at),
     status: deriveStatus(week),
@@ -201,9 +201,13 @@ export default function WeeklyTimeline() {
                   <h3 className="font-serif text-lg font-bold text-[#F4F1EA] tracking-tight mb-2 group-hover:text-[#D9A404] transition-colors">
                     {week.title}
                   </h3>
-                  <p className="font-sans text-xs text-[#8B93A7] leading-relaxed mb-6 flex-1">
-                    {week.description}
-                  </p>
+                  {week.description ? (
+                    <p className="font-sans text-xs text-[#8B93A7] leading-relaxed mb-6 flex-1">
+                      {week.description}
+                    </p>
+                  ) : (
+                    <div className="mb-6 flex-1" />
+                  )}
 
                   <div className="grid grid-cols-2 gap-2 mb-6 font-mono text-[10px] bg-[#0b0d13] p-3 border border-[#1a1c24]">
                     <div>

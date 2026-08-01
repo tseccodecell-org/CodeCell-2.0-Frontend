@@ -312,6 +312,33 @@ export default function LeaderboardTable({
 
 
 
+          {!unauthorized && forbidden && (
+            <motion.div
+              key="forbidden"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="py-20 flex flex-col items-center justify-center text-center select-none rounded-2xl border border-[#1E1E1E] bg-gradient-to-b from-[#0F0F0F] to-[#0A0A0A] relative overflow-hidden px-6 shadow-2xl"
+            >
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-[120px] pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col items-center max-w-md w-full">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/40 flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(212,175,55,0.2)]">
+                  <Shield size={34} className="text-[#D4AF37]" />
+                </div>
+
+                <h2 className="font-display text-xl md:text-2xl font-bold text-[#F0EDE6] mb-2 tracking-wide uppercase">
+                  TSEC Students Only
+                </h2>
+                <p className="font-sans text-sm text-[#7A7870] leading-relaxed">
+                  The TSEC leaderboard is limited to verified TSEC students. Switch to the global
+                  leaderboard to see full standings.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
           {!unauthorized && !forbidden && error && (
             <motion.div
               key="error"

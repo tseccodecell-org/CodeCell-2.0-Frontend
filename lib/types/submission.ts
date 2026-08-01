@@ -87,4 +87,5 @@ export interface SubmissionResult {
   language?: Language;
   sourceCode?: string;
   queuePosition?: number;
+  invalidated?: boolean;
 }

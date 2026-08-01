@@ -49,7 +49,20 @@ export interface Problem {
   updated_at: string;
 }
 
- 
+export interface WeekProblem {
+  id: string;
+  week_id: string;
+  title: string;
+  slug: string;
+  difficulty: string;
+  base_points: number;
+  time_limit_ms: number;
+  memory_limit_mb: number;
+  solved: boolean;
+  week_ended: boolean;
+}
+
+
 // Backend DTO: EventResponse (camelCase — distinct from the raw Event model)
 export type EventStatus = "UPCOMING" | "LIVE" | "ENDED";
  
@@ -64,48 +77,59 @@ export interface Event {
 
 // ---------- Profile ----------
 
+export interface ProfileWarning {
+  id: string;
+  stage: number;
+  reason: string;
+  created_at: string;
+}
+
 export interface UserProfile {
   id: number;
+  name: string;
   username: string;
   email: string;
   rating: number;
   total_problems_solved: number;
   college_name: string;
   year: string;
+  course: string;
+  location: string;
   is_tsec_user: boolean;
+  is_registered: boolean;
+  is_banned: boolean;
+  ban_reason: string;
+  banned_at: string | null;
+  warning_count: number;
+  warnings: ProfileWarning[];
+}
+
+export function authHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
+  if (!token) return {};
+  return { Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}` };
 }
 
 export async function getProfile(): Promise<UserProfile | null> {
-  const headers: Record<string, string> = { Accept: "application/json" };
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
-    if (token) {
-      headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-    }
-  }
+  const res = await fetch("/api/profile", {
+    method: "GET",
+    headers: { Accept: "application/json", ...authHeaders() },
+    credentials: "include",
+    cache: "no-store",
+  });
 
-  try {
-    const res = await fetch("/api/profile", {
-      method: "GET",
-      headers,
-      credentials: "include",
-      cache: "no-store",
-    });
-
-    if (res.status === 401) {
-      return null;
-    }
-
-    const body = (await readBody(res)) as Envelope<UserProfile> | null;
-
-    if (!res.ok || !body?.success) {
-      return null;
-    }
-
-    return body.data as UserProfile;
-  } catch {
+  if (res.status === 401) {
     return null;
   }
+
+  const body = (await readBody(res)) as Envelope<UserProfile> | null;
+
+  if (!res.ok || !body?.success) {
+    throw errorFrom(res, body);
+  }
+
+  return body.data as UserProfile;
 }
 
 export const LOGIN_URL = `${BASE_URL}/oauth/google/login`;
@@ -202,7 +226,7 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
   if (!urlBase) throw new ApiError(0, "API base URL is not set");
   const res = await fetch(`${urlBase}${path}`, {
     method: "GET",
-    headers: { "Accept": "application/json" },
+    headers: { "Accept": "application/json", ...authHeaders() },
     credentials: "include",
   });
 
@@ -218,7 +242,7 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
 async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: TRequest): Promise<TResponse> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     credentials: "include",
     body: JSON.stringify(requestBody),
   });
@@ -233,14 +257,18 @@ async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: 
 }
 
 export async function getWeeks(): Promise<Week[]> {
-  try {
-    const res = await fetch("/api/weeks", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : (data?.data ?? []);
-  } catch {
-    return [];
+  const res = await fetch("/api/weeks", {
+    cache: "no-store",
+    credentials: "include",
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    throw errorFrom(res, await readBody(res));
   }
+
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data?.data ?? []);
 }
 
 export async function getWeek(id: string): Promise<Week | null> {
@@ -252,15 +280,19 @@ export async function getWeek(id: string): Promise<Week | null> {
   }
 }
  
-export async function getWeekProblems(id: string): Promise<Problem[]> {
-  try {
-    const res = await fetch(`/api/weeks/${id}/problems`, { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : (data?.data ?? []);
-  } catch {
-    return [];
+export async function getWeekProblems(id: string): Promise<WeekProblem[]> {
+  const res = await fetch(`/api/weeks/${id}/problems`, {
+    cache: "no-store",
+    credentials: "include",
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    throw errorFrom(res, await readBody(res));
   }
+
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data?.data ?? []);
 }
  
 // ---------- Events ----------
@@ -315,13 +347,8 @@ export function getSubmissionHistory(
   return apiGetEnveloped(`/api/problems/${problemId}/submissions`);
 }
 
-function buildLeaderboardEndpoint(
-  kind: LeaderboardKind,
-  role: UserRole | undefined,
-  tab: LeaderboardTab
-) {
-  const useTsecEndpoint = role === UserRole.TSEC && tab === "TSEC";
-  const audience = useTsecEndpoint ? "tsec_student" : "other";
+function buildLeaderboardEndpoint(kind: LeaderboardKind, tab: LeaderboardTab) {
+  const audience = tab === "TSEC" ? "tsec_student" : "other";
 
   return `/${audience}/${kind}_leaderboard`;
 }
@@ -337,15 +364,8 @@ export async function getLeaderboard(
   params.set("limit", String(opts.limit));
   if (kind === "weekly" && opts.weekId) params.set("week_id", opts.weekId);
 
-  const endpoint = buildLeaderboardEndpoint(kind, role, tab);
-  const headers: Record<string, string> = { Accept: "application/json" };
-
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
-    if (token) {
-      headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-    }
-  }
+  const endpoint = buildLeaderboardEndpoint(kind, tab);
+  const headers: Record<string, string> = { Accept: "application/json", ...authHeaders() };
 
   // Route through the Next.js API proxy to avoid CORS issues
   const res = await fetch(`/api/leaderboard${endpoint}?${params.toString()}`, {

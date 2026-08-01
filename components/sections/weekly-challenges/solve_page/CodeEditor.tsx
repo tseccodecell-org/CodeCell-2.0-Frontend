@@ -23,6 +23,7 @@ interface CodeEditorProps {
   starterCode?: Partial<Record<Language, string>>;
   loadRequest?: { language: Language; code: string; nonce: number } | null;
   cooldownLeft?: number;
+  banned?: boolean;
   onRun?: (code: string, language: Language, stdin: string) => Promise<void>;
   onSubmit?: (code: string, language: Language) => Promise<void>;
 }
@@ -43,6 +44,7 @@ export default function CodeEditor({
   starterCode,
   loadRequest,
   cooldownLeft = 0,
+  banned = false,
   onRun,
   onSubmit,
 }: CodeEditorProps) {
@@ -56,7 +58,7 @@ export default function CodeEditor({
   const isRunning = activeAction === "RUN";
   const isJudging = activeAction === "SUBMIT";
   const isBusy = status === "QUEUED" || status === "RUNNING" || activeAction !== null;
-  const submitBusy = activeAction !== null || cooldownLeft > 0;
+  const submitBusy = activeAction !== null || cooldownLeft > 0 || banned;
 
   const current = LANGUAGES.find((l) => l.id === language) ?? LANGUAGES[0];
   const code = codeByLang[language];

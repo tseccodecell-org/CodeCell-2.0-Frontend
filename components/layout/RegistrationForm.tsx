@@ -6,11 +6,15 @@ import {
     User, School, BookOpen, MapPin,
     ArrowLeft, Send, CheckCircle2, AlertTriangle
 } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { LOGIN_URL } from "@/lib/api-client";
+import { useAuth } from "@/hooks/useAuth";
 
 export function RegistrationForm() {
     const { data: session, status } = useSession();
+    const { profile, isAuthenticated, refresh } = useAuth();
+    const router = useRouter();
     const [activeStep, setActiveStep] = useState(1);
     const [submitError, setSubmitError] = useState("");
     const [formData, setFormData] = useState({
@@ -83,25 +87,31 @@ export function RegistrationForm() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
-                    collegeName: formData.collegeName,
+                    name: formData.fullName,
+                    college_name: formData.collegeName,
+                    year: formData.yearOfStudy,
                     course: formData.course,
-                    yearOfStudy: formData.yearOfStudy,
                     location: formData.location,
                 }),
             });
 
-            if (response.status === 409) {
-                const data = await response.json();
-                setSubmitError(data.error);
+            const body = await response.json().catch(() => null);
+
+            if (!response.ok || body?.success === false) {
+                setSubmitError(
+                    body?.error?.message ||
+                    (response.status === 401
+                        ? "Your sign in has expired. Please sign in with Google again."
+                        : "Registration failed. Please try again.")
+                );
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error("Registration failed");
-            }
-
             setIsRegistered(true);
+            refresh();
+            setTimeout(() => router.replace("/events/weekly-challenges/timeline"), 2500);
         } catch (err) {
             console.error(err);
             setSubmitError("Something went wrong. Please try again.");
@@ -111,14 +121,14 @@ export function RegistrationForm() {
     };
 
     useEffect(() => {
-        if (status === "authenticated") {
+        if (status === "authenticated" || isAuthenticated) {
             setActiveStep(2);
             setFormData((prev) => ({
                 ...prev,
-                fullName: session?.user?.name ?? "",
+                fullName: prev.fullName || profile?.name || session?.user?.name || "",
             }));
         }
-    }, [status, session]);
+    }, [status, session, isAuthenticated, profile]);
 
     return (
         <div className="w-full max-w-xl mx-auto px-4 md:px-6">

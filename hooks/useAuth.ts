@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { signOut as nextAuthSignOut } from "next-auth/react";
-import { getProfile } from "@/lib/api-client";
+import { getProfile, LOGOUT_URL } from "@/lib/api-client";
 import type { ProfileWarning, UserProfile } from "@/lib/api-client";
 import { AuthUser, UserRole } from "@/lib/types/leaderboard";
 
@@ -68,11 +68,13 @@ export function useAuth(): UseAuthResult {
 
   const logout = useCallback(() => {
     clearStoredSession();
-    if (typeof window !== "undefined") {
-      document.cookie = "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    }
     setProfile(null);
-    nextAuthSignOut({ redirect: false });
+
+    nextAuthSignOut({ redirect: false }).finally(() => {
+      if (typeof window !== "undefined") {
+        window.location.href = LOGOUT_URL;
+      }
+    });
   }, []);
 
   const setAuthToken = useCallback(

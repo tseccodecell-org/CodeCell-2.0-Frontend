@@ -104,17 +104,15 @@ export interface UserProfile {
   warnings: ProfileWarning[];
 }
 
-export function authHeaders(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
-  if (!token) return {};
-  return { Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}` };
-}
-
+// The HttpOnly cookie is the only credential. There used to be a localStorage
+// Bearer fallback here, which meant a browser could hold two identities at
+// once: submits authenticated as the cookie's user while reads authenticated
+// as whoever a stale stored token belonged to, and submissions quietly landed
+// on another account.
 export async function getProfile(): Promise<UserProfile | null> {
   const res = await fetch("/api/profile", {
     method: "GET",
-    headers: { Accept: "application/json", ...authHeaders() },
+    headers: { Accept: "application/json" },
     credentials: "include",
     cache: "no-store",
   });
@@ -226,7 +224,7 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
   if (!urlBase) throw new ApiError(0, "API base URL is not set");
   const res = await fetch(`${urlBase}${path}`, {
     method: "GET",
-    headers: { "Accept": "application/json", ...authHeaders() },
+    headers: { "Accept": "application/json" },
     credentials: "include",
   });
 
@@ -242,7 +240,7 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
 async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: TRequest): Promise<TResponse> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify(requestBody),
   });
@@ -260,7 +258,7 @@ export async function getWeeks(): Promise<Week[]> {
   const res = await fetch("/api/weeks", {
     cache: "no-store",
     credentials: "include",
-    headers: authHeaders(),
+    headers: { Accept: "application/json" },
   });
 
   if (!res.ok) {
@@ -284,7 +282,7 @@ export async function getWeekProblems(id: string): Promise<WeekProblem[]> {
   const res = await fetch(`/api/weeks/${id}/problems`, {
     cache: "no-store",
     credentials: "include",
-    headers: authHeaders(),
+    headers: { Accept: "application/json" },
   });
 
   if (!res.ok) {
@@ -365,7 +363,7 @@ export async function getLeaderboard(
   if (kind === "weekly" && opts.weekId) params.set("week_id", opts.weekId);
 
   const endpoint = buildLeaderboardEndpoint(kind, tab);
-  const headers: Record<string, string> = { Accept: "application/json", ...authHeaders() };
+  const headers: Record<string, string> = { Accept: "application/json" };
 
   // Route through the Next.js API proxy to avoid CORS issues
   const res = await fetch(`/api/leaderboard${endpoint}?${params.toString()}`, {

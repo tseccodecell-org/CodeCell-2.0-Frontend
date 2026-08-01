@@ -94,8 +94,14 @@ const Page = () => {
             </div>
           </div>
 
-          <div className="border border-[#D9A404]/40 border-t-2 border-t-[#D9A404] bg-[#0b0d13] p-5 flex items-center gap-4">
-            <div className="w-11 h-11 border border-[#D9A404]/60 flex items-center justify-center text-[#D9A404] font-extrabold shrink-0">
+          <div
+            className="border border-[#D9A404]/40 border-t-2 border-t-[#D9A404] bg-[#0b0d13] p-5 flex items-center gap-4"
+            style={{ boxShadow: "0 0 18px rgba(217,167,4,0.12)" }}
+          >
+            <div
+              className="w-11 h-11 rounded-full flex items-center justify-center text-[#06070B] font-extrabold shrink-0"
+              style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}
+            >
               <Briefcase size={22} />
             </div>
             <div>

@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function WeeklyChallengesPage() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isProfileComplete } = useAuth();
 
   return (
     <main className="flex min-h-screen flex-col bg-[#02040A] text-white selection:bg-[#eab308]/30 selection:text-[#eab308] relative">
@@ -31,12 +31,19 @@ export default function WeeklyChallengesPage() {
 
       {/* Bottom CTA with Trigger */}
       <div className="relative pb-12 sm:pb-16 flex justify-center px-4">
-        {isAuthenticated ? (
+        {isAuthenticated && isProfileComplete ? (
           <Link
             href="/events/weekly-challenges/timeline"
             className="px-6 sm:px-10 py-3.5 sm:py-4 rounded-full border border-[#D4AF37] bg-black text-[#D4AF37] hover:bg-[#D4AF37]/15 font-mono font-black text-[10px] sm:text-xs md:text-sm tracking-[0.15em] sm:tracking-[0.25em] transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:scale-105 active:scale-95 cursor-pointer text-center"
           >
             [ GO TO TIMELINE → ]
+          </Link>
+        ) : isAuthenticated && !isProfileComplete ? (
+          <Link
+            href="/register"
+            className="px-6 sm:px-10 py-3.5 sm:py-4 rounded-full border border-[#eab308]/60 bg-[#eab308]/15 text-[#eab308] hover:bg-[#eab308] hover:text-black font-mono font-black text-[10px] sm:text-xs md:text-sm tracking-[0.15em] sm:tracking-[0.25em] transition-all duration-300 shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:shadow-[0_0_50px_rgba(234,179,8,0.7)] transform active:scale-95 cursor-pointer text-center"
+          >
+            [ FILL DETAILS (STEP 2) → ]
           </Link>
         ) : (
           <button
@@ -52,12 +59,20 @@ export default function WeeklyChallengesPage() {
 
       {/* Floating Glowing CTA Button (Sticky Bottom Right) — hidden on small mobile to avoid overlap */}
       <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 hidden sm:block">
-        {isAuthenticated ? (
+        {isAuthenticated && isProfileComplete ? (
           <Link
             href="/events/weekly-challenges/timeline"
             className="relative flex items-center gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
           >
             <span>Go to Timeline</span>
+            <ArrowRight size={14} />
+          </Link>
+        ) : isAuthenticated && !isProfileComplete ? (
+          <Link
+            href="/register"
+            className="relative flex items-center gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
+          >
+            <span>Fill Details (Step 2)</span>
             <ArrowRight size={14} />
           </Link>
         ) : (

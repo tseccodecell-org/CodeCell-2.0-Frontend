@@ -73,6 +73,7 @@ export interface UserProfile {
   college_name: string;
   year: string;
   is_tsec_user: boolean;
+  is_registered?: boolean;
 }
 
 export async function getProfile(): Promise<UserProfile | null> {
@@ -197,12 +198,23 @@ function errorFrom(res: Response, body: unknown): ApiError {
   return new ApiError(res.status, res.statusText || "Request failed");
 }
 
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("jwt_token") || localStorage.getItem("codecell_token");
+    if (token) {
+      headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+    }
+  }
+  return headers;
+}
+
 async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
   const urlBase = baseUrl ?? BASE_URL;
   if (!urlBase) throw new ApiError(0, "API base URL is not set");
   const res = await fetch(`${urlBase}${path}`, {
     method: "GET",
-    headers: { "Accept": "application/json" },
+    headers: { Accept: "application/json", ...getAuthHeaders() },
     credentials: "include",
   });
 
@@ -218,7 +230,7 @@ async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
 async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: TRequest): Promise<TResponse> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     credentials: "include",
     body: JSON.stringify(requestBody),
   });
@@ -317,12 +329,9 @@ export function getSubmissionHistory(
 
 function buildLeaderboardEndpoint(
   kind: LeaderboardKind,
-  role: UserRole | undefined,
   tab: LeaderboardTab
 ) {
-  const useTsecEndpoint = role === UserRole.TSEC && tab === "TSEC";
-  const audience = useTsecEndpoint ? "tsec_student" : "other";
-
+  const audience = tab === "TSEC" ? "tsec_student" : "other";
   return `/${audience}/${kind}_leaderboard`;
 }
 
@@ -337,7 +346,7 @@ export async function getLeaderboard(
   params.set("limit", String(opts.limit));
   if (kind === "weekly" && opts.weekId) params.set("week_id", opts.weekId);
 
-  const endpoint = buildLeaderboardEndpoint(kind, role, tab);
+  const endpoint = buildLeaderboardEndpoint(kind, tab);
   const headers: Record<string, string> = { Accept: "application/json" };
 
   if (typeof window !== "undefined") {

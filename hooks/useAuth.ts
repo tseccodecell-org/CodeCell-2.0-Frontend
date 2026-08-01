@@ -53,6 +53,7 @@ interface UseAuthResult {
   profile: UserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isProfileComplete: boolean;
   error: string | null;
   isTsecStudent: boolean;
   refresh: () => void;
@@ -74,6 +75,7 @@ export function useAuth(): UseAuthResult {
     if (typeof window !== "undefined") {
       localStorage.removeItem(TOKEN_CACHE_KEY);
       localStorage.removeItem("codecell_token");
+      localStorage.removeItem("codecell_is_registered");
       document.cookie = "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }
     setProfile(null);
@@ -85,6 +87,8 @@ export function useAuth(): UseAuthResult {
       if (typeof window !== "undefined") {
         const cleanToken = token.trim().replace(/^Bearer\s+/i, "");
         localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
+        localStorage.setItem("codecell_token", cleanToken);
+        document.cookie = `jwt_token=${cleanToken}; path=/; max-age=31536000;`;
         refresh();
       }
     },
@@ -95,13 +99,17 @@ export function useAuth(): UseAuthResult {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    const tokenParam = params.get("token") || params.get("jwt") || params.get("jwt_token");
+    const tokenParam = params.get("token") || params.get("jwt") || params.get("jwt_token") || params.get("access_token");
     if (tokenParam) {
-      localStorage.setItem(TOKEN_CACHE_KEY, tokenParam);
+      const cleanToken = tokenParam.trim().replace(/^Bearer\s+/i, "");
+      localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
+      localStorage.setItem("codecell_token", cleanToken);
+      document.cookie = `jwt_token=${cleanToken}; path=/; max-age=31536000;`;
       const url = new URL(window.location.href);
       url.searchParams.delete("token");
       url.searchParams.delete("jwt");
       url.searchParams.delete("jwt_token");
+      url.searchParams.delete("access_token");
       window.history.replaceState({}, "", url.toString());
       refresh();
     }
@@ -143,15 +151,26 @@ export function useAuth(): UseAuthResult {
         email: session?.user?.email || "",
         rating: 1400,
         total_problems_solved: 0,
-        college_name: session?.user?.email?.endsWith("@tsec.edu") || session?.user?.email?.includes("tsec")
-          ? "Thadomal Shahani Engineering College"
-          : "TSEC",
-        year: "BE",
+        college_name: "",
+        year: "",
         is_tsec_user: session?.user?.email?.endsWith("@tsec.edu") || session?.user?.email?.includes("tsec") || false,
       }
     : null;
 
   const activeProfile = profile || fallbackUser;
+
+  // Check if Step 2 registration has been completed for this specific user
+  let isProfileComplete = false;
+  if (typeof window !== "undefined") {
+    const email = activeProfile?.email || session?.user?.email;
+    if (email) {
+      const hasRegFlag = localStorage.getItem(`codecell_is_registered_${email}`) === "true";
+      const hasRegDetails = Boolean(localStorage.getItem(`codecell_registered_${email}`));
+      const isProfileRegistered = Boolean(profile?.is_registered);
+      
+      isProfileComplete = hasRegFlag || hasRegDetails || isProfileRegistered;
+    }
+  }
 
   const user: AuthUser | null = activeProfile
     ? {
@@ -168,6 +187,7 @@ export function useAuth(): UseAuthResult {
     profile: activeProfile,
     isLoading: isSessionLoading,
     isAuthenticated: Boolean(activeProfile),
+    isProfileComplete,
     error,
     isTsecStudent: !isSessionLoading && user?.role === UserRole.TSEC,
     refresh,

@@ -70,19 +70,11 @@ export async function GET(
   }
 
   try {
-    let upstream = await fetch(url, { headers, cache: "no-store" });
-
-    // If tsec_student segment returns 403, automatically fallback to public /other/ segment
-    if (upstream.status === 403 && backendPath.includes("/tsec_student/")) {
-      const fallbackPath = backendPath.replace("/tsec_student/", "/other/");
-      const fallbackUrl = `${API_BASE}${fallbackPath}${search ? `?${search}` : ""}`;
-      upstream = await fetch(fallbackUrl, { headers, cache: "no-store" });
-    }
-
+    const upstream = await fetch(url, { headers, cache: "no-store" });
     const bodyText = await upstream.text();
 
     return new NextResponse(bodyText, {
-      status: upstream.status === 403 ? 200 : upstream.status,
+      status: upstream.status,
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-store, max-age=0",

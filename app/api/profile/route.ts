@@ -45,14 +45,16 @@ export async function GET(req: NextRequest) {
   if (cookie) headers["Cookie"] = cookie;
   if (authHeader) headers["Authorization"] = authHeader;
 
-  // Always ensure a valid JWT token signed with JWT_SECRET is attached
-  const devToken = generateDevJwt(JWT_SECRET);
-  if (!headers["Authorization"] || !headers["Authorization"].startsWith("Bearer ")) {
-    headers["Authorization"] = `Bearer ${devToken}`;
+  if (!cookie && !authHeader) {
+    return NextResponse.json(
+      { success: false, data: null, message: "Unauthorized" },
+      { status: 401 }
+    );
   }
-  if (!headers["Cookie"] || !headers["Cookie"].includes("jwt_token=")) {
-    const existing = headers["Cookie"] ? `${headers["Cookie"]}; ` : "";
-    headers["Cookie"] = `${existing}jwt_token=${devToken}`;
+
+  if (!headers["Authorization"]) {
+    const devToken = generateDevJwt(JWT_SECRET);
+    headers["Authorization"] = `Bearer ${devToken}`;
   }
 
   try {

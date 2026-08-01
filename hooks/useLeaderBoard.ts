@@ -36,7 +36,7 @@ export function useLeaderboard({
   const [unauthorized, setUnauthorized] = useState(false);
   const [refetchToken, setRefetchToken] = useState(0);
 
-  const showToggle = true;
+  const showToggle = isTsecStudent;
 
   const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);
@@ -53,24 +53,11 @@ export function useLeaderboard({
       setData(json);
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 403) {
-          // If TSEC segment was 403 forbidden, automatically fallback to GLOBAL
-          if (selectedTab === "TSEC") {
-            setSelectedTab("GLOBAL");
-            return;
-          }
-        }
         if (err.status === 401 && !isAuthenticated) {
           setUnauthorized(true);
           setData(null);
           return;
         }
-      }
-
-      // Final fallback: try fetching GLOBAL tab directly if TSEC tab failed
-      if (selectedTab === "TSEC") {
-        setSelectedTab("GLOBAL");
-        return;
       }
 
       setData(null);

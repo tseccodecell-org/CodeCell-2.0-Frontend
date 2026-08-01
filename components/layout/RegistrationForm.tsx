@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
+import Link from "next/link";
 import {
     User, School, BookOpen, MapPin,
-    ArrowLeft, Send, CheckCircle2, AlertTriangle
+    ArrowLeft, Send, CheckCircle2, AlertTriangle, ArrowRight
 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { LOGIN_URL } from "@/lib/api-client";
+import { useAuth } from "@/hooks/useAuth";
 
 export function RegistrationForm() {
     const { data: session, status } = useSession();
+    const { profile, refresh: refreshAuth } = useAuth();
     const [activeStep, setActiveStep] = useState(1);
     const [submitError, setSubmitError] = useState("");
     const [formData, setFormData] = useState({
@@ -97,9 +99,11 @@ export function RegistrationForm() {
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error("Registration failed");
-            }
+            // Save registration state locally
+            const email = session?.user?.email || profile?.email || "user";
+            localStorage.setItem(`codecell_is_registered_${email}`, "true");
+            localStorage.setItem(`codecell_registered_${email}`, JSON.stringify(formData));
+            refreshAuth();
 
             setIsRegistered(true);
         } catch (err) {
@@ -110,15 +114,57 @@ export function RegistrationForm() {
         }
     };
 
+    const userEmail = session?.user?.email || profile?.email;
+    const userName = session?.user?.name || profile?.username || "";
+
     useEffect(() => {
-        if (status === "authenticated") {
+        if (!userEmail && status !== "authenticated") return;
+
+        const storedReg = userEmail ? localStorage.getItem(`codecell_registered_${userEmail}`) : null;
+        const isReg = userEmail ? (localStorage.getItem(`codecell_is_registered_${userEmail}`) === "true" || Boolean(storedReg)) : false;
+
+        if (isReg) {
+            setIsRegistered(true);
+            if (storedReg) {
+                try {
+                    const parsed = JSON.parse(storedReg);
+                    setFormData((prev) => {
+                        const newName = userName || parsed.fullName || prev.fullName;
+                        const newCollege = parsed.collegeName || prev.collegeName;
+                        const newCourse = parsed.course || prev.course;
+                        const newYear = parsed.yearOfStudy || prev.yearOfStudy;
+                        const newLoc = parsed.location || prev.location;
+
+                        if (
+                            prev.fullName === newName &&
+                            prev.collegeName === newCollege &&
+                            prev.course === newCourse &&
+                            prev.yearOfStudy === newYear &&
+                            prev.location === newLoc
+                        ) {
+                            return prev;
+                        }
+
+                        return {
+                            fullName: newName,
+                            collegeName: newCollege,
+                            course: newCourse,
+                            yearOfStudy: newYear,
+                            location: newLoc,
+                        };
+                    });
+                } catch {}
+            }
+        } else if (status === "authenticated") {
             setActiveStep(2);
-            setFormData((prev) => ({
-                ...prev,
-                fullName: session?.user?.name ?? "",
-            }));
+            if (userName) {
+                setFormData((prev) => {
+                    if (prev.fullName === userName) return prev;
+                    return { ...prev, fullName: userName };
+                });
+            }
         }
-    }, [status, session]);
+    }, [userEmail, userName, status]);
 
     return (
         <div className="w-full max-w-xl mx-auto px-4 md:px-6">
@@ -177,6 +223,15 @@ export function RegistrationForm() {
                                 </p>
                             </div>
 
+                            {/* GO TO TIMELINE CTA */}
+                            <Link
+                                href="/events/weekly-challenges/timeline"
+                                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F5E6A3] to-[#eab308] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] text-[#0d0d0d] font-bold text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2.5 cursor-pointer transform active:scale-[0.98]"
+                            >
+                                <span>Go to Timeline</span>
+                                <ArrowRight className="w-4 h-4 text-[#0d0d0d]" />
+                            </Link>
+
                             {/* WhatsApp Group Invite CTA */}
                             <div className="w-full relative group/wa p-[1px] rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.15)] hover:shadow-[0_0_25px_rgba(37,211,102,0.35)] transition-all duration-300">
                                 <a
@@ -221,19 +276,19 @@ export function RegistrationForm() {
                                 <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs relative z-10">
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Institution</span>
-                                        <span className="font-medium text-zinc-200">{formData.collegeName}</span>
+                                        <span className="font-medium text-zinc-200">{formData.collegeName || "N/A"}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Course / Major</span>
-                                        <span className="font-medium text-zinc-200">{formData.course}</span>
+                                        <span className="font-medium text-zinc-200">{formData.course || "N/A"}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Year of Study</span>
-                                        <span className="font-medium text-zinc-200">{formData.yearOfStudy} Year</span>
+                                        <span className="font-medium text-zinc-200">{formData.yearOfStudy ? `${formData.yearOfStudy} Year` : "N/A"}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Location</span>
-                                        <span className="font-medium text-zinc-200">{formData.location}</span>
+                                        <span className="font-medium text-zinc-200">{formData.location || "N/A"}</span>
                                     </div>
                                 </div>
                             </div>
@@ -257,7 +312,7 @@ export function RegistrationForm() {
 
                                     <button
                                         type="button"
-                                        onClick={() => (window.location.href = LOGIN_URL)}
+                                        onClick={() => signIn("google", { callbackUrl: "/register" }).catch(() => (window.location.href = LOGIN_URL))}
                                         className="w-full max-w-sm flex items-center justify-center gap-3 rounded-xl border border-zinc-800 bg-[#141414] hover:border-zinc-700 hover:bg-[#1a1a1a] py-3.5 px-5 transition-all duration-300 cursor-pointer shadow-md"
                                     >
                                         <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48">

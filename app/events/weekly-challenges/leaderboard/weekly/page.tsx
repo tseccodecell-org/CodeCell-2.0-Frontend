@@ -23,21 +23,32 @@ export default function WeeklyLeaderboardPage() {
     showToggle,
   } = useLeaderboard({ kind: "weekly", page, limit: 25 });
 
-  const response = data as WeeklyLeaderboardResponse | null;
+  const response = data as any;
 
-  const rows: LeaderboardRow[] = useMemo(
-    () =>
-      response?.data.map((entry) => ({
-        rank: entry.rank,
-        id: entry.user_id,
-        name: entry.name,
-        primaryValue: entry.weekly_score,
-        primaryLabel: "WEEKLY SCORE",
-        secondaryValue: entry.problems_solved,
-        secondaryLabel: "SOLVED",
-      })) ?? [],
-    [response?.data]
-  );
+  const rows: LeaderboardRow[] = useMemo(() => {
+    if (!response) return [];
+
+    let list: any[] = [];
+    if (Array.isArray(response)) {
+      list = response;
+    } else if (Array.isArray(response.data)) {
+      list = response.data;
+    } else if (Array.isArray(response?.data?.data)) {
+      list = response.data.data;
+    }
+
+    return list.map((entry: any, index: number) => ({
+      rank: entry.rank ?? index + 1,
+      id: entry.user_id ?? entry.id ?? entry.username ?? index,
+      name: entry.name ?? entry.username ?? "Anonymous",
+      primaryValue: entry.weekly_score ?? entry.score ?? 0,
+      primaryLabel: "WEEKLY SCORE",
+      secondaryValue: entry.problems_solved ?? entry.solved ?? 0,
+      secondaryLabel: "SOLVED",
+    }));
+  }, [response]);
+
+  const hasNext = Boolean(response?.has_next ?? response?.data?.has_next ?? false);
 
   return (
     <>
@@ -60,7 +71,7 @@ export default function WeeklyLeaderboardPage() {
         forbidden={forbidden}
         unauthorized={unauthorized}
         page={page}
-        hasNext={response?.has_next ?? false}
+        hasNext={hasNext}
         onPageChange={setPage}
         controls={
           <LeaderboardToggle

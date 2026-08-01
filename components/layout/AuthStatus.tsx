@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LogOut, User, Trophy } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { LOGIN_URL } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -12,10 +13,10 @@ export default function AuthStatus({ accent = "#4BE2C4" }: { accent?: string }) 
     return <span className="block h-8 w-24 animate-pulse rounded-full bg-white/5" />;
   }
 
-  if (!isAuthenticated || !profile) {
+  if (!isAuthenticated) {
     return (
       <button
-        onClick={() => (window.location.href = LOGIN_URL)}
+        onClick={() => signIn("google", { callbackUrl: "/register" }).catch(() => (window.location.href = LOGIN_URL))}
         className="rounded-full border px-5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] transition-colors cursor-pointer hover:bg-white/5"
         style={{ borderColor: accent, color: accent }}
       >
@@ -33,8 +34,8 @@ export default function AuthStatus({ accent = "#4BE2C4" }: { accent?: string }) 
         title="View Leaderboard"
       >
         <User size={13} />
-        <span>{profile.username}</span>
-        {profile.is_tsec_user && (
+        <span>{profile?.username || "Contestant"}</span>
+        {profile?.is_tsec_user && (
           <span className="rounded-sm bg-white/10 px-1 text-[9px] uppercase tracking-wider">
             TSEC
           </span>

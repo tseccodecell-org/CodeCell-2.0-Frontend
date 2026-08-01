@@ -1970,6 +1970,13 @@ body,
    MARKDOWN + KATEX (problem statements)
    ======================================================== */
 
+.markdown-content .katex,
+.markdown-content .katex * {
+  /* katex takes its colour from whatever wraps it, so a muted container used
+     to render the maths grey. pin it to the body ink instead. */
+  color: #f4f1ea;
+}
+
 .markdown-content .katex {
   font-size: 1.05em;
 }

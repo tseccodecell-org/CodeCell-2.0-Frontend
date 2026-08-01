@@ -24,13 +24,13 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
       const isInline = !className || !className.startsWith("language-");
       return isInline ? (
         <code
-          className="bg-[#1C1C1C] border border-[#2A2A2A] text-[#D4AF37] px-1.5 py-0.5 rounded font-mono text-[11px]"
+          className="bg-[#0d0f14] border border-[#1a1c24] text-[#D9A404] px-1.5 py-0.5 rounded font-mono text-[11px]"
           {...props}
         >
           {children}
         </code>
       ) : (
-        <pre className="bg-[#070707] border border-[#2A2A2A] p-4 rounded-lg my-3 overflow-x-auto text-[11px] font-mono leading-relaxed text-white">
+        <pre className="bg-[#06070B] border border-[#1a1c24] p-4 rounded-lg my-3 overflow-x-auto text-[11px] font-mono leading-relaxed text-white">
           <code className={className} {...props}>
             {children}
           </code>
@@ -47,11 +47,11 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
       return <ol className="list-decimal list-inside mb-3 pl-4 space-y-1">{children}</ol>;
     },
     li({ children }) {
-      return <li className="text-[11px] md:text-xs text-[#8A8880] list-item">{children}</li>;
+      return <li className="text-[11px] md:text-xs list-item">{children}</li>;
     },
     blockquote({ children }) {
       return (
-        <blockquote className="border-l-2 border-[#D4AF37] pl-4 italic my-3 text-white/60 bg-[#D4AF37]/5 py-2.5 pr-2 rounded-r-md">
+        <blockquote className="border-l-2 border-[#D9A404] pl-4 italic my-3 text-[#F4F1EA]/75 bg-[#D9A404]/5 py-2.5 pr-2 rounded-r-md">
           {children}
         </blockquote>
       );
@@ -62,7 +62,7 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
           href={href}
           target="_blank"
           rel="noreferrer noopener"
-          className="text-[#D4AF37] hover:underline inline-flex items-center gap-0.5"
+          className="text-[#D9A404] hover:underline inline-flex items-center gap-0.5"
         >
           {children}
         </a>
@@ -79,8 +79,10 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
     },
   };
 
+  // an explicit base colour, so rendered maths never inherits whatever muted
+  // grey happens to wrap the block it was dropped into
   return (
-    <div className={`markdown-content ${className}`}>
+    <div className={`markdown-content text-[#F4F1EA] ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkMath]}
         rehypePlugins={[rehypeKatex]}

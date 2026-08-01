@@ -33,11 +33,18 @@ function setCachedProfile(profile: UserProfile | null) {
   }
 }
 
+function clearLegacyTokenCookie() {
+  if (typeof window === "undefined") return;
+  if (!document.cookie.includes("jwt_token=")) return;
+  document.cookie = "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+}
+
 function clearStoredSession() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(PROFILE_CACHE_KEY);
   localStorage.removeItem(TOKEN_CACHE_KEY);
   localStorage.removeItem("codecell_token");
+  clearLegacyTokenCookie();
 }
 
 interface UseAuthResult {
@@ -87,6 +94,10 @@ export function useAuth(): UseAuthResult {
     },
     [refresh]
   );
+
+  useEffect(() => {
+    clearLegacyTokenCookie();
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

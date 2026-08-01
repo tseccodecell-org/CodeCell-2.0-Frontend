@@ -13,7 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export function RegistrationForm() {
     const { data: session, status } = useSession();
-    const { profile, isAuthenticated, refresh } = useAuth();
+    const { profile, isAuthenticated, isLoading, refresh } = useAuth();
     const router = useRouter();
     const [activeStep, setActiveStep] = useState(1);
     const [submitError, setSubmitError] = useState("");
@@ -121,14 +121,16 @@ export function RegistrationForm() {
     };
 
     useEffect(() => {
-        if (status === "authenticated" || isAuthenticated) {
+        if (isAuthenticated) {
             setActiveStep(2);
             setFormData((prev) => ({
                 ...prev,
                 fullName: prev.fullName || profile?.name || session?.user?.name || "",
             }));
+        } else if (!isLoading) {
+            setActiveStep(1);
         }
-    }, [status, session, isAuthenticated, profile]);
+    }, [session, isAuthenticated, isLoading, profile]);
 
     return (
         <div className="w-full max-w-xl mx-auto px-4 md:px-6">
@@ -264,6 +266,15 @@ export function RegistrationForm() {
                                             Please authenticate using your Google account to proceed to the academic form.
                                         </p>
                                     </div>
+
+                                    {status === "authenticated" && !isAuthenticated && !isLoading && (
+                                        <div className="w-full max-w-sm rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+                                            <p className="text-xs leading-relaxed text-amber-300/90">
+                                                You are signed in to Google as {session?.user?.email}, but the contest
+                                                server has not recognised that session. Sign in again below to continue.
+                                            </p>
+                                        </div>
+                                    )}
 
                                     <button
                                         type="button"

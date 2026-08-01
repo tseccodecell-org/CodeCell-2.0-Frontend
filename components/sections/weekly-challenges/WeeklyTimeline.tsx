@@ -289,12 +289,8 @@ export default function WeeklyTimeline() {
             <span className="font-mono text-[10px] text-[#D9A404] font-bold uppercase tracking-wider block mb-1">
               03. NO PLAGIARISM, NO AI GENERATED CODE
             </span>
-            Every solution must be your own. While a week is live, AI tools are
-            off limits entirely, including generating any part of a solution,
-            asking one to explain a problem, and AI assisted editor plugins.
-            Copying another entrant is treated the same way. Submissions are
-            reviewed, anything in breach is invalidated, and repeat cases are
-            banned from the season.{" "}
+            Solutions must be your own. AI tools and copied code are both off
+            limits while a week is live.{" "}
             <Link href="/codeofconduct" className="text-[#D9A404] hover:underline">
               Read the full rules
             </Link>

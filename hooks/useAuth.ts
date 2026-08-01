@@ -162,14 +162,32 @@ export function useAuth(): UseAuthResult {
   // Check if Step 2 registration has been completed for this specific user
   let isProfileComplete = false;
   if (typeof window !== "undefined") {
-    const email = activeProfile?.email || session?.user?.email;
-    if (email) {
-      const hasRegFlag = localStorage.getItem(`codecell_is_registered_${email}`) === "true";
-      const hasRegDetails = Boolean(localStorage.getItem(`codecell_registered_${email}`));
-      const isProfileRegistered = Boolean(profile?.is_registered);
-      
-      isProfileComplete = hasRegFlag || hasRegDetails || isProfileRegistered;
-    }
+    const rawEmail = activeProfile?.email || session?.user?.email;
+    const email = rawEmail ? rawEmail.trim().toLowerCase() : "";
+
+    const hasGlobalFlag = localStorage.getItem("codecell_is_registered") === "true";
+    const hasGlobalDetails = Boolean(localStorage.getItem("codecell_registered"));
+
+    const hasEmailFlag = email
+      ? localStorage.getItem(`codecell_is_registered_${email}`) === "true" ||
+        (rawEmail ? localStorage.getItem(`codecell_is_registered_${rawEmail}`) === "true" : false)
+      : false;
+
+    const hasEmailDetails = email
+      ? Boolean(localStorage.getItem(`codecell_registered_${email}`)) ||
+        (rawEmail ? Boolean(localStorage.getItem(`codecell_registered_${rawEmail}`)) : false)
+      : false;
+
+    const hasProfileCollege = Boolean(activeProfile?.college_name || (activeProfile as any)?.college);
+    const isProfileRegistered = Boolean(profile?.is_registered);
+
+    isProfileComplete =
+      hasEmailFlag ||
+      hasEmailDetails ||
+      hasGlobalFlag ||
+      hasGlobalDetails ||
+      hasProfileCollege ||
+      isProfileRegistered;
   }
 
   const user: AuthUser | null = activeProfile

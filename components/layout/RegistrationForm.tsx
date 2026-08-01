@@ -100,11 +100,22 @@ export function RegistrationForm() {
             }
 
             // Save registration state locally
-            const email = session?.user?.email || profile?.email || "user";
-            localStorage.setItem(`codecell_is_registered_${email}`, "true");
-            localStorage.setItem(`codecell_registered_${email}`, JSON.stringify(formData));
-            refreshAuth();
+            const rawEmail = session?.user?.email || profile?.email || "";
+            const lowerEmail = rawEmail.trim().toLowerCase();
 
+            localStorage.setItem("codecell_is_registered", "true");
+            localStorage.setItem("codecell_registered", JSON.stringify(formData));
+
+            if (lowerEmail) {
+                localStorage.setItem(`codecell_is_registered_${lowerEmail}`, "true");
+                localStorage.setItem(`codecell_registered_${lowerEmail}`, JSON.stringify(formData));
+            }
+            if (rawEmail && rawEmail !== lowerEmail) {
+                localStorage.setItem(`codecell_is_registered_${rawEmail}`, "true");
+                localStorage.setItem(`codecell_registered_${rawEmail}`, JSON.stringify(formData));
+            }
+
+            refreshAuth();
             setIsRegistered(true);
         } catch (err) {
             console.error(err);
@@ -120,8 +131,19 @@ export function RegistrationForm() {
     useEffect(() => {
         if (!userEmail && status !== "authenticated") return;
 
-        const storedReg = userEmail ? localStorage.getItem(`codecell_registered_${userEmail}`) : null;
-        const isReg = userEmail ? (localStorage.getItem(`codecell_is_registered_${userEmail}`) === "true" || Boolean(storedReg)) : false;
+        const rawEmail = userEmail || "";
+        const lowerEmail = rawEmail.trim().toLowerCase();
+
+        const storedReg =
+            (lowerEmail ? localStorage.getItem(`codecell_registered_${lowerEmail}`) : null) ||
+            (rawEmail ? localStorage.getItem(`codecell_registered_${rawEmail}`) : null) ||
+            localStorage.getItem("codecell_registered");
+
+        const isReg =
+            localStorage.getItem("codecell_is_registered") === "true" ||
+            (lowerEmail ? localStorage.getItem(`codecell_is_registered_${lowerEmail}`) === "true" : false) ||
+            (rawEmail ? localStorage.getItem(`codecell_is_registered_${rawEmail}`) === "true" : false) ||
+            Boolean(storedReg);
 
         if (isReg) {
             setIsRegistered(true);

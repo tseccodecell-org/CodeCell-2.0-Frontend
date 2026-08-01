@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Lock,
   Check,
@@ -286,9 +287,17 @@ export default function WeeklyTimeline() {
           </div>
           <div className="p-3.5 bg-[#0b0d13] border border-[#1a1c24]">
             <span className="font-mono text-[10px] text-[#D9A404] font-bold uppercase tracking-wider block mb-1">
-              03. ANTI-CHEAT SYSTEM
+              03. NO PLAGIARISM, NO AI GENERATED CODE
             </span>
-            Code similarity algorithms check all accepted submissions. Plagiarism results in immediate disqualification.
+            Every solution must be your own. While a week is live, AI tools are
+            off limits entirely, including generating any part of a solution,
+            asking one to explain a problem, and AI assisted editor plugins.
+            Copying another entrant is treated the same way. Submissions are
+            reviewed, anything in breach is invalidated, and repeat cases are
+            banned from the season.{" "}
+            <Link href="/codeofconduct" className="text-[#D9A404] hover:underline">
+              Read the full rules
+            </Link>
           </div>
         </div>
       </div>

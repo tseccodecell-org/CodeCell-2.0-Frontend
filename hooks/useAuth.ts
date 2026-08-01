@@ -47,6 +47,45 @@ function clearStoredSession() {
   clearLegacyTokenCookie();
 }
 
+let sharedProfile: UserProfile | null = null;
+let sharedLoading = true;
+let sharedError: string | null = null;
+let hasStarted = false;
+let inFlight: Promise<void> | null = null;
+
+const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((fn) => fn());
+}
+
+function loadProfile(): Promise<void> {
+  if (inFlight) return inFlight;
+
+  sharedLoading = true;
+  notify();
+
+  inFlight = (async () => {
+    try {
+      const data = await getProfile();
+      sharedProfile = data;
+      setCachedProfile(data);
+      if (!data) clearStoredSession();
+      sharedError = null;
+    } catch (err) {
+      sharedProfile = null;
+      clearStoredSession();
+      sharedError = err instanceof Error ? err.message : "Could not load your profile.";
+    } finally {
+      sharedLoading = false;
+      inFlight = null;
+      notify();
+    }
+  })();
+
+  return inFlight;
+}
+
 interface UseAuthResult {
   user: AuthUser | null;
   profile: UserProfile | null;
@@ -66,16 +105,32 @@ interface UseAuthResult {
 }
 
 export function useAuth(): UseAuthResult {
-  const [profile, setProfile] = useState<UserProfile | null>(getCachedProfile);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
+  const [, setVersion] = useState(0);
 
-  const refresh = useCallback(() => setTick((t) => t + 1), []);
+  useEffect(() => {
+    const rerender = () => setVersion((v) => v + 1);
+    listeners.add(rerender);
+
+    if (!hasStarted) {
+      hasStarted = true;
+      clearLegacyTokenCookie();
+      sharedProfile = getCachedProfile();
+      loadProfile();
+    }
+
+    return () => {
+      listeners.delete(rerender);
+    };
+  }, []);
+
+  const refresh = useCallback(() => {
+    loadProfile();
+  }, []);
 
   const logout = useCallback(() => {
     clearStoredSession();
-    setProfile(null);
+    sharedProfile = null;
+    notify();
 
     nextAuthSignOut({ redirect: false }).finally(() => {
       if (typeof window !== "undefined") {
@@ -84,19 +139,11 @@ export function useAuth(): UseAuthResult {
     });
   }, []);
 
-  const setAuthToken = useCallback(
-    (token: string) => {
-      if (typeof window !== "undefined") {
-        const cleanToken = token.trim().replace(/^Bearer\s+/i, "");
-        localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
-        refresh();
-      }
-    },
-    [refresh]
-  );
-
-  useEffect(() => {
-    clearLegacyTokenCookie();
+  const setAuthToken = useCallback((token: string) => {
+    if (typeof window === "undefined") return;
+    const cleanToken = token.trim().replace(/^Bearer\s+/i, "");
+    localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
+    loadProfile();
   }, []);
 
   useEffect(() => {
@@ -110,38 +157,11 @@ export function useAuth(): UseAuthResult {
       url.searchParams.delete("jwt");
       url.searchParams.delete("jwt_token");
       window.history.replaceState({}, "", url.toString());
-      refresh();
+      loadProfile();
     }
-  }, [refresh]);
+  }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadUser() {
-      setIsLoading(true);
-      try {
-        const data = await getProfile();
-        if (cancelled) return;
-        setProfile(data);
-        setCachedProfile(data);
-        if (!data) clearStoredSession();
-        setError(null);
-      } catch (err) {
-        if (cancelled) return;
-        setProfile(null);
-        clearStoredSession();
-        setError(err instanceof Error ? err.message : "Could not load your profile.");
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    }
-
-    loadUser();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [tick]);
+  const profile = sharedProfile;
 
   const user: AuthUser | null = profile
     ? {
@@ -154,14 +174,13 @@ export function useAuth(): UseAuthResult {
   const warnings = profile?.warnings ?? [];
 
   const registered = profile
-    ? profile.is_registered !== false ||
-      Boolean(profile.college_name && profile.year)
+    ? profile.is_registered !== false || Boolean(profile.college_name && profile.year)
     : false;
 
   return {
     user,
     profile,
-    isLoading,
+    isLoading: sharedLoading,
     isAuthenticated: profile !== null,
     isRegistered: registered,
     isProfileComplete: registered,
@@ -169,7 +188,7 @@ export function useAuth(): UseAuthResult {
     banReason: profile?.ban_reason ?? "",
     warningCount: profile?.warning_count ?? 0,
     latestWarning: warnings.length > 0 ? warnings[0] : null,
-    error,
+    error: sharedError,
     isTsecStudent: profile?.is_tsec_user === true,
     refresh,
     logout,

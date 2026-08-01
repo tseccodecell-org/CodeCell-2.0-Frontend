@@ -18,7 +18,16 @@ export async function POST(req: Request) {
       );
     }
 
-    const { error } = await supabase
+    console.log("[Supabase Register] Inserting payload:", {
+      email: userEmail,
+      full_name: userName,
+      college: body.collegeName || body.college_name || "",
+      course: body.course || "",
+      year: body.yearOfStudy || body.year_of_study || body.year || "",
+      location: body.location || "",
+    });
+
+    const { data, error } = await supabase
       .from("registrations")
       .insert({
         email: userEmail,
@@ -27,9 +36,11 @@ export async function POST(req: Request) {
         course: body.course || "",
         year: body.yearOfStudy || body.year_of_study || body.year || "",
         location: body.location || "",
-      });
+      })
+      .select();
 
     if (error) {
+      console.error("[Supabase Register Error]:", error);
       if (error.code === "23505") {
         return NextResponse.json(
           { error: "You have already registered for this event." },
@@ -38,10 +49,12 @@ export async function POST(req: Request) {
       }
 
       return NextResponse.json(
-        { error: error.message },
+        { error: error.message || "Failed to save registration to Supabase" },
         { status: 500 }
       );
     }
+
+    console.log("[Supabase Register Success]:", data);
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (err: unknown) {

@@ -1,8 +1,38 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import LeaderboardButtons from "@/components/sections/leaderboard/LeaderboardButtons";
 import WeeklyTimeline from "@/components/sections/weekly-challenges/WeeklyTimeline";
-import { Users, Trophy, Briefcase, Swords } from "lucide-react";
+import { Users, Trophy, Briefcase } from "lucide-react";
 
 const Page = () => {
+  const router = useRouter();
+  const { isAuthenticated, isProfileComplete, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && (!isAuthenticated || !isProfileComplete)) {
+      router.push("/register");
+    }
+  }, [isLoading, isAuthenticated, isProfileComplete, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#06070B] flex items-center justify-center font-mono text-xs text-[#D4AF37] animate-pulse">
+        VERIFYING ACCREDITATION STATUS...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !isProfileComplete) {
+    return (
+      <div className="min-h-screen bg-[#06070B] flex items-center justify-center font-mono text-xs text-[#D4AF37] animate-pulse">
+        REDIRECTING TO REGISTRATION STEP 2...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#06070B] text-[#F0EDE6] relative overflow-hidden">
       {/* Ambient Cyberpunk Glow */}

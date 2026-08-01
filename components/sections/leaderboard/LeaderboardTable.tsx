@@ -23,6 +23,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LOGIN_URL } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
+/* ── Pixel font for the "Hall of Champions" header block ── */
+const PIXEL_FONT_STYLE = `
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+`;
+
 export interface LeaderboardRow {
   rank: number;
   id: string | number;
@@ -51,44 +59,50 @@ interface LeaderboardTableProps {
   controls?: React.ReactNode;
 }
 
-/* ── Medal styling for podium ── */
+/* ── Trophy + medal styling for podium ── */
 const podiumConfig = [
   {
     // 1st — Gold Champion
+    trophy: "/trophy-gold.png",
+    crown: "/crown-pixel.png",
     border: "border-[#D4AF37]",
     glow: "shadow-[0_0_50px_rgba(212,175,55,0.3)]",
     bg: "from-[#D4AF37]/20 via-[#D4AF37]/8 to-transparent",
     text: "text-[#D4AF37]",
-    badge: "bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#996515]",
-    icon: <Crown size={20} className="text-[#0A0A0A]" />,
+    trophyGlow: "drop-shadow-[0_0_25px_rgba(212,175,55,0.55)]",
+    trophySize: "w-20 h-20 md:w-28 md:h-28",
+    crownSize: "w-9 h-9 md:w-12 md:h-12",
     barHeight: "h-32 md:h-44",
-    avatarSize: "w-16 h-16 md:w-20 md:h-20",
     label: "CHAMPION",
     ring: "ring-4 ring-[#D4AF37]/30",
   },
   {
     // 2nd — Silver Runner-Up
+    trophy: "/trophy-silver.png",
+    crown: null,
     border: "border-[#C0C0C0]",
     glow: "shadow-[0_0_35px_rgba(192,192,192,0.2)]",
     bg: "from-[#C0C0C0]/15 via-[#C0C0C0]/5 to-transparent",
     text: "text-[#E0E0E0]",
-    badge: "bg-gradient-to-br from-[#FFFFFF] via-[#C0C0C0] to-[#707070]",
-    icon: <Medal size={16} className="text-[#0A0A0A]" />,
+    trophyGlow: "drop-shadow-[0_0_18px_rgba(192,192,192,0.35)]",
+    trophySize: "w-16 h-16 md:w-20 md:h-20",
+    crownSize: "",
     barHeight: "h-24 md:h-32",
-    avatarSize: "w-14 h-14 md:w-16 md:h-16",
     label: "RUNNER-UP",
     ring: "ring-2 ring-[#C0C0C0]/20",
   },
   {
     // 3rd — Bronze 3rd Place
+    trophy: "/trophy-bronze.png",
+    crown: null,
     border: "border-[#CD7F32]",
     glow: "shadow-[0_0_35px_rgba(205,127,50,0.2)]",
     bg: "from-[#CD7F32]/15 via-[#CD7F32]/5 to-transparent",
     text: "text-[#CD7F32]",
-    badge: "bg-gradient-to-br from-[#E89D50] via-[#CD7F32] to-[#6E3B07]",
-    icon: <Medal size={16} className="text-[#0A0A0A]" />,
+    trophyGlow: "drop-shadow-[0_0_18px_rgba(205,127,50,0.35)]",
+    trophySize: "w-16 h-16 md:w-20 md:h-20",
+    crownSize: "",
     barHeight: "h-20 md:h-28",
-    avatarSize: "w-14 h-14 md:w-16 md:h-16",
     label: "3RD PLACE",
     ring: "ring-2 ring-[#CD7F32]/20",
   },
@@ -104,7 +118,7 @@ function PodiumCard({
   index: number;
 }) {
   const displayOrder = index === 0 ? "order-2" : index === 1 ? "order-1" : "order-3";
-  const elevation = index === 0 ? "-mt-4 md:-mt-8" : "";
+  const elevation = index === 0 ? "-mt-6 md:-mt-10" : "";
 
   return (
     <motion.div
@@ -113,25 +127,47 @@ function PodiumCard({
       transition={{ duration: 0.6, delay: index * 0.12 }}
       className={`flex flex-col items-center ${displayOrder} ${elevation}`}
     >
-      {/* Avatar */}
-      <div className="relative mb-3 group">
-        <div
-          className={`${config.avatarSize} rounded-full border-2 ${config.border} ${config.glow} ${config.ring} flex items-center justify-center bg-gradient-to-br ${config.bg} backdrop-blur-md transition-transform duration-300 group-hover:scale-105`}
+      {/* Crown — floats above the gold trophy only */}
+      {config.crown && (
+        <motion.div
+          initial={{ opacity: 0, y: -10, scale: 0.7 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, delay: index * 0.12 + 0.05, type: "spring" }}
+          className="mb-1 drop-shadow-[0_0_15px_rgba(212,175,55,0.6)]"
         >
-          <span className={`font-display text-xl md:text-2xl font-black ${config.text}`}>
-            {row.name.charAt(0).toUpperCase()}
-          </span>
-        </div>
-        {/* Rank badge */}
-        <div
-          className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 ${config.badge} w-7 h-7 rounded-full flex items-center justify-center shadow-md`}
-        >
-          {config.icon}
-        </div>
-      </div>
+          <img
+            src={config.crown}
+            alt="Champion crown"
+            draggable={false}
+            className={`${config.crownSize} object-contain select-none pointer-events-none`}
+            style={{ imageRendering: "pixelated" }}
+          />
+        </motion.div>
+      )}
+
+      {/* Trophy — floating pixel-art icon, no circular frame */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.6, y: -12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: index * 0.12 + 0.15, type: "spring" }}
+        className={`relative mb-2 ${config.trophyGlow}`}
+      >
+        <img
+          src={config.trophy}
+          alt={`${config.label} trophy`}
+          draggable={false}
+          className={`${config.trophySize} object-contain select-none pointer-events-none`}
+          style={{ imageRendering: "pixelated" }}
+        />
+      </motion.div>
+
+      {/* Rank */}
+      <span className={`font-mono text-xs font-bold ${config.text} tracking-widest mb-1`}>
+        #{row.rank}
+      </span>
 
       {/* Name */}
-      <span className={`font-sans text-sm font-bold ${config.text} text-center mt-1 mb-0.5 max-w-[110px] truncate`}>
+      <span className="font-sans text-sm font-bold text-[#F0EDE6] text-center mb-0.5 max-w-[110px] truncate">
         {row.name}
       </span>
       <span className="font-mono text-[9px] text-[#5A5850] tracking-widest uppercase mb-3">
@@ -188,6 +224,7 @@ export default function LeaderboardTable({
 
   return (
     <div className="min-h-screen bg-[#070707] text-[#F0EDE6] relative overflow-hidden">
+      <style>{PIXEL_FONT_STYLE}</style>
       {/* ── Cyberpunk Ambient Glow ── */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(212,175,55,0.12),transparent)] pointer-events-none z-0" />
       <div className="absolute top-96 right-0 w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(212,175,55,0.04),transparent)] pointer-events-none z-0" />
@@ -198,23 +235,35 @@ export default function LeaderboardTable({
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#1A1A1A] pb-8 select-none"
+          className="mb-8 md:mb-12 flex flex-col items-center text-center gap-3 border-b border-[#1A1A1A] pb-10 select-none"
         >
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
-              <span className="font-mono text-[11px] text-[#D4AF37] tracking-[0.25em] uppercase font-semibold">
-                {eyebrow}
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#F0EDE6] font-display">
-              {title}
-            </h1>
-            <p className="font-sans text-sm text-[#7A7870] mt-3 max-w-xl leading-relaxed">
-              {description}
-            </p>
+          {/* Eyebrow — pixel stars + label */}
+          <div className="flex items-center gap-3">
+            <span className="font-pixel text-[10px] text-[#D4AF37]">★</span>
+            <span className="font-pixel text-[10px] text-[#D4AF37] tracking-[0.3em] uppercase">
+              {eyebrow}
+            </span>
+            <span className="font-pixel text-[10px] text-[#D4AF37]">★</span>
           </div>
-          {controls && <div className="shrink-0">{controls}</div>}
+
+          {/* Title — blocky pixel font, accent word in gold */}
+          <h1 className="font-pixel text-2xl sm:text-3xl md:text-4xl leading-relaxed tracking-tight text-[#F0EDE6]">
+            {title.split(" ").map((word, i, arr) => (
+              <span
+                key={i}
+                className={i === arr.length - 1 ? "text-[#D4AF37]" : "text-[#F0EDE6]"}
+              >
+                {word}
+                {i < arr.length - 1 ? " " : ""}
+              </span>
+            ))}
+          </h1>
+
+          <p className="font-sans text-sm text-[#7A7870] mt-1 max-w-xl leading-relaxed">
+            {description}
+          </p>
+
+          {controls && <div className="shrink-0 mt-3">{controls}</div>}
         </motion.div>
 
         {/* ── Top Overview Stats Bar ── */}
@@ -310,8 +359,6 @@ export default function LeaderboardTable({
             </motion.div>
           )}
 
-
-
           {!unauthorized && forbidden && (
             <motion.div
               key="forbidden"
@@ -383,7 +430,7 @@ export default function LeaderboardTable({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.5 }}
-              className="mb-12 md:mb-16"
+              className="mb-12 md:mb-16 mt-10"
             >
               <div className="grid grid-cols-3 gap-3 md:gap-8 items-end max-w-2xl mx-auto px-2">
                 {top3.map((row, i) => (

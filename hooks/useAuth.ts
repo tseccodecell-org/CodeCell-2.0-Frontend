@@ -46,6 +46,7 @@ interface UseAuthResult {
   isLoading: boolean;
   isAuthenticated: boolean;
   isRegistered: boolean;
+  isProfileComplete: boolean;
   isBanned: boolean;
   banReason: string;
   warningCount: number;
@@ -145,6 +146,7 @@ export function useAuth(): UseAuthResult {
     isLoading,
     isAuthenticated: profile !== null,
     isRegistered: profile ? profile.is_registered !== false : false,
+    isProfileComplete: profile ? profile.is_registered !== false : false,
     isBanned: profile?.is_banned === true,
     banReason: profile?.ban_reason ?? "",
     warningCount: profile?.warning_count ?? 0,

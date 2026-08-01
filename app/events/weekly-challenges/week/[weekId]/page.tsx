@@ -57,6 +57,23 @@ export default function WeekPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // returning from the solve page can restore this component without
+  // remounting, so a solve made a moment ago would still read as unsolved
+  // until a hard reload. refetch whenever the tab is looked at again.
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    const refetch = () => {
+      if (document.visibilityState === "visible") setReloadKey((k) => k + 1);
+    };
+    window.addEventListener("focus", refetch);
+    document.addEventListener("visibilitychange", refetch);
+    return () => {
+      window.removeEventListener("focus", refetch);
+      document.removeEventListener("visibilitychange", refetch);
+    };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -97,7 +114,7 @@ export default function WeekPage() {
     return () => {
       cancelled = true;
     };
-  }, [weekId]);
+  }, [weekId, reloadKey]);
 
   if (loading) return <WeekLoading />;
 

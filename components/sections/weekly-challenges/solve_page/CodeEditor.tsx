@@ -57,7 +57,7 @@ export default function CodeEditor({
 
   const isRunning = activeAction === "RUN";
   const isJudging = activeAction === "SUBMIT";
-  const isBusy = status === "QUEUED" || status === "RUNNING" || activeAction !== null;
+  const isBusy = status === "QUEUED" || status === "RUNNING" || activeAction !== null || banned;
   const submitBusy = activeAction !== null || cooldownLeft > 0 || banned;
 
   const current = LANGUAGES.find((l) => l.id === language) ?? LANGUAGES[0];
@@ -348,6 +348,7 @@ export default function CodeEditor({
           <button
             onClick={handleRunClick}
             disabled={isBusy}
+            title={banned ? "Your account is suspended, so you cannot run code." : undefined}
             className="flex items-center gap-1.5 rounded border border-[#22262f] px-3.5 py-1.5 font-mono text-xs font-semibold text-[#F4F1EA] transition-colors hover:border-[#D9A404]/60 hover:text-[#D9A404] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             {isRunning ? (
@@ -362,9 +363,11 @@ export default function CodeEditor({
             onClick={handleSubmitClick}
             disabled={submitBusy}
             title={
-              cooldownLeft > 0
-                ? `You have hit the submission limit, try again in ${cooldownLeft}s`
-                : undefined
+              banned
+                ? "Your account is suspended, so you cannot submit."
+                : cooldownLeft > 0
+                  ? `You have hit the submission limit, try again in ${cooldownLeft}s`
+                  : undefined
             }
             className="flex items-center gap-1.5 rounded px-4 py-1.5 font-mono text-xs font-bold text-[#06070B] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}

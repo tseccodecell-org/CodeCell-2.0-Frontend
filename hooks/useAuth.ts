@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { signOut as nextAuthSignOut } from "next-auth/react";
 import { getProfile, LOGOUT_URL } from "@/lib/api-client";
 import type { ProfileWarning, UserProfile } from "@/lib/api-client";
 import { AuthUser, UserRole } from "@/lib/types/leaderboard";
@@ -132,11 +131,9 @@ export function useAuth(): UseAuthResult {
     sharedProfile = null;
     notify();
 
-    nextAuthSignOut({ redirect: false }).finally(() => {
-      if (typeof window !== "undefined") {
-        window.location.href = LOGOUT_URL;
-      }
-    });
+    if (typeof window !== "undefined") {
+      window.location.href = LOGOUT_URL;
+    }
   }, []);
 
   const setAuthToken = useCallback((token: string) => {

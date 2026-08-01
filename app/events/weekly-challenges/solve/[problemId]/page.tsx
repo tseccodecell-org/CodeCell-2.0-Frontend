@@ -316,6 +316,11 @@ export default function Solve({ params }: PageProps) {
   const handleRun = async (code: string, language: Language, stdin: string) => {
     if (!problemId) return;
 
+    if (isBanned) {
+      setNotice("Your account is suspended, so you cannot run code.");
+      return;
+    }
+
     try {
       setActiveAction("RUN");
       setResultMode("RUN");
@@ -394,6 +399,11 @@ export default function Solve({ params }: PageProps) {
 
   const handleSubmit = async (code: string, language: Language) => {
     if (!problemId) return;
+
+    if (isBanned) {
+      setNotice("Your account is suspended, so you cannot submit solutions.");
+      return;
+    }
 
     try {
       setActiveAction("SUBMIT");

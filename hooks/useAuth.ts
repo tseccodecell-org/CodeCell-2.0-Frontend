@@ -140,13 +140,18 @@ export function useAuth(): UseAuthResult {
 
   const warnings = profile?.warnings ?? [];
 
+  const registered = profile
+    ? profile.is_registered !== false ||
+      Boolean(profile.college_name && profile.year)
+    : false;
+
   return {
     user,
     profile,
     isLoading,
     isAuthenticated: profile !== null,
-    isRegistered: profile ? profile.is_registered !== false : false,
-    isProfileComplete: profile ? profile.is_registered !== false : false,
+    isRegistered: registered,
+    isProfileComplete: registered,
     isBanned: profile?.is_banned === true,
     banReason: profile?.ban_reason ?? "",
     warningCount: profile?.warning_count ?? 0,

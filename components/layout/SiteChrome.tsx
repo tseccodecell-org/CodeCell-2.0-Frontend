@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import FooterWrapper from "@/components/layout/FooterWrapper";
 import InteractiveGrid from "@/components/layout/InteractiveGrid";
 import AccountStatusBanner from "@/components/layout/AccountStatusBanner";
+import NotificationPopup from "@/components/layout/NotificationPopup";
 import RegistrationGate from "@/components/layout/RegistrationGate";
 
 const BARE_ROUTES = ["/events/weekly-challenges/solve"];
@@ -18,6 +19,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
       <RegistrationGate>
         <div className="flex h-screen flex-col">
           <AccountStatusBanner compact />
+          <NotificationPopup />
           <main className="relative z-10 min-h-0 flex-1">{children}</main>
         </div>
       </RegistrationGate>
@@ -29,6 +31,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
       <InteractiveGrid />
       <Navbar />
       <AccountStatusBanner />
+      <NotificationPopup />
       <main className="relative z-10 min-h-screen">{children}</main>
       <FooterWrapper />
     </RegistrationGate>

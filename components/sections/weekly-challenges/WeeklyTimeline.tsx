@@ -224,17 +224,21 @@ export default function WeeklyTimeline() {
                   {isLive && (
                     <button
                       onClick={() => router.push(`/events/weekly-challenges/week/${week.weekId}`)}
-                      className="w-full py-3.5 border border-[#D9A404] bg-[#D9A404]/10 text-[#D9A404] hover:bg-[#D9A404]/20 font-mono text-xs font-black tracking-widest uppercase transition-colors cursor-pointer flex items-center justify-center gap-2 group/btn"
+                      className="w-full py-3 rounded-full text-[#06070B] font-mono text-xs font-black tracking-[0.08em] uppercase cursor-pointer flex items-center justify-center gap-2 group/btn"
+                      style={{
+                        background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+                        boxShadow: "0 0 18px rgba(217,167,4,0.25)",
+                      }}
                     >
                       <span>ENTER BATTLE GROUND</span>
-                      <ArrowRight size={15} className="group-hover/btn:translate-x-1 transition-transform" />
+                      <ArrowRight size={15} className="text-[#06070B]/60 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   )}
 
                   {isDone && (
                     <button
                       onClick={() => router.push(`/events/weekly-challenges/week/${week.weekId}`)}
-                      className="w-full py-3 border border-[#1a1c24] bg-[#0b0d13] text-[#D9A404] hover:border-[#D9A404]/50 hover:bg-[#D9A404]/10 font-mono text-xs font-bold tracking-wider uppercase transition-colors cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-full border border-[#3a3320] bg-[#0d0f14] text-[#D9A404] hover:border-[#D9A404] font-mono text-xs font-bold tracking-[0.08em] uppercase transition-colors cursor-pointer flex items-center justify-center gap-2"
                     >
                       <span>VIEW MATCH ARCHIVE</span>
                       <ArrowRight size={14} />
@@ -244,7 +248,7 @@ export default function WeeklyTimeline() {
                   {isLocked && (
                     <button
                       disabled
-                      className="w-full py-3 border border-[#1a1c24] bg-[#06070B] text-[#5A5850] font-mono text-xs font-semibold tracking-wider uppercase cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-full border border-[#1a1c24] bg-[#0d0f14] text-[#5A5850] font-mono text-xs font-semibold tracking-[0.08em] uppercase cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       <Lock size={13} />
                       <span>UNLOCKS SOON</span>

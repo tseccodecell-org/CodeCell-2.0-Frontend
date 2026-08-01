@@ -27,16 +27,16 @@ export function useLeaderboard({
   weekId,
 }: UseLeaderboardOptions) {
   const { user, isTsecStudent, isAuthenticated } = useAuth();
+  const showToggle = isTsecStudent;
 
-  const [selectedTab, setSelectedTab] = useState<LeaderboardTab>("GLOBAL");
+  // Default to TSEC tab if they are a TSEC student, else GLOBAL
+  const [selectedTab, setSelectedTab] = useState<LeaderboardTab>(showToggle ? "TSEC" : "GLOBAL");
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [forbidden, setForbidden] = useState(false);
   const [unauthorized, setUnauthorized] = useState(false);
   const [refetchToken, setRefetchToken] = useState(0);
-
-  const showToggle = isTsecStudent;
 
   const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);
@@ -72,10 +72,14 @@ export function useLeaderboard({
   }, [fetchLeaderboard, refetchToken]);
 
   useEffect(() => {
-    if (!showToggle && selectedTab === "TSEC") {
+    if (showToggle && selectedTab === "GLOBAL") {
+      // When their TSEC profile loads, instantly move them to the TSEC tab!
+      setSelectedTab("TSEC");
+    } else if (!showToggle && selectedTab === "TSEC") {
+      // If they log out or lose TSEC status, move them back to GLOBAL
       setSelectedTab("GLOBAL");
     }
-  }, [showToggle, selectedTab]);
+  }, [showToggle]);
 
   return {
     data,

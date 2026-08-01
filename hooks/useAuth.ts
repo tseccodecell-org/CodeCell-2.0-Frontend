@@ -100,7 +100,6 @@ interface UseAuthResult {
   isTsecStudent: boolean;
   refresh: () => void;
   logout: () => void;
-  setAuthToken: (token: string) => void;
 }
 
 export function useAuth(): UseAuthResult {
@@ -113,6 +112,11 @@ export function useAuth(): UseAuthResult {
     if (!hasStarted) {
       hasStarted = true;
       clearLegacyTokenCookie();
+      // long lived tokens from the old auth still sit in some browsers, and a
+      // stale one is a second identity. nothing reads them any more, but they
+      // are actively deleted so they stop existing at all
+      localStorage.removeItem(TOKEN_CACHE_KEY);
+      localStorage.removeItem("codecell_token");
       sharedProfile = getCachedProfile();
       loadProfile();
     }
@@ -133,28 +137,6 @@ export function useAuth(): UseAuthResult {
 
     if (typeof window !== "undefined") {
       window.location.href = LOGOUT_URL;
-    }
-  }, []);
-
-  const setAuthToken = useCallback((token: string) => {
-    if (typeof window === "undefined") return;
-    const cleanToken = token.trim().replace(/^Bearer\s+/i, "");
-    localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
-    loadProfile();
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const tokenParam = params.get("token") || params.get("jwt") || params.get("jwt_token");
-    if (tokenParam) {
-      localStorage.setItem(TOKEN_CACHE_KEY, tokenParam);
-      const url = new URL(window.location.href);
-      url.searchParams.delete("token");
-      url.searchParams.delete("jwt");
-      url.searchParams.delete("jwt_token");
-      window.history.replaceState({}, "", url.toString());
-      loadProfile();
     }
   }, []);
 
@@ -189,6 +171,5 @@ export function useAuth(): UseAuthResult {
     isTsecStudent: profile?.is_tsec_user === true,
     refresh,
     logout,
-    setAuthToken,
   };
 }

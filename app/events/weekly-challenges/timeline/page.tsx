@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import LeaderboardButtons from "@/components/sections/leaderboard/LeaderboardButtons";
 import WeeklyTimeline from "@/components/sections/weekly-challenges/WeeklyTimeline";
-import { Users, Trophy, Briefcase } from "lucide-react";
+import { Users, Trophy, Briefcase, Download } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();
@@ -42,8 +42,17 @@ const Page = () => {
       >
         ♚
       </span>
-
-
+      {/* Fixed Install CodeCell Runtime Button - Positioned strictly below Navbar (Navbar is h-20 / 80px) */}
+      <a
+        href="/download"
+        className="fixed top-[96px] right-4 md:right-8 lg:right-12 z-40 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wide text-[#06070B] transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-[0_4px_20px_rgba(217,167,4,0.35)]"
+        style={{
+          background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+        }}
+      >
+        <Download size={14} />
+        <span>Install CodeCell Runtime</span>
+      </a>
 
       <div className="relative z-10 px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto flex flex-col">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 border-b border-[#1a1c24] pb-8 select-none">

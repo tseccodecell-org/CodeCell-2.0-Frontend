@@ -88,10 +88,14 @@ export function useLeaderboard({
   }, [fetchLeaderboard, refetchToken, hasInitTab]);
 
   useEffect(() => {
-    if (!showToggle && selectedTab === "TSEC") {
+    if (showToggle && selectedTab === "GLOBAL") {
+      // When their TSEC profile loads, instantly move them to the TSEC tab!
+      setSelectedTab("TSEC");
+    } else if (!showToggle && selectedTab === "TSEC") {
+      // If they log out or lose TSEC status, move them back to GLOBAL
       setSelectedTab("GLOBAL");
     }
-  }, [showToggle, selectedTab]);
+  }, [showToggle]);
 
   return {
     data,

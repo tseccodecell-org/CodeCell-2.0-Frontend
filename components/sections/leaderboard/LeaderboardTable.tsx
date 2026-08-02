@@ -1,13 +1,11 @@
 // components/LeaderboardTable.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Search,
   Crown,
   Shield,
-  ChevronLeft,
-  ChevronRight,
   Trophy,
   Medal,
   Loader2,
@@ -18,6 +16,7 @@ import {
   Users,
   Flame,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LOGIN_URL } from "@/lib/api-client";
@@ -28,6 +27,28 @@ const PIXEL_FONT_STYLE = `
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 .font-pixel {
   font-family: 'Press Start 2P', monospace;
+}
+@keyframes fadeInRow {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.row-fade-in {
+  animation: fadeInRow 0.3s ease-out forwards;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(10, 10, 10, 0.5);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
 }
 `;
 
@@ -52,9 +73,10 @@ interface LeaderboardTableProps {
   error: string | null;
   forbidden: boolean;
   unauthorized: boolean;
-  page: number;
-  hasNext: boolean;
-  onPageChange: (page: number) => void;
+  /** The specific row for the logged-in user, persisted across tabs */
+  currentUserRow?: LeaderboardRow;
+  /** Real total from backend (may be larger than rows.length) */
+  totalCount?: number;
   /** rendered next to the title, e.g. the TSEC/Other toggle */
   controls?: React.ReactNode;
 }
@@ -195,6 +217,73 @@ function PodiumCard({
   );
 }
 
+/* ── Your Rank Card (LeetCode-style) ── */
+function YourRankCard({ row }: { row: LeaderboardRow }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.15 }}
+      className="mb-8 select-none"
+    >
+      <div className="relative rounded-xl border border-[#D4AF37]/40 bg-gradient-to-r from-[#D4AF37]/10 via-[#0A0A0A] to-[#D4AF37]/10 backdrop-blur-md p-4 md:p-5 shadow-[0_0_30px_rgba(212,175,55,0.12)] overflow-hidden">
+        {/* Subtle shimmer overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/5 to-transparent animate-pulse pointer-events-none" />
+
+        <div className="relative z-10 flex items-center justify-between gap-4">
+          {/* Left: Icon + Label */}
+          <div className="flex items-center gap-3.5">
+           
+            <div className="flex flex-col">
+              <span className="font-mono text-[9px] text-[#D4AF37] tracking-[0.25em] uppercase font-bold">
+                YOUR RANKING
+              </span>
+              <span className="font-sans text-sm md:text-base font-bold text-[#F0EDE6] truncate max-w-[180px] md:max-w-none">
+                {row.name}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: Rank + Stats */}
+          <div className="flex items-center gap-4 md:gap-6">
+            {/* Score */}
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="font-mono text-[9px] text-[#5A5850] tracking-wider uppercase">
+                {row.primaryLabel}
+              </span>
+              <span className="font-mono text-base md:text-lg font-extrabold text-[#F0EDE6]">
+                {row.primaryValue.toLocaleString()}
+              </span>
+            </div>
+
+            {/* Secondary stat */}
+            {row.secondaryValue > 0 && (
+              <div className="hidden md:flex flex-col items-end">
+                <span className="font-mono text-[9px] text-[#5A5850] tracking-wider uppercase">
+                  {row.secondaryLabel}
+                </span>
+                <span className="font-mono text-sm font-bold text-[#8A8880]">
+                  {row.secondaryValue.toLocaleString()}
+                </span>
+              </div>
+            )}
+
+            {/* Rank badge */}
+            <div className="flex flex-col items-center px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30 min-w-[56px]">
+              <span className="font-mono text-[8px] text-[#D4AF37] tracking-widest uppercase">
+                RANK
+              </span>
+              <span className="font-mono text-lg md:text-xl font-black text-[#D4AF37]">
+                #{row.rank}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function LeaderboardTable({
   title,
   eyebrow,
@@ -204,21 +293,28 @@ export default function LeaderboardTable({
   error,
   forbidden,
   unauthorized,
-  page,
-  hasNext,
-  onPageChange,
+  currentUserRow,
+  totalCount,
   controls,
 }: LeaderboardTableProps) {
   const [search, setSearch] = useState("");
+  const [visibleCount, setVisibleCount] = useState(25);
+  const prevVisibleRef = useRef(25);
 
   const filteredRows = rows.filter((row) =>
     row.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const top3 = rows.slice(0, 3);
-  const showPodium = search.length === 0 && page === 1 && top3.length === 3;
-  const tableRows = search.length > 0 ? filteredRows : rows;
+  const showPodium = search.length === 0 && top3.length === 3;
 
+  // When searching, show all filtered results. Otherwise, progressive reveal.
+  const isSearching = search.length > 0;
+  const tableRows = isSearching ? filteredRows : rows.slice(0, visibleCount);
+  const canShowMore = !isSearching && visibleCount < rows.length;
+  const remaining = rows.length - visibleCount;
+
+  const displayTotal = totalCount ?? rows.length;
   const highestScore = rows.length > 0 ? Math.max(...rows.map((r) => r.primaryValue)) : 0;
   const topContestant = rows[0]?.name || "N/A";
 
@@ -284,7 +380,7 @@ export default function LeaderboardTable({
                   ACTIVE CONTESTANTS
                 </span>
                 <span className="font-mono text-xl font-bold text-[#F0EDE6]">
-                  {rows.length}
+                  {displayTotal.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -401,7 +497,7 @@ export default function LeaderboardTable({
                 UNABLE TO LOAD RANKINGS
               </span>
               <span className="text-[10px] text-[#5A5850] mt-2 max-w-sm">
-                {error}
+                {error === "No active week found and no week_id provided" ? "No active week" : error}
               </span>
             </motion.div>
           )}
@@ -446,6 +542,11 @@ export default function LeaderboardTable({
           )}
         </AnimatePresence>
 
+        {/* ── Your Rank Card (LeetCode-style) ── */}
+        {!unauthorized && !forbidden && !error && !isLoading && currentUserRow && (
+          <YourRankCard row={currentUserRow} />
+        )}
+
         {/* ── Search Bar & Filter Summary ── */}
         {!unauthorized && !forbidden && !error && !isLoading && rows.length > 0 && (
           <motion.div
@@ -475,7 +576,9 @@ export default function LeaderboardTable({
 
             <div className="flex items-center gap-3">
               <span className="font-mono text-[10px] text-[#5A5850] tracking-wider uppercase bg-[#0A0A0A] px-3 py-1.5 rounded-lg border border-[#1E1E1E]">
-                {search ? `${filteredRows.length} MATCHING` : `${rows.length} RANKED`}
+                {isSearching
+                  ? `${filteredRows.length} MATCHING`
+                  : `SHOWING ${Math.min(visibleCount, rows.length)} OF ${displayTotal.toLocaleString()} RANKED`}
               </span>
             </div>
           </motion.div>
@@ -487,12 +590,12 @@ export default function LeaderboardTable({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="rounded-2xl border border-[#1E1E1E] bg-[#0A0A0A]/90 backdrop-blur-md overflow-hidden shadow-2xl"
+            className="rounded-2xl border border-[#1E1E1E] bg-[#0A0A0A]/90 backdrop-blur-md overflow-hidden shadow-2xl flex flex-col"
           >
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-sans text-sm">
-                <thead>
-                  <tr className="border-b border-[#1A1A1A] bg-[#050505]/80 select-none">
+            <div className="overflow-x-auto overflow-y-auto max-h-[550px] custom-scrollbar">
+              <table className="w-full text-left font-sans text-sm relative">
+                <thead className="sticky top-0 z-20">
+                  <tr className="border-b border-[#1A1A1A] bg-[#050505]/95 backdrop-blur-sm select-none">
                     <th className="py-4 pl-6 pr-3 font-mono text-[10px] font-semibold text-[#5A5850] tracking-[0.2em] uppercase w-20">
                       RANK
                     </th>
@@ -510,6 +613,7 @@ export default function LeaderboardTable({
                 <tbody>
                   {tableRows.map((row, i) => {
                     const isTop3 = row.rank <= 3;
+                    const isCurrentUser = currentUserRow && String(row.id) === String(currentUserRow.id);
                     const rankColors: Record<number, string> = {
                       1: "text-[#D4AF37]",
                       2: "text-[#C0C0C0]",
@@ -525,15 +629,22 @@ export default function LeaderboardTable({
                     const avatarStyle =
                       avatarBg[row.rank] ?? "from-[#181818] to-[#101010] border-[#222222] text-[#A0A0A0]";
 
+                    // Only animate rows that are newly revealed
+                    const isNewRow = i >= prevVisibleRef.current;
+
                     return (
-                      <motion.tr
+                      <tr
                         key={row.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className={`border-b border-[#121212] transition-all duration-200 group cursor-default ${
-                          isTop3 ? "hover:bg-[#111111]" : "hover:bg-[#0E0E0E]"
+                        className={`border-b border-[#121212] transition-colors duration-200 group cursor-default ${
+                          isNewRow ? "row-fade-in" : ""
+                        } ${
+                          isCurrentUser
+                            ? "bg-[#D4AF37]/[0.07] hover:bg-[#D4AF37]/[0.12] border-l-2 border-l-[#D4AF37]/60"
+                            : isTop3
+                            ? "hover:bg-[#111111]"
+                            : "hover:bg-[#0E0E0E]"
                         }`}
+                        style={isNewRow ? { animationDelay: `${(i - prevVisibleRef.current) * 0.04}s` } : undefined}
                       >
                         {/* Rank Column */}
                         <td className="py-4 pl-6 pr-3 font-mono text-xs font-bold">
@@ -554,8 +665,17 @@ export default function LeaderboardTable({
                               {row.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="flex flex-col">
-                              <span className="font-sans text-sm font-semibold text-[#F0EDE6] group-hover:text-[#D4AF37] transition-colors duration-200">
+                              <span className={`font-sans text-sm font-semibold transition-colors duration-200 ${
+                                isCurrentUser
+                                  ? "text-[#D4AF37]"
+                                  : "text-[#F0EDE6] group-hover:text-[#D4AF37]"
+                              }`}>
                                 {row.name}
+                                {isCurrentUser && (
+                                  <span className="ml-2 text-[9px] font-mono text-[#D4AF37]/70 tracking-wider">
+                                    (YOU)
+                                  </span>
+                                )}
                               </span>
                             </div>
                           </div>
@@ -578,7 +698,7 @@ export default function LeaderboardTable({
                             {row.secondaryValue.toLocaleString()}
                           </span>
                         </td>
-                      </motion.tr>
+                      </tr>
                     );
                   })}
                 </tbody>
@@ -595,25 +715,21 @@ export default function LeaderboardTable({
               </div>
             )}
 
-            {/* Pagination Controls */}
-            {search.length === 0 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t border-[#1A1A1A] bg-[#050505]/60 font-mono text-[10px] text-[#5A5850] tracking-wider select-none">
+            {/* Show More Button */}
+            {canShowMore && (
+              <div className="flex items-center justify-center px-6 py-5 border-t border-[#1A1A1A] bg-[#050505]/60">
                 <button
-                  onClick={() => onPageChange(Math.max(1, page - 1))}
-                  disabled={page === 1}
-                  className="flex items-center gap-1.5 disabled:opacity-20 hover:text-[#D4AF37] transition-colors px-3.5 py-1.5 rounded-lg hover:bg-[#D4AF37]/10 disabled:hover:bg-transparent disabled:hover:text-[#5A5850] cursor-pointer"
+                  onClick={() => {
+                    prevVisibleRef.current = visibleCount;
+                    setVisibleCount((prev) => prev + 25);
+                  }}
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/[0.08] hover:bg-[#D4AF37]/[0.15] text-[#D4AF37] font-mono text-[11px] font-bold tracking-widest hover:shadow-[0_0_20px_rgba(212,175,55,0.15)] transition-all duration-300 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <ChevronLeft size={14} /> PREV
-                </button>
-                <span className="text-[#6A6860]">
-                  PAGE <span className="text-[#D4AF37] font-bold">{page}</span>
-                </span>
-                <button
-                  onClick={() => onPageChange(page + 1)}
-                  disabled={!hasNext}
-                  className="flex items-center gap-1.5 disabled:opacity-20 hover:text-[#D4AF37] transition-colors px-3.5 py-1.5 rounded-lg hover:bg-[#D4AF37]/10 disabled:hover:bg-transparent disabled:hover:text-[#5A5850] cursor-pointer"
-                >
-                  NEXT <ChevronRight size={14} />
+                  <ChevronDown size={14} />
+                  SHOW MORE
+                  <span className="text-[#D4AF37]/60 ml-1">
+                    ({Math.min(remaining, 25)} MORE)
+                  </span>
                 </button>
               </div>
             )}

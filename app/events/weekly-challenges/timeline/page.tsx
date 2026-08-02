@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import LeaderboardButtons from "@/components/sections/leaderboard/LeaderboardButtons";
 import WeeklyTimeline from "@/components/sections/weekly-challenges/WeeklyTimeline";
-import { Users, Trophy, Briefcase } from "lucide-react";
+import { Users, Trophy, Briefcase, Download } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();
@@ -42,6 +42,18 @@ const Page = () => {
       >
         ♚
       </span>
+
+      <a
+        href="/download"
+        className="fixed top-5 right-4 md:right-8 lg:right-12 z-50 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wide text-[#06070B] transition-transform hover:scale-[1.03]"
+        style={{
+          background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+          boxShadow: "0 0 18px rgba(217,167,4,0.25)",
+        }}
+      >
+        <Download size={14} />
+        Install CodeCell Runtime
+      </a>
 
       <div className="relative z-10 px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto flex flex-col">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 border-b border-[#1a1c24] pb-8 select-none">

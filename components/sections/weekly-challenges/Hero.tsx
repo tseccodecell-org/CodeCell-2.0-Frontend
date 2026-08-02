@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Playfair_Display } from "next/font/google";
+import Link from "next/link";
+import { Download } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import LoginCard from "../login/LoginCard";
 

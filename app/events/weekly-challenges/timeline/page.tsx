@@ -42,22 +42,10 @@ const Page = () => {
       >
         ♚
       </span>
-      {/* Sticky Install Runtime Sub-bar — sits in normal flow below navbar, sticks on scroll */}
-      <div className="sticky top-20 z-40 flex justify-end px-6 md:px-12 lg:px-24 py-3">
-        <a
-          href="/download"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wide text-[#06070B] transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
-          style={{
-            background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
-            boxShadow: "0 4px 20px rgba(217,167,4,0.35)",
-          }}
-        >
-          <Download size={14} />
-          <span>Install CodeCell Runtime</span>
-        </a>
-      </div>
 
+      {/* Main Content Area */}
       <div className="relative z-10 px-6 py-12 md:px-12 lg:px-24 max-w-7xl mx-auto flex flex-col">
+        {/* Header Section with Title & Action Buttons */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 border-b border-[#1a1c24] pb-8 select-none">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -74,11 +62,24 @@ const Page = () => {
             </p>
           </div>
 
-          <div className="shrink-0">
+          {/* Action Buttons Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+            <a
+              href="/download"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wide text-[#06070B] transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-lg"
+              style={{
+                background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+                boxShadow: "0 4px 20px rgba(217,167,4,0.35)",
+              }}
+            >
+              <Download size={14} />
+              <span>Install CodeCell Runtime</span>
+            </a>
             <LeaderboardButtons />
           </div>
         </div>
 
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12 select-none">
           <div className="border border-[#1a1c24] border-t-2 border-t-[#D9A404]/40 bg-[#0b0d13] p-5 flex items-center gap-4">
             <div className="w-11 h-11 border border-[#D9A404]/30 flex items-center justify-center text-[#D9A404] shrink-0">
@@ -133,6 +134,20 @@ const Page = () => {
         </div>
 
         <WeeklyTimeline />
+      </div>
+
+      {/* Fixed Floating Install Runtime Button at Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <a
+          href="/download"
+          className="relative flex items-center gap-2.5 px-5 py-3.5 rounded-full text-xs font-mono font-black uppercase tracking-wider text-[#06070B] transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_30px_rgba(217,167,4,0.6)] hover:shadow-[0_0_45px_rgba(217,167,4,0.9)] ring-2 ring-[#F5C451]/50 animate-pulse"
+          style={{
+            background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+          }}
+        >
+          <Download size={16} />
+          <span>Install CodeCell Runtime</span>
+        </a>
       </div>
     </div>
   );

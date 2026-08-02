@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+
 import {
     User, School, BookOpen, MapPin,
-    ArrowLeft, Send, CheckCircle2, AlertTriangle, ArrowRight
+    ArrowLeft, Send, CheckCircle2, AlertTriangle
 } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { LOGIN_URL } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
 export function RegistrationForm() {
-    const { data: session, status } = useSession();
-    const { profile, refresh: refreshAuth } = useAuth();
+    const { profile, isAuthenticated, isLoading, refresh } = useAuth();
+    const router = useRouter();
     const [activeStep, setActiveStep] = useState(1);
     const [submitError, setSubmitError] = useState("");
     const [formData, setFormData] = useState({
@@ -85,38 +85,31 @@ export function RegistrationForm() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
-                    collegeName: formData.collegeName,
+                    name: formData.fullName,
+                    college_name: formData.collegeName,
+                    year: formData.yearOfStudy,
                     course: formData.course,
-                    yearOfStudy: formData.yearOfStudy,
                     location: formData.location,
                 }),
             });
 
-            if (response.status === 409) {
-                const data = await response.json();
-                setSubmitError(data.error);
+            const body = await response.json().catch(() => null);
+
+            if (!response.ok || body?.success === false) {
+                setSubmitError(
+                    body?.error?.message ||
+                    (response.status === 401
+                        ? "Your sign in has expired. Please sign in with Google again."
+                        : "Registration failed. Please try again.")
+                );
                 return;
             }
 
-            // Save registration state locally
-            const rawEmail = session?.user?.email || profile?.email || "";
-            const lowerEmail = rawEmail.trim().toLowerCase();
-
-            localStorage.setItem("codecell_is_registered", "true");
-            localStorage.setItem("codecell_registered", JSON.stringify(formData));
-
-            if (lowerEmail) {
-                localStorage.setItem(`codecell_is_registered_${lowerEmail}`, "true");
-                localStorage.setItem(`codecell_registered_${lowerEmail}`, JSON.stringify(formData));
-            }
-            if (rawEmail && rawEmail !== lowerEmail) {
-                localStorage.setItem(`codecell_is_registered_${rawEmail}`, "true");
-                localStorage.setItem(`codecell_registered_${rawEmail}`, JSON.stringify(formData));
-            }
-
-            refreshAuth();
             setIsRegistered(true);
+            refresh();
+            setTimeout(() => router.replace("/events/weekly-challenges/timeline"), 2500);
         } catch (err) {
             console.error(err);
             setSubmitError("Something went wrong. Please try again.");
@@ -125,68 +118,17 @@ export function RegistrationForm() {
         }
     };
 
-    const userEmail = session?.user?.email || profile?.email;
-    const userName = session?.user?.name || profile?.username || "";
-
     useEffect(() => {
-        if (!userEmail && status !== "authenticated") return;
-
-        const rawEmail = userEmail || "";
-        const lowerEmail = rawEmail.trim().toLowerCase();
-
-        const storedReg =
-            (lowerEmail ? localStorage.getItem(`codecell_registered_${lowerEmail}`) : null) ||
-            (rawEmail ? localStorage.getItem(`codecell_registered_${rawEmail}`) : null) ||
-            localStorage.getItem("codecell_registered");
-
-        const isReg =
-            localStorage.getItem("codecell_is_registered") === "true" ||
-            (lowerEmail ? localStorage.getItem(`codecell_is_registered_${lowerEmail}`) === "true" : false) ||
-            (rawEmail ? localStorage.getItem(`codecell_is_registered_${rawEmail}`) === "true" : false) ||
-            Boolean(storedReg);
-
-        if (isReg) {
-            setIsRegistered(true);
-            if (storedReg) {
-                try {
-                    const parsed = JSON.parse(storedReg);
-                    setFormData((prev) => {
-                        const newName = userName || parsed.fullName || prev.fullName;
-                        const newCollege = parsed.collegeName || prev.collegeName;
-                        const newCourse = parsed.course || prev.course;
-                        const newYear = parsed.yearOfStudy || prev.yearOfStudy;
-                        const newLoc = parsed.location || prev.location;
-
-                        if (
-                            prev.fullName === newName &&
-                            prev.collegeName === newCollege &&
-                            prev.course === newCourse &&
-                            prev.yearOfStudy === newYear &&
-                            prev.location === newLoc
-                        ) {
-                            return prev;
-                        }
-
-                        return {
-                            fullName: newName,
-                            collegeName: newCollege,
-                            course: newCourse,
-                            yearOfStudy: newYear,
-                            location: newLoc,
-                        };
-                    });
-                } catch {}
-            }
-        } else if (status === "authenticated") {
+        if (isAuthenticated) {
             setActiveStep(2);
-            if (userName) {
-                setFormData((prev) => {
-                    if (prev.fullName === userName) return prev;
-                    return { ...prev, fullName: userName };
-                });
-            }
+            setFormData((prev) => ({
+                ...prev,
+                fullName: prev.fullName || profile?.name || "",
+            }));
+        } else if (!isLoading) {
+            setActiveStep(1);
         }
-    }, [userEmail, userName, status]);
+    }, [isAuthenticated, isLoading, profile]);
 
     return (
         <div className="w-full max-w-xl mx-auto px-4 md:px-6">
@@ -245,15 +187,6 @@ export function RegistrationForm() {
                                 </p>
                             </div>
 
-                            {/* GO TO TIMELINE CTA */}
-                            <Link
-                                href="/events/weekly-challenges/timeline"
-                                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F5E6A3] to-[#eab308] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] text-[#0d0d0d] font-bold text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2.5 cursor-pointer transform active:scale-[0.98]"
-                            >
-                                <span>Go to Timeline</span>
-                                <ArrowRight className="w-4 h-4 text-[#0d0d0d]" />
-                            </Link>
-
                             {/* WhatsApp Group Invite CTA */}
                             <div className="w-full relative group/wa p-[1px] rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.15)] hover:shadow-[0_0_25px_rgba(37,211,102,0.35)] transition-all duration-300">
                                 <a
@@ -278,9 +211,9 @@ export function RegistrationForm() {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#4BE2C4]/10 to-[#E8FF00]/10 rounded-full blur-2xl pointer-events-none" />
 
                                 <div className="flex items-center gap-3.5 border-b border-zinc-800/80 pb-4 relative z-10">
-                                    {session?.user?.image ? (
+                                    {false ? (
                                         <img
-                                            src={session.user.image}
+                                            src=""
                                             alt={formData.fullName}
                                             className="w-10 h-10 rounded-full border border-zinc-800"
                                         />
@@ -291,26 +224,26 @@ export function RegistrationForm() {
                                     )}
                                     <div>
                                         <h4 className="font-bold text-white text-sm leading-snug">{formData.fullName}</h4>
-                                        <span className="text-xs text-zinc-455">{session?.user?.email}</span>
+                                        <span className="text-xs text-zinc-400">{profile?.email}</span>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs relative z-10">
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Institution</span>
-                                        <span className="font-medium text-zinc-200">{formData.collegeName || "N/A"}</span>
+                                        <span className="font-medium text-zinc-200">{formData.collegeName}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Course / Major</span>
-                                        <span className="font-medium text-zinc-200">{formData.course || "N/A"}</span>
+                                        <span className="font-medium text-zinc-200">{formData.course}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Year of Study</span>
-                                        <span className="font-medium text-zinc-200">{formData.yearOfStudy ? `${formData.yearOfStudy} Year` : "N/A"}</span>
+                                        <span className="font-medium text-zinc-200">{formData.yearOfStudy} Year</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-0.5">Location</span>
-                                        <span className="font-medium text-zinc-200">{formData.location || "N/A"}</span>
+                                        <span className="font-medium text-zinc-200">{formData.location}</span>
                                     </div>
                                 </div>
                             </div>
@@ -332,9 +265,11 @@ export function RegistrationForm() {
                                         </p>
                                     </div>
 
+
+
                                     <button
                                         type="button"
-                                        onClick={() => signIn("google", { callbackUrl: "/register" }).catch(() => (window.location.href = LOGIN_URL))}
+                                        onClick={() => (window.location.href = LOGIN_URL)}
                                         className="w-full max-w-sm flex items-center justify-center gap-3 rounded-xl border border-zinc-800 bg-[#141414] hover:border-zinc-700 hover:bg-[#1a1a1a] py-3.5 px-5 transition-all duration-300 cursor-pointer shadow-md"
                                     >
                                         <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48">
@@ -371,24 +306,24 @@ export function RegistrationForm() {
                                 <div className="space-y-5">
 
                                     {/* Linked Account Banner */}
-                                    {session?.user && (
+                                    {profile && (
                                         <div className="flex items-center gap-3.5 bg-[#141414]/90 border border-zinc-800/80 rounded-2xl p-3.5 mb-4 relative overflow-hidden">
                                             <div className="absolute right-0 top-0 w-16 h-16 bg-[#4BE2C4]/5 rounded-full blur-xl pointer-events-none" />
-                                            {session.user.image ? (
+                                            {false ? (
                                                 <img
-                                                    src={session.user.image}
-                                                    alt={session.user.name || "Avatar"}
+                                                    src=""
+                                                    alt="Avatar"
                                                     className="w-10 h-10 rounded-full border border-zinc-800"
                                                 />
                                             ) : (
                                                 <div className="w-10 h-10 rounded-full bg-[#4BE2C4]/10 border border-[#4BE2C4]/20 flex items-center justify-center text-[#4BE2C4] font-bold text-sm">
-                                                    {session.user.name ? session.user.name[0].toUpperCase() : "U"}
+                                                    {profile.name ? profile.name[0].toUpperCase() : "U"}
                                                 </div>
                                             )}
                                             <div className="flex flex-col min-w-0">
                                                 <span className="text-[9px] text-[#4BE2C4] uppercase font-bold tracking-wider block">Verified Account</span>
-                                                <span className="text-xs font-bold text-zinc-100 truncate pr-2 mt-0.5">{session.user.name}</span>
-                                                <span className="text-[10px] text-zinc-400 truncate leading-none mt-1">{session.user.email}</span>
+                                                <span className="text-xs font-bold text-zinc-100 truncate pr-2 mt-0.5">{profile.name || profile.username}</span>
+                                                <span className="text-[10px] text-zinc-400 truncate leading-none mt-1">{profile.email}</span>
                                             </div>
                                         </div>
                                     )}

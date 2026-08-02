@@ -53,7 +53,12 @@ export function useLeaderboard({
       setData(json);
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 401 && !isAuthenticated) {
+        if (err.status === 403) {
+          setForbidden(true);
+          setData(null);
+          return;
+        }
+        if (err.status === 401) {
           setUnauthorized(true);
           setData(null);
           return;
@@ -65,7 +70,7 @@ export function useLeaderboard({
     } finally {
       setIsLoading(false);
     }
-  }, [kind, user?.role, selectedTab, page, limit, weekId, isAuthenticated]);
+  }, [kind, user?.role, selectedTab, page, limit, weekId]);
 
   useEffect(() => {
     fetchLeaderboard();

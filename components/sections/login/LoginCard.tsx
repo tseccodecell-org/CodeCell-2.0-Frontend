@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 import { LOGIN_URL } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -42,7 +41,7 @@ export default function LoginCard() {
 
   return (
     <button
-      onClick={() => signIn("google", { callbackUrl: "/register" }).catch(() => (window.location.href = LOGIN_URL))}
+      onClick={() => (window.location.href = LOGIN_URL)}
       className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-black border-2 border-[#f59e0b] text-[#f59e0b] font-mono font-black text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] hover:bg-[#f59e0b]/10 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center gap-3 group"
     >
       <span>LOGIN</span>

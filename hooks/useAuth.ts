@@ -1,15 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
-import { getProfile } from "@/lib/api-client";
-import type { UserProfile } from "@/lib/api-client";
+import { getProfile, LOGOUT_URL } from "@/lib/api-client";
+import type { ProfileWarning, UserProfile } from "@/lib/api-client";
 import { AuthUser, UserRole } from "@/lib/types/leaderboard";
 
 const PROFILE_CACHE_KEY = "codecell_user_profile";
 const TOKEN_CACHE_KEY = "jwt_token";
 
-/** Read cached profile from localStorage */
 function getCachedProfile(): UserProfile | null {
   if (typeof window === "undefined") return null;
   try {
@@ -21,7 +19,6 @@ function getCachedProfile(): UserProfile | null {
   }
 }
 
-/** Write profile to localStorage */
 function setCachedProfile(profile: UserProfile | null) {
   if (typeof window === "undefined") return;
   try {
@@ -31,21 +28,61 @@ function setCachedProfile(profile: UserProfile | null) {
       localStorage.removeItem(PROFILE_CACHE_KEY);
     }
   } catch {
-    // localStorage may be full or disabled — silently ignore
+    return;
   }
 }
 
-/** Check if JWT token exists in cookies or localStorage */
-function hasAuthToken(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const token = localStorage.getItem(TOKEN_CACHE_KEY) || localStorage.getItem("codecell_token");
-    if (token) return true;
-    if (document.cookie.includes("jwt_token=")) return true;
-    return false;
-  } catch {
-    return false;
-  }
+function clearLegacyTokenCookie() {
+  if (typeof window === "undefined") return;
+  if (!document.cookie.includes("jwt_token=")) return;
+  document.cookie = "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+}
+
+function clearStoredSession() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(PROFILE_CACHE_KEY);
+  localStorage.removeItem(TOKEN_CACHE_KEY);
+  localStorage.removeItem("codecell_token");
+  clearLegacyTokenCookie();
+}
+
+let sharedProfile: UserProfile | null = null;
+let sharedLoading = true;
+let sharedError: string | null = null;
+let hasStarted = false;
+let inFlight: Promise<void> | null = null;
+
+const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((fn) => fn());
+}
+
+function loadProfile(): Promise<void> {
+  if (inFlight) return inFlight;
+
+  sharedLoading = true;
+  notify();
+
+  inFlight = (async () => {
+    try {
+      const data = await getProfile();
+      sharedProfile = data;
+      setCachedProfile(data);
+      if (!data) clearStoredSession();
+      sharedError = null;
+    } catch (err) {
+      sharedProfile = null;
+      clearStoredSession();
+      sharedError = err instanceof Error ? err.message : "Could not load your profile.";
+    } finally {
+      sharedLoading = false;
+      inFlight = null;
+      notify();
+    }
+  })();
+
+  return inFlight;
 }
 
 interface UseAuthResult {
@@ -53,163 +90,86 @@ interface UseAuthResult {
   profile: UserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isRegistered: boolean;
   isProfileComplete: boolean;
+  isBanned: boolean;
+  banReason: string;
+  warningCount: number;
+  latestWarning: ProfileWarning | null;
   error: string | null;
   isTsecStudent: boolean;
   refresh: () => void;
   logout: () => void;
-  setAuthToken: (token: string) => void;
 }
 
 export function useAuth(): UseAuthResult {
-  const { data: session, status: sessionStatus } = useSession();
-  const [profile, setProfile] = useState<UserProfile | null>(getCachedProfile);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
+  const [, setVersion] = useState(0);
 
-  const refresh = useCallback(() => setTick((t) => t + 1), []);
+  useEffect(() => {
+    const rerender = () => setVersion((v) => v + 1);
+    listeners.add(rerender);
 
-  const logout = useCallback(() => {
-    setCachedProfile(null);
-    if (typeof window !== "undefined") {
+    if (!hasStarted) {
+      hasStarted = true;
+      clearLegacyTokenCookie();
+      // long lived tokens from the old auth still sit in some browsers, and a
+      // stale one is a second identity. nothing reads them any more, but they
+      // are actively deleted so they stop existing at all
       localStorage.removeItem(TOKEN_CACHE_KEY);
       localStorage.removeItem("codecell_token");
-      localStorage.removeItem("codecell_is_registered");
-      document.cookie = "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      sharedProfile = getCachedProfile();
+      loadProfile();
     }
-    setProfile(null);
-    nextAuthSignOut({ redirect: false });
-  }, []);
-
-  const setAuthToken = useCallback(
-    (token: string) => {
-      if (typeof window !== "undefined") {
-        const cleanToken = token.trim().replace(/^Bearer\s+/i, "");
-        localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
-        localStorage.setItem("codecell_token", cleanToken);
-        document.cookie = `jwt_token=${cleanToken}; path=/; max-age=31536000;`;
-        refresh();
-      }
-    },
-    [refresh]
-  );
-
-  // Parse URL parameters for ?token=... or ?jwt_token=... on mount
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const tokenParam = params.get("token") || params.get("jwt") || params.get("jwt_token") || params.get("access_token");
-    if (tokenParam) {
-      const cleanToken = tokenParam.trim().replace(/^Bearer\s+/i, "");
-      localStorage.setItem(TOKEN_CACHE_KEY, cleanToken);
-      localStorage.setItem("codecell_token", cleanToken);
-      document.cookie = `jwt_token=${cleanToken}; path=/; max-age=31536000;`;
-      const url = new URL(window.location.href);
-      url.searchParams.delete("token");
-      url.searchParams.delete("jwt");
-      url.searchParams.delete("jwt_token");
-      url.searchParams.delete("access_token");
-      window.history.replaceState({}, "", url.toString());
-      refresh();
-    }
-  }, [refresh]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadUser() {
-      setIsLoading(true);
-      try {
-        const data = await getProfile();
-        if (cancelled) return;
-        setProfile(data);
-        if (data) setCachedProfile(data);
-        setError(null);
-      } catch (err) {
-        if (cancelled) return;
-        setError(null);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    }
-
-    loadUser();
 
     return () => {
-      cancelled = true;
+      listeners.delete(rerender);
     };
-  }, [tick]);
+  }, []);
 
-  const tokenPresent = hasAuthToken();
+  const refresh = useCallback(() => {
+    loadProfile();
+  }, []);
 
-  // NextAuth fallback profile if NextAuth session exists or token exists
-  const fallbackUser: UserProfile | null = (session?.user || tokenPresent)
+  const logout = useCallback(() => {
+    clearStoredSession();
+    sharedProfile = null;
+    notify();
+
+    if (typeof window !== "undefined") {
+      window.location.href = LOGOUT_URL;
+    }
+  }, []);
+
+  const profile = sharedProfile;
+
+  const user: AuthUser | null = profile
     ? {
-        id: 1,
-        username: session?.user?.name || session?.user?.email?.split("@")[0] || "Contestant",
-        email: session?.user?.email || "",
-        rating: 1400,
-        total_problems_solved: 0,
-        college_name: "",
-        year: "",
-        is_tsec_user: session?.user?.email?.endsWith("@tsec.edu") || session?.user?.email?.includes("tsec") || false,
+        id: profile.id,
+        name: profile.name || profile.username,
+        role: profile.is_tsec_user ? UserRole.TSEC : UserRole.OTHER,
       }
     : null;
 
-  const activeProfile = profile || fallbackUser;
+  const warnings = profile?.warnings ?? [];
 
-  // Check if Step 2 registration has been completed for this specific user
-  let isProfileComplete = false;
-  if (typeof window !== "undefined") {
-    const rawEmail = activeProfile?.email || session?.user?.email;
-    const email = rawEmail ? rawEmail.trim().toLowerCase() : "";
-
-    const hasGlobalFlag = localStorage.getItem("codecell_is_registered") === "true";
-    const hasGlobalDetails = Boolean(localStorage.getItem("codecell_registered"));
-
-    const hasEmailFlag = email
-      ? localStorage.getItem(`codecell_is_registered_${email}`) === "true" ||
-        (rawEmail ? localStorage.getItem(`codecell_is_registered_${rawEmail}`) === "true" : false)
-      : false;
-
-    const hasEmailDetails = email
-      ? Boolean(localStorage.getItem(`codecell_registered_${email}`)) ||
-        (rawEmail ? Boolean(localStorage.getItem(`codecell_registered_${rawEmail}`)) : false)
-      : false;
-
-    const hasProfileCollege = Boolean(activeProfile?.college_name || (activeProfile as any)?.college);
-    const isProfileRegistered = Boolean(profile?.is_registered);
-
-    isProfileComplete =
-      hasEmailFlag ||
-      hasEmailDetails ||
-      hasGlobalFlag ||
-      hasGlobalDetails ||
-      hasProfileCollege ||
-      isProfileRegistered;
-  }
-
-  const user: AuthUser | null = activeProfile
-    ? {
-        id: activeProfile.id,
-        name: activeProfile.username,
-        role: activeProfile.is_tsec_user ? UserRole.TSEC : UserRole.OTHER,
-      }
-    : null;
-
-  const isSessionLoading = isLoading && sessionStatus === "loading";
+  const registered = profile
+    ? profile.is_registered !== false || Boolean(profile.college_name && profile.year)
+    : false;
 
   return {
     user,
-    profile: activeProfile,
-    isLoading: isSessionLoading,
-    isAuthenticated: Boolean(activeProfile),
-    isProfileComplete,
-    error,
-    isTsecStudent: !isSessionLoading && user?.role === UserRole.TSEC,
+    profile,
+    isLoading: sharedLoading,
+    isAuthenticated: profile !== null,
+    isRegistered: registered,
+    isProfileComplete: registered,
+    isBanned: profile?.is_banned === true,
+    banReason: profile?.ban_reason ?? "",
+    warningCount: profile?.warning_count ?? 0,
+    latestWarning: warnings.length > 0 ? warnings[0] : null,
+    error: sharedError,
+    isTsecStudent: profile?.is_tsec_user === true,
     refresh,
     logout,
-    setAuthToken,
   };
 }

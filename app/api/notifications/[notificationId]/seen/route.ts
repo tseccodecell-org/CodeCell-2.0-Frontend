@@ -2,26 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.tseccodecell.com";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string[] }> }
-) {
-  const { slug } = await params;
-
-  if (!API_BASE) {
-    return NextResponse.json(
-      { error: "API base URL is not configured" },
-      { status: 500 }
-    );
-  }
-
-  const backendPath = `/weeks/${slug.join("/")}`;
-  const search = req.nextUrl.searchParams.toString();
-  const url = `${API_BASE}${backendPath}${search ? `?${search}` : ""}`;
-
-  const headers: Record<string, string> = {
-    Accept: "application/json",
-  };
+function forwardedHeaders(req: NextRequest): Record<string, string> {
+  const headers: Record<string, string> = { Accept: "application/json" };
 
   const cookie = req.headers.get("cookie");
   const authHeader = req.headers.get("authorization");
@@ -29,8 +11,25 @@ export async function GET(
   if (cookie) headers["Cookie"] = cookie;
   if (authHeader) headers["Authorization"] = authHeader;
 
+  return headers;
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ notificationId: string }> }
+) {
+  const { notificationId } = await params;
+
   try {
-    const upstream = await fetch(url, { headers, cache: "no-store" });
+    const upstream = await fetch(
+      `${API_BASE}/notifications/${encodeURIComponent(notificationId)}/seen`,
+      {
+        method: "POST",
+        headers: forwardedHeaders(req),
+        cache: "no-store",
+      }
+    );
+
     const bodyText = await upstream.text();
 
     return new NextResponse(bodyText, {
@@ -42,7 +41,7 @@ export async function GET(
     });
   } catch {
     return NextResponse.json(
-      { error: "Failed to reach backend server" },
+      { success: false, data: null, error: { message: "Could not reach the server." } },
       { status: 502 }
     );
   }

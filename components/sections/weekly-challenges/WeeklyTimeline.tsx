@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Lock,
   Check,
@@ -52,7 +53,7 @@ function mapWeek(week: BackendWeek, index: number): Week {
     weekId: week.id,
     weekNumber: week.week_number,
     title: week.chapter_name || `Chapter 0${week.week_number}`,
-    description: week.description || "Algorithmic problem-solving match with ELO rating evaluation.",
+    description: week.description || "",
     glyph: GLYPHS[index % GLYPHS.length],
     dateRange: formatDateRange(week.starts_at, week.ends_at),
     status: deriveStatus(week),
@@ -90,22 +91,21 @@ export default function WeeklyTimeline() {
 
   return (
     <div className="w-full select-none">
-      {/* ── Section Title Bar ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-[#1E1E1E] gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-[#1a1c24] gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
-            <span className="font-mono text-[11px] text-[#D4AF37] tracking-[0.25em] uppercase font-bold">
+            <span className="w-2 h-2 rounded-full bg-[#D9A404] animate-pulse" />
+            <span className="font-mono text-[11px] text-[#D9A404] tracking-[0.25em] uppercase font-bold">
               SEASON 01 MATCH SCHEDULE
             </span>
           </div>
-          <h2 className="font-display text-xl md:text-2xl font-extrabold uppercase text-[#F0EDE6] tracking-tight">
+          <h2 className="font-serif text-xl md:text-2xl font-bold uppercase text-[#F4F1EA] tracking-tight">
             CONTEST ARENA CHAPTERS
           </h2>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-[#7A7870] bg-[#0E0E0E] px-3.5 py-1.5 rounded-lg border border-[#1E1E1E]">
+          <span className="font-mono text-xs text-[#8B93A7] bg-[#0b0d13] px-3.5 py-1.5 border border-[#1a1c24]">
             {weeks.length} CONTEST MATCHES
           </span>
         </div>
@@ -113,15 +113,15 @@ export default function WeeklyTimeline() {
 
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center text-center font-mono">
-          <div className="w-8 h-8 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin mb-4" />
-          <span className="text-xs text-[#7A7870] tracking-widest animate-pulse uppercase">
+          <div className="w-8 h-8 border-2 border-[#D9A404] border-t-transparent rounded-full animate-spin mb-4" />
+          <span className="text-xs text-[#8B93A7] tracking-widest animate-pulse uppercase">
             LOADING ARENA SCHEDULE...
           </span>
         </div>
       ) : weeks.length === 0 ? (
-        <div className="py-20 flex flex-col items-center justify-center text-center font-mono rounded-2xl border border-[#1E1E1E] bg-[#0A0A0A]">
-          <Swords size={36} className="text-[#3A3830] mb-3" />
-          <span className="text-xs text-[#7A7870] tracking-widest uppercase">
+        <div className="py-20 flex flex-col items-center justify-center text-center font-mono border border-[#1a1c24] bg-[#0b0d13]">
+          <Swords size={36} className="text-[#5A5850] mb-3" />
+          <span className="text-xs text-[#8B93A7] tracking-widest uppercase">
             NO CONTEST MATCHES PUBLISHED YET
           </span>
         </div>
@@ -138,30 +138,28 @@ export default function WeeklyTimeline() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                className={`relative flex flex-col rounded-2xl border transition-all duration-300 overflow-hidden group ${
+                className={`relative flex flex-col border transition-colors duration-300 overflow-hidden group ${
                   isLive
-                    ? "border-[#D4AF37] bg-gradient-to-b from-[#14120A] via-[#0E0D08] to-[#0A0A0A] shadow-[0_0_40px_rgba(212,175,55,0.2)] ring-1 ring-[#D4AF37]/50"
+                    ? "border-[#D9A404]/50 bg-[#0b0d13]"
                     : isDone
-                    ? "border-[#2A2820] bg-[#0A0A0A]/90 hover:border-[#D4AF37]/40"
-                    : "border-[#1A1A1A] bg-[#080808]/70 opacity-70"
+                    ? "border-[#1a1c24] bg-[#0b0d13] hover:border-[#D9A404]/40"
+                    : "border-[#1a1c24] bg-[#06070B]/70 opacity-70"
                 }`}
               >
-                {/* Live Top Glow Indicator */}
                 {isLive && (
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#B8860B] animate-pulse" />
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#D9A404]" />
                 )}
 
                 <div className="p-6 flex flex-col flex-1">
-                  {/* Top Bar: Glyph & Status Badge */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-10 h-10 rounded-xl border flex items-center justify-center font-mono text-lg ${
+                        className={`w-10 h-10 border flex items-center justify-center font-mono text-lg ${
                           isLive
-                            ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                            ? "border-[#D9A404] bg-[#D9A404]/10 text-[#D9A404]"
                             : isDone
-                            ? "border-[#3A3830] bg-[#121212] text-[#C0C0C0]"
-                            : "border-[#1E1E1E] bg-[#0E0E0E] text-[#5A5850]"
+                            ? "border-[#1a1c24] bg-[#0b0d13] text-[#8B93A7]"
+                            : "border-[#1a1c24] bg-[#0b0d13] text-[#5A5850]"
                         }`}
                       >
                         {week.glyph}
@@ -170,69 +168,77 @@ export default function WeeklyTimeline() {
                         <span className="font-mono text-[10px] text-[#5A5850] tracking-widest uppercase block">
                           CHAPTER 0{week.weekNumber}
                         </span>
-                        <span className="font-mono text-[9px] text-[#D4AF37] uppercase tracking-wider">
+                        <span className="font-mono text-[9px] text-[#D9A404] uppercase tracking-wider">
                           {week.contestType} MATCH
                         </span>
                       </div>
                     </div>
 
                     {isLive && (
-                      <span className="flex items-center gap-1.5 bg-[#D4AF37]/20 border border-[#D4AF37]/60 text-[#D4AF37] text-[9px] font-mono font-bold px-2.5 py-1 rounded-full animate-pulse shadow-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+                      <span className="flex items-center gap-1.5 font-mono text-[9px] tracking-[0.15em] text-[#D9A404] border border-[#D9A404]/40 px-2 py-0.5">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-[#D9A404] animate-ping" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#D9A404]" />
+                        </span>
                         LIVE ARENA
                       </span>
                     )}
 
                     {isDone && (
-                      <span className="flex items-center gap-1 bg-[#1E1E1E] text-[#8A8880] text-[9px] font-mono font-bold px-2.5 py-1 rounded-full border border-[#2A2A2A]">
-                        <Check size={11} className="text-[#4BE2C4]" />
+                      <span className="flex items-center gap-1 font-mono text-[9px] tracking-[0.15em] text-[#8B93A7] border border-[#1a1c24] px-2 py-0.5">
+                        <Check size={11} className="text-[#6FCF97]" />
                         COMPLETED
                       </span>
                     )}
 
                     {isLocked && (
-                      <span className="flex items-center gap-1 bg-[#0E0E0E] text-[#5A5850] text-[9px] font-mono px-2.5 py-1 rounded-full border border-[#1E1E1E]">
+                      <span className="flex items-center gap-1 font-mono text-[9px] tracking-[0.15em] text-[#5A5850] border border-[#1a1c24] px-2 py-0.5">
                         <Lock size={11} />
                         LOCKED
                       </span>
                     )}
                   </div>
 
-                  {/* Title & Description */}
-                  <h3 className="font-display text-lg font-bold uppercase text-[#F0EDE6] tracking-tight mb-2 group-hover:text-[#D4AF37] transition-colors">
+                  <h3 className="font-serif text-lg font-bold text-[#F4F1EA] tracking-tight mb-2 group-hover:text-[#D9A404] transition-colors">
                     {week.title}
                   </h3>
-                  <p className="font-sans text-xs text-[#7A7870] leading-relaxed mb-6 flex-1">
-                    {week.description}
-                  </p>
+                  {week.description ? (
+                    <p className="font-sans text-xs text-[#8B93A7] leading-relaxed mb-6 flex-1">
+                      {week.description}
+                    </p>
+                  ) : (
+                    <div className="mb-6 flex-1" />
+                  )}
 
-                  {/* Meta Specs */}
-                  <div className="grid grid-cols-2 gap-2 mb-6 font-mono text-[10px] bg-[#050505] p-3 rounded-xl border border-[#1A1A1A]">
+                  <div className="grid grid-cols-2 gap-2 mb-6 font-mono text-[10px] bg-[#0b0d13] p-3 border border-[#1a1c24]">
                     <div>
                       <span className="text-[#5A5850] block uppercase">TIMEFRAME</span>
-                      <span className="text-[#C0C0C0] font-semibold">{week.dateRange}</span>
+                      <span className="text-[#F4F1EA] font-semibold">{week.dateRange}</span>
                     </div>
                     <div>
                       <span className="text-[#5A5850] block uppercase">SCORING</span>
-                      <span className="text-[#D4AF37] font-semibold">{week.scoringSystem} POINTS</span>
+                      <span className="text-[#D9A404] font-semibold">{week.scoringSystem} POINTS</span>
                     </div>
                   </div>
 
-                  {/* Action Button */}
                   {isLive && (
                     <button
                       onClick={() => router.push(`/events/weekly-challenges/week/${week.weekId}`)}
-                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#B8860B] text-[#0A0A0A] font-mono text-xs font-black tracking-widest uppercase hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group/btn"
+                      className="w-full py-3 rounded-full text-[#06070B] font-mono text-xs font-black tracking-[0.08em] uppercase cursor-pointer flex items-center justify-center gap-2 group/btn"
+                      style={{
+                        background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+                        boxShadow: "0 0 18px rgba(217,167,4,0.25)",
+                      }}
                     >
                       <span>ENTER BATTLE GROUND</span>
-                      <ArrowRight size={15} className="group-hover/btn:translate-x-1 transition-transform" />
+                      <ArrowRight size={15} className="text-[#06070B]/60 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   )}
 
                   {isDone && (
                     <button
                       onClick={() => router.push(`/events/weekly-challenges/week/${week.weekId}`)}
-                      className="w-full py-3 rounded-xl border border-[#2A2820] bg-[#121210] text-[#D4AF37] hover:bg-[#D4AF37]/15 hover:border-[#D4AF37]/50 font-mono text-xs font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-full border border-[#3a3320] bg-[#0d0f14] text-[#D9A404] hover:border-[#D9A404] font-mono text-xs font-bold tracking-[0.08em] uppercase transition-colors cursor-pointer flex items-center justify-center gap-2"
                     >
                       <span>VIEW MATCH ARCHIVE</span>
                       <ArrowRight size={14} />
@@ -242,7 +248,7 @@ export default function WeeklyTimeline() {
                   {isLocked && (
                     <button
                       disabled
-                      className="w-full py-3 rounded-xl border border-[#1E1E1E] bg-[#0A0A0A] text-[#5A5850] font-mono text-xs font-semibold tracking-wider uppercase cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-full border border-[#1a1c24] bg-[#0d0f14] text-[#5A5850] font-mono text-xs font-semibold tracking-[0.08em] uppercase cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       <Lock size={13} />
                       <span>UNLOCKS SOON</span>
@@ -255,14 +261,13 @@ export default function WeeklyTimeline() {
         </div>
       )}
 
-      {/* ── Contest Rules & Guidelines Footer Card ── */}
-      <div className="mt-14 rounded-2xl border border-[#1E1E1E] bg-[#0A0A0A]/90 p-6 md:p-8 backdrop-blur-md">
+      <div className="mt-14 border border-[#1a1c24] bg-[#0b0d13] p-6 md:p-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
+          <div className="w-9 h-9 border border-[#D9A404]/30 bg-[#D9A404]/5 flex items-center justify-center text-[#D9A404]">
             <ShieldAlert size={18} />
           </div>
           <div>
-            <h4 className="font-display text-sm font-bold uppercase text-[#F0EDE6] tracking-wide">
+            <h4 className="font-serif text-sm font-bold uppercase text-[#F4F1EA] tracking-wide">
               CONTEST ARENA RULES & REWARDS
             </h4>
             <span className="font-mono text-[10px] text-[#5A5850] tracking-wider uppercase block">
@@ -271,24 +276,28 @@ export default function WeeklyTimeline() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans text-[#8A8880] mt-4">
-          <div className="p-3.5 rounded-xl bg-[#050505] border border-[#181818]">
-            <span className="font-mono text-[10px] text-[#D4AF37] font-bold uppercase tracking-wider block mb-1">
-              📍 01. OFFLINE FINALE AT TSEC BANDRA
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans text-[#8B93A7] mt-4">
+          <div className="p-3.5 bg-[#0b0d13] border border-[#1a1c24]">
+            <span className="font-mono text-[10px] text-[#D9A404] font-bold uppercase tracking-wider block mb-1">
+              01. OFFLINE FINALE AT TSEC BANDRA
             </span>
             Top ranking qualifiers from the weekly matches advance to the Grand Offline Finale held live on-campus at TSEC Bandra!
           </div>
-          <div className="p-3.5 rounded-xl bg-[#050505] border border-[#D4AF37]/30 bg-[#D4AF37]/5">
-            <span className="font-mono text-[10px] text-[#D4AF37] font-bold uppercase tracking-wider block mb-1">
-              💼 02. INTERNSHIPS & ₹20,000+ PRIZES
+          <div className="p-3.5 bg-[#D9A404]/5 border border-[#D9A404]/30">
+            <span className="font-mono text-[10px] text-[#D9A404] font-bold uppercase tracking-wider block mb-1">
+              02. INTERNSHIPS & ₹20,000+ PRIZES
             </span>
             Top performers receive direct internship interview opportunities, discount coupons, swag, and cash pool rewards!
           </div>
-          <div className="p-3.5 rounded-xl bg-[#050505] border border-[#181818]">
-            <span className="font-mono text-[10px] text-[#D4AF37] font-bold uppercase tracking-wider block mb-1">
-              🛡️ 03. ANTI-CHEAT SYSTEM
+          <div className="p-3.5 bg-[#0b0d13] border border-[#1a1c24]">
+            <span className="font-mono text-[10px] text-[#D9A404] font-bold uppercase tracking-wider block mb-1">
+              03. NO PLAGIARISM, NO AI GENERATED CODE
             </span>
-            Code similarity algorithms check all accepted submissions. Plagiarism results in immediate disqualification.
+            Solutions must be your own. AI tools and copied code are both off
+            limits while a week is live.{" "}
+            <Link href="/codeofconduct" className="text-[#D9A404] hover:underline">
+              Read the full rules
+            </Link>
           </div>
         </div>
       </div>

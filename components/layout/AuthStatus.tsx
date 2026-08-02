@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { LogOut, User, Trophy } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { LOGIN_URL } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,7 +15,7 @@ export default function AuthStatus({ accent = "#4BE2C4" }: { accent?: string }) 
   if (!isAuthenticated) {
     return (
       <button
-        onClick={() => signIn("google", { callbackUrl: "/register" }).catch(() => (window.location.href = LOGIN_URL))}
+        onClick={() => (window.location.href = LOGIN_URL)}
         className="rounded-full border px-5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] transition-colors cursor-pointer hover:bg-white/5"
         style={{ borderColor: accent, color: accent }}
       >

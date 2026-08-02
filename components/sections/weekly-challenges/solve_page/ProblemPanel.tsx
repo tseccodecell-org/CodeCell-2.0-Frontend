@@ -452,9 +452,7 @@ export default function ProblemPanel({
           {/* Constraints */}
           {problem.constraints && (
             <Section title="Constraints">
-              <div className="text-[12.5px]" style={{ color: tokens.muted }}>
-                <MarkdownRenderer content={problem.constraints} />
-              </div>
+              <MarkdownRenderer content={problem.constraints} />
             </Section>
           )}
 

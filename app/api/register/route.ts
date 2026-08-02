@@ -1,67 +1,37 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/nextauth";
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.tseccodecell.com";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
     const body = await req.json();
 
-    const userEmail = session?.user?.email || body.email;
-    const userName = session?.user?.name || body.fullName || body.name || "";
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
 
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: "Unauthorized: User email required" },
-        { status: 401 }
-      );
-    }
+    const cookie = req.headers.get("cookie");
+    const authHeader = req.headers.get("authorization");
+    if (cookie) headers["Cookie"] = cookie;
+    if (authHeader) headers["Authorization"] = authHeader;
 
-    console.log("[Supabase Register] Inserting payload:", {
-      email: userEmail,
-      full_name: userName,
-      college: body.collegeName || body.college_name || "",
-      course: body.course || "",
-      year: body.yearOfStudy || body.year_of_study || body.year || "",
-      location: body.location || "",
+    const upstream = await fetch(`${API_BASE}/profile/complete`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
     });
 
-    const { data, error } = await supabase
-      .from("registrations")
-      .insert({
-        email: userEmail,
-        full_name: userName,
-        college: body.collegeName || body.college_name || "",
-        course: body.course || "",
-        year: body.yearOfStudy || body.year_of_study || body.year || "",
-        location: body.location || "",
-      })
-      .select();
+    const bodyText = await upstream.text();
 
-    if (error) {
-      console.error("[Supabase Register Error]:", error);
-      if (error.code === "23505") {
-        return NextResponse.json(
-          { error: "You have already registered for this event." },
-          { status: 409 }
-        );
-      }
-
-      return NextResponse.json(
-        { error: error.message || "Failed to save registration to Supabase" },
-        { status: 500 }
-      );
-    }
-
-    console.log("[Supabase Register Success]:", data);
-
-    return NextResponse.json({ success: true }, { status: 201 });
-  } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : "Failed to process registration";
+    return new NextResponse(bodyText, {
+      status: upstream.status,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch {
     return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
+      { success: false, error: { message: "Could not reach the server. Please try again." } },
+      { status: 502 }
     );
   }
 }

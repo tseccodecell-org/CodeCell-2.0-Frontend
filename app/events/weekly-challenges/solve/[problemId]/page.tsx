@@ -8,6 +8,7 @@ import VerdictPanel from "@/components/sections/weekly-challenges/solve_page/Ver
 import SubmissionHistory from "@/components/sections/weekly-challenges/solve_page/SubmissionHistory";
 import { ArrowLeft, TriangleAlert } from "lucide-react";
 import { runCode, submitCode, getSubmission, getRun } from "@/lib/api-client";
+import { useAuth } from "@/hooks/useAuth";
 import {
   checkRuntimeHealth,
   getLocalToolchainStatus,
@@ -80,6 +81,7 @@ const difficultyColor = (difficulty?: string) => {
 
 export default function Solve({ params }: PageProps) {
   const { problemId } = React.use(params);
+  const { isBanned } = useAuth();
 
   const [problem, setProblem] = useState<ProblemDetail | null>(null);
   const [activeAction, setActiveAction] = useState<"RUN" | "SUBMIT" | null>(null);
@@ -314,6 +316,11 @@ export default function Solve({ params }: PageProps) {
   const handleRun = async (code: string, language: Language, stdin: string) => {
     if (!problemId) return;
 
+    if (isBanned) {
+      setNotice("Your account is suspended, so you cannot run code.");
+      return;
+    }
+
     try {
       setActiveAction("RUN");
       setResultMode("RUN");
@@ -392,6 +399,11 @@ export default function Solve({ params }: PageProps) {
 
   const handleSubmit = async (code: string, language: Language) => {
     if (!problemId) return;
+
+    if (isBanned) {
+      setNotice("Your account is suspended, so you cannot submit solutions.");
+      return;
+    }
 
     try {
       setActiveAction("SUBMIT");
@@ -498,7 +510,7 @@ export default function Solve({ params }: PageProps) {
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#06070B]">
+    <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
         <Link
           href="/events/weekly-challenges/timeline"
@@ -595,6 +607,7 @@ export default function Solve({ params }: PageProps) {
               starterCode={starterCode}
               loadRequest={loadRequest}
               cooldownLeft={cooldownLeft}
+              banned={isBanned}
               onRun={handleRun}
               onSubmit={handleSubmit}
             />

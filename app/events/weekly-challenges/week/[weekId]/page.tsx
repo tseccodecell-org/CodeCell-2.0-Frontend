@@ -22,6 +22,7 @@ interface WeekData {
   glyph: string;
   dateRange: string;
   isLive: boolean;
+  hasEnded: boolean;
   problems: Problem[];
 }
 
@@ -56,6 +57,23 @@ export default function WeekPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // returning from the solve page can restore this component without
+  // remounting, so a solve made a moment ago would still read as unsolved
+  // until a hard reload. refetch whenever the tab is looked at again.
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    const refetch = () => {
+      if (document.visibilityState === "visible") setReloadKey((k) => k + 1);
+    };
+    window.addEventListener("focus", refetch);
+    document.addEventListener("visibilitychange", refetch);
+    return () => {
+      window.removeEventListener("focus", refetch);
+      document.removeEventListener("visibilitychange", refetch);
+    };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -75,14 +93,13 @@ export default function WeekPage() {
           glyph: GLYPHS[(weekRes.week_number - 1) % GLYPHS.length],
           dateRange: formatDateRange(weekRes.starts_at, weekRes.ends_at),
           isLive: weekRes.is_active,
-          // NOTE: "solved" isn't available from this endpoint — it would need
-          // a per-user submissions lookup. Defaulting to false for now.
+          hasEnded: new Date(weekRes.ends_at).getTime() < Date.now(),
           problems: problemsRes.map((p) => ({
             problemId: p.id,
             title: p.title,
             difficulty: normalizeDifficulty(p.difficulty),
             points: p.base_points,
-            solved: false,
+            solved: p.solved === true,
           })),
         });
       })
@@ -97,7 +114,7 @@ export default function WeekPage() {
     return () => {
       cancelled = true;
     };
-  }, [weekId]);
+  }, [weekId, reloadKey]);
 
   if (loading) return <WeekLoading />;
 
@@ -151,6 +168,13 @@ export default function WeekPage() {
         <p className="font-sans text-sm text-[#8B93A7] mt-3">
           {week.problems.filter((p) => p.solved).length} of {week.problems.length} cleared
         </p>
+
+        {week.hasEnded && (
+          <p className="mt-4 border border-[#D9A404]/30 bg-[#0b0d13] px-4 py-3 font-mono text-[11px] leading-relaxed text-[#D9A404]">
+            This week has ended. Problems stay open for practice, but submissions no longer award
+            points.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-3 relative z-10">
@@ -160,8 +184,12 @@ export default function WeekPage() {
             onClick={() => router.push(`/events/weekly-challenges/solve/${problem.problemId}`)}
             className="group flex items-center gap-5 border-t border-[#1a1c24] bg-[#0b0d13] hover:bg-[#101219] px-6 py-5 text-left transition-colors"
           >
-            <span className="font-mono text-xs text-[#5A5850] w-6">
-              {String(i + 1).padStart(2, "0")}
+            <span className="font-mono text-xs w-6 flex items-center">
+              {problem.solved ? (
+                <Check size={14} className="text-[#6FCF97]" />
+              ) : (
+                <span className="text-[#5A5850]">{String(i + 1).padStart(2, "0")}</span>
+              )}
             </span>
 
             <span

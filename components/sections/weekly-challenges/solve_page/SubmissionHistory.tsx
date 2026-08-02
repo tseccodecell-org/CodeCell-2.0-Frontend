@@ -24,6 +24,7 @@ const tokens = {
   green: "#34D399",
   red: "#E2574C",
   gold: "#D9A404",
+  violet: "#A78BFA",
 };
 
 const PENDING_POLL_MS = 3000;
@@ -35,7 +36,12 @@ interface SubmissionHistoryProps {
   onLoadCode?: (language: Language, code: string) => void;
 }
 
-function verdictColor(status: SubmissionResult["status"], verdict: string) {
+function verdictColor(
+  status: SubmissionResult["status"],
+  verdict: string,
+  invalidated?: boolean
+) {
+  if (invalidated) return tokens.violet;
   if (status === "FAILED") return tokens.red;
   if (status === "QUEUED" || status === "RUNNING") return tokens.gold;
   if (verdict === "ACCEPTED" || verdict === "SUCCESS") return tokens.green;
@@ -175,7 +181,7 @@ export default function SubmissionHistory({
         )}
 
         {items.map((item) => {
-          const color = verdictColor(item.status, item.verdict);
+          const color = verdictColor(item.status, item.verdict, item.invalidated);
           const isBusy = item.status === "QUEUED" || item.status === "RUNNING";
           const isOpen = expandedId === item.id;
           const detail = details[item.id];
@@ -227,9 +233,20 @@ export default function SubmissionHistory({
                 >
                   {item.status === "COMPLETED" && (
                     <>
-                      <span>{item.score ?? 0} pts</span>
+                      <span style={item.invalidated ? { textDecoration: "line-through" } : undefined}>
+                        {item.score ?? 0} pts
+                      </span>
                       <span>{item.executionTimeMs} ms</span>
                     </>
+                  )}
+                  {item.invalidated && (
+                    <span
+                      className="border px-1.5 py-0.5 tracking-wide"
+                      style={{ color: tokens.violet, borderColor: `${tokens.violet}55` }}
+                      title="This submission was invalidated by an admin and awards no points."
+                    >
+                      INVALIDATED
+                    </span>
                   )}
                   {item.status === "QUEUED" && (
                     <span style={{ color: tokens.gold }}>

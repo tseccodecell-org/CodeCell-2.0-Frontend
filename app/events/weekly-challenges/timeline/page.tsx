@@ -63,18 +63,7 @@ const Page = () => {
           </div>
 
           {/* Action Buttons Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-            <a
-              href="/download"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wide text-[#06070B] transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-lg"
-              style={{
-                background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
-                boxShadow: "0 4px 20px rgba(217,167,4,0.35)",
-              }}
-            >
-              <Download size={14} />
-              <span>Install CodeCell Runtime</span>
-            </a>
+          <div className="shrink-0">
             <LeaderboardButtons />
           </div>
         </div>

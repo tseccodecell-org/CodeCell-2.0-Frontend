@@ -9,7 +9,6 @@ import {
   ExternalLink,
   Copy,
   Check,
-  Clock,
   Download,
   AlertTriangle,
   Cpu,
@@ -90,22 +89,7 @@ export default function SetupGuide() {
             }`}
           >
             <Apple className="w-4 h-4" />
-            macOS
-          </button>
-
-          <button
-            onClick={() => setActiveTab('linux')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-mono tracking-wide transition-all ${
-              activeTab === 'linux'
-                ? 'bg-gradient-to-b from-[var(--color-gold)] to-[var(--color-gold-glow)] text-[var(--color-bg)] font-semibold shadow-[0_0_18px_rgba(212,175,55,0.28)]'
-                : 'text-[var(--color-text-mid)] hover:text-[var(--color-text-hi)] hover:bg-[var(--color-surface-2)]'
-            }`}
-          >
-            <Terminal className="w-4 h-4" />
-            Linux
-            <span className="ml-1 text-[10px] font-mono bg-[var(--color-bg)] text-[var(--color-gold)] px-2 py-0.5 rounded-full font-semibold border border-[var(--color-gold)]/20">
-              Soon
-            </span>
+            macOS/Linux
           </button>
 
           <button
@@ -431,7 +415,7 @@ export default function SetupGuide() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-xl font-serif font-semibold text-[var(--color-text-hi)] flex items-center gap-2 tracking-wide">
-                  <Apple className="text-[var(--color-gold)]" /> macOS Homebrew &amp; Terminal Setup
+                  <Apple className="text-[var(--color-gold)]" /> macOS/Linux Homebrew &amp; Terminal Setup
                 </h2>
                 <p className="text-[var(--color-text-mid)] text-sm mt-1">
                   Follow these terminal steps to tap the repository, start the daemon service, and trigger toolchain installs.
@@ -598,21 +582,6 @@ brew services list`}
                   <pre className="pr-16 leading-relaxed">{macResetCmd}</pre>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* ---------------------------------------------------------------------- */}
-          {/* TAB 3: LINUX (COMING SOON)                                             */}
-          {/* ---------------------------------------------------------------------- */}
-          {activeTab === 'linux' && (
-            <div className="text-center py-12 space-y-4">
-              <div className="inline-flex p-4 bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-full text-[var(--color-gold)] mb-2">
-                <Clock className="w-8 h-8 animate-pulse" />
-              </div>
-              <h2 className="text-2xl font-serif font-semibold text-[var(--color-text-hi)] tracking-wide">Linux Package Coming Soon</h2>
-              <p className="text-[var(--color-text-mid)] max-w-md mx-auto text-sm leading-relaxed">
-                We are actively packaging Linux distribution builds (.deb and AppImage formats). Check back shortly before test week!
-              </p>
             </div>
           )}
 

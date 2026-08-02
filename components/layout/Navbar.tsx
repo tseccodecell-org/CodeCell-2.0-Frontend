@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Download } from "lucide-react";
 import { usePathname } from "next/navigation";
 import AuthStatus from "@/components/layout/AuthStatus";
 
@@ -270,9 +270,20 @@ export default function Navbar() {
           </nav>
 
           {/* =====================================
-              DESKTOP AUTH STATUS
+              DESKTOP AUTH STATUS & RUNTIME
           ===================================== */}
-          <div className="hidden lg:flex flex-1 justify-end">
+          <div className="hidden lg:flex flex-1 justify-end items-center gap-3">
+            <Link
+              href="/download"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider text-[#06070B] transition-transform hover:scale-[1.03]"
+              style={{
+                background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+                boxShadow: "0 0 12px rgba(217,167,4,0.2)",
+              }}
+            >
+              <Download size={13} />
+              <span>Runtime</span>
+            </Link>
             <AuthStatus accent={primaryAccent} />
           </div>
 
@@ -417,7 +428,18 @@ export default function Navbar() {
                 );
               })}
 
-              <div className="pt-4">
+              <div className="pt-4 flex flex-col gap-3">
+                <Link
+                  href="/download"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider text-[#06070B]"
+                  style={{
+                    background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)",
+                  }}
+                >
+                  <Download size={14} />
+                  <span>Install CodeCell Runtime</span>
+                </Link>
                 <AuthStatus accent={primaryAccent} />
               </div>
             </nav>

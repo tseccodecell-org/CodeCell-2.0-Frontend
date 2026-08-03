@@ -118,17 +118,24 @@ export function RegistrationForm() {
         }
     };
 
+    const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
+
+    // FIX ISSUE 5: Decoupled step navigation from recurring auth side-effects.
+    // It only auto-advances to Step 2 once upon initial authentication detection,
+    // so clicking "Back" won't be overridden by subsequent auth state updates.
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && !hasAutoNavigated) {
             setActiveStep(2);
+            setHasAutoNavigated(true);
             setFormData((prev) => ({
                 ...prev,
                 fullName: prev.fullName || profile?.name || "",
             }));
-        } else if (!isLoading) {
+        } else if (!isLoading && !isAuthenticated) {
             setActiveStep(1);
+            setHasAutoNavigated(false);
         }
-    }, [isAuthenticated, isLoading, profile]);
+    }, [isAuthenticated, isLoading, profile, hasAutoNavigated]);
 
     return (
         <div className="w-full max-w-xl mx-auto px-4 md:px-6">

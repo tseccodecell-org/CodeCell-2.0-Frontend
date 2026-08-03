@@ -15,6 +15,24 @@ export async function GET(
     );
   }
 
+  // FIX ISSUE 3: Validate the slug to prevent path traversal/SSRF
+  // Valid patterns: /weeks/[id] or /weeks/[id]/problems
+  if (slug.length > 2 || (slug.length === 2 && slug[1] !== "problems")) {
+    return NextResponse.json(
+      { error: "Invalid week path requested" },
+      { status: 400 }
+    );
+  }
+  
+  // Ensure the ID part only contains alphanumeric and dashes (standard UUID/slug)
+  const idRegex = /^[a-zA-Z0-9-]+$/;
+  if (!idRegex.test(slug[0])) {
+    return NextResponse.json(
+      { error: "Invalid week ID format" },
+      { status: 400 }
+    );
+  }
+
   const backendPath = `/weeks/${slug.join("/")}`;
   const search = req.nextUrl.searchParams.toString();
   const url = `${API_BASE}${backendPath}${search ? `?${search}` : ""}`;

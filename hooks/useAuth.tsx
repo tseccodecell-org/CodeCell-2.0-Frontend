@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, createContext, useContext, ReactNode } from "react";
 import { getProfile, LOGOUT_URL } from "@/lib/api-client";
 import type { ProfileWarning, UserProfile } from "@/lib/api-client";
 import { AuthUser, UserRole } from "@/lib/types/leaderboard";
@@ -46,45 +46,6 @@ function clearStoredSession() {
   clearLegacyTokenCookie();
 }
 
-let sharedProfile: UserProfile | null = null;
-let sharedLoading = true;
-let sharedError: string | null = null;
-let hasStarted = false;
-let inFlight: Promise<void> | null = null;
-
-const listeners = new Set<() => void>();
-
-function notify() {
-  listeners.forEach((fn) => fn());
-}
-
-function loadProfile(): Promise<void> {
-  if (inFlight) return inFlight;
-
-  sharedLoading = true;
-  notify();
-
-  inFlight = (async () => {
-    try {
-      const data = await getProfile();
-      sharedProfile = data;
-      setCachedProfile(data);
-      if (!data) clearStoredSession();
-      sharedError = null;
-    } catch (err) {
-      sharedProfile = null;
-      clearStoredSession();
-      sharedError = err instanceof Error ? err.message : "Could not load your profile.";
-    } finally {
-      sharedLoading = false;
-      inFlight = null;
-      notify();
-    }
-  })();
-
-  return inFlight;
-}
-
 interface UseAuthResult {
   user: AuthUser | null;
   profile: UserProfile | null;
@@ -102,45 +63,51 @@ interface UseAuthResult {
   logout: () => void;
 }
 
-export function useAuth(): UseAuthResult {
-  const [, setVersion] = useState(0);
+// FIX ISSUE 1: Removed module-level singletons (sharedProfile, sharedLoading, etc.)
+// Replaced with React Context to encapsulate auth state within the component tree and avoid race conditions.
+const AuthContext = createContext<UseAuthResult | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [profile, setProfile] = useState<UserProfile | null>(() => getCachedProfile());
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProfile = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await getProfile();
+      setProfile(data);
+      setCachedProfile(data);
+      if (!data) clearStoredSession();
+      setError(null);
+    } catch (err) {
+      setProfile(null);
+      clearStoredSession();
+      setError(err instanceof Error ? err.message : "Could not load your profile.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const rerender = () => setVersion((v) => v + 1);
-    listeners.add(rerender);
-
-    if (!hasStarted) {
-      hasStarted = true;
-      clearLegacyTokenCookie();
-      // long lived tokens from the old auth still sit in some browsers, and a
-      // stale one is a second identity. nothing reads them any more, but they
-      // are actively deleted so they stop existing at all
-      localStorage.removeItem(TOKEN_CACHE_KEY);
-      localStorage.removeItem("codecell_token");
-      sharedProfile = getCachedProfile();
-      loadProfile();
-    }
-
-    return () => {
-      listeners.delete(rerender);
-    };
-  }, []);
+    clearLegacyTokenCookie();
+    localStorage.removeItem(TOKEN_CACHE_KEY);
+    localStorage.removeItem("codecell_token");
+    loadProfile();
+  }, [loadProfile]);
 
   const refresh = useCallback(() => {
     loadProfile();
-  }, []);
+  }, [loadProfile]);
 
   const logout = useCallback(() => {
     clearStoredSession();
-    sharedProfile = null;
-    notify();
+    setProfile(null);
 
     if (typeof window !== "undefined") {
       window.location.href = LOGOUT_URL;
     }
   }, []);
-
-  const profile = sharedProfile;
 
   const user: AuthUser | null = profile
     ? {
@@ -151,15 +118,14 @@ export function useAuth(): UseAuthResult {
     : null;
 
   const warnings = profile?.warnings ?? [];
-
   const registered = profile
     ? profile.is_registered !== false || Boolean(profile.college_name && profile.year)
     : false;
 
-  return {
+  const value: UseAuthResult = {
     user,
     profile,
-    isLoading: sharedLoading,
+    isLoading,
     isAuthenticated: profile !== null,
     isRegistered: registered,
     isProfileComplete: registered,
@@ -167,9 +133,19 @@ export function useAuth(): UseAuthResult {
     banReason: profile?.ban_reason ?? "",
     warningCount: profile?.warning_count ?? 0,
     latestWarning: warnings.length > 0 ? warnings[0] : null,
-    error: sharedError,
+    error,
     isTsecStudent: profile?.is_tsec_user === true,
     refresh,
     logout,
   };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth(): UseAuthResult {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }

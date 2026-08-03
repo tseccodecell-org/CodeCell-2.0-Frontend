@@ -87,15 +87,25 @@ export function useLeaderboard({
     }
   }, [fetchLeaderboard, refetchToken, hasInitTab]);
 
+  const [userManuallySelectedTab, setUserManuallySelectedTab] = useState(false);
+
+  // FIX ISSUE 6: Stabilize tab switching logic.
+  // We track if the user manually clicked a tab so we don't automatically
+  // snap them back during background auth updates or re-renders.
   useEffect(() => {
-    if (showToggle && selectedTab === "GLOBAL") {
-      // When their TSEC profile loads, instantly move them to the TSEC tab!
-      setSelectedTab("TSEC");
-    } else if (!showToggle && selectedTab === "TSEC") {
-      // If they log out or lose TSEC status, move them back to GLOBAL
-      setSelectedTab("GLOBAL");
+    if (!userManuallySelectedTab) {
+      if (showToggle && selectedTab === "GLOBAL") {
+        setSelectedTab("TSEC");
+      } else if (!showToggle && selectedTab === "TSEC") {
+        setSelectedTab("GLOBAL");
+      }
     }
-  }, [showToggle]);
+  }, [showToggle, selectedTab, userManuallySelectedTab]);
+
+  const handleTabChange = useCallback((tab: LeaderboardTab) => {
+    setUserManuallySelectedTab(true);
+    setSelectedTab(tab);
+  }, []);
 
   return {
     data,
@@ -104,7 +114,7 @@ export function useLeaderboard({
     forbidden,
     unauthorized,
     selectedTab,
-    setSelectedTab,
+    setSelectedTab: handleTabChange,
     showToggle,
     refetch: () => setRefetchToken((t) => t + 1),
   };

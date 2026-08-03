@@ -5,10 +5,20 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.tseccodece
 function forwardedHeaders(req: NextRequest): Record<string, string> {
   const headers: Record<string, string> = { Accept: "application/json" };
 
-  const cookie = req.headers.get("cookie");
+  // FIX ISSUE 4: Filter and sanitize request headers explicitly instead of 
+  // forwarding the raw cookie indiscriminately, preventing header-forwarding vulnerabilities.
+  const cookieHeader = req.headers.get("cookie");
   const authHeader = req.headers.get("authorization");
 
-  if (cookie) headers["Cookie"] = cookie;
+  if (cookieHeader) {
+    // Only extract expected cookies (e.g., jwt_token or session cookies)
+    const cookies = cookieHeader.split(";").map(c => c.trim());
+    const safeCookies = cookies.filter(c => c.startsWith("jwt_token=") || c.startsWith("session="));
+    if (safeCookies.length > 0) {
+      headers["Cookie"] = safeCookies.join("; ");
+    }
+  }
+
   if (authHeader) headers["Authorization"] = authHeader;
 
   return headers;

@@ -14,7 +14,7 @@ import {
   getLocalToolchainStatus,
   executeLocalCode,
 } from "@/lib/runtime-api";
-
+import EditorialPanel from "@/components/sections/weekly-challenges/solve_page/Editorials";
 import type { LanguageKey, RunResponse } from "@/lib/runtime-api";
 
 import type { ProblemDetail } from "@/lib/types/problem";
@@ -89,7 +89,7 @@ export default function Solve({ params }: PageProps) {
     status: "IDLE",
     testResults: [],
   });
-  const [leftTab, setLeftTab] = useState<"statement" | "submissions">("statement");
+  const [leftTab, setLeftTab] = useState<"statement" | "submissions" | "editorial">("statement");
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [resultMode, setResultMode] = useState<"RUN" | "SUBMIT" | null>(null);
   const [lastInput, setLastInput] = useState("");
@@ -553,37 +553,42 @@ export default function Solve({ params }: PageProps) {
           className="flex h-full shrink-0 flex-col overflow-hidden border-r border-[#1a1c24] bg-[#0b0d13]"
         >
           <div className="flex h-10 shrink-0 items-center gap-1 border-b border-[#1a1c24] bg-[#0d0f14] px-2">
-            {(
-              [
-                { key: "statement", text: "Statement" },
-                { key: "submissions", text: "Submissions" },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setLeftTab(tab.key)}
-                className={`rounded px-2.5 py-1 font-mono text-[11px] tracking-wide transition-colors cursor-pointer ${
-                  leftTab === tab.key
-                    ? "bg-[#151821] text-[#D9A404]"
-                    : "text-[#8B93A7] hover:text-[#F4F1EA]"
-                }`}
-              >
-                {tab.text}
-              </button>
-            ))}
-          </div>
+  {(
+    [
+      { key: "statement", text: "Statement" },
+      { key: "submissions", text: "Submissions" },
+      ...(problem?.weekEnded ? [{ key: "editorial", text: "Editorial" } as const] : []),
+    ] as const
+  ).map((tab) => (
+    <button
+      key={tab.key}
+      onClick={() => setLeftTab(tab.key)}
+      className={`rounded px-2.5 py-1 font-mono text-[11px] tracking-wide transition-colors cursor-pointer ${
+        leftTab === tab.key
+          ? "bg-[#151821] text-[#D9A404]"
+          : "text-[#8B93A7] hover:text-[#F4F1EA]"
+      }`}
+    >
+      {tab.text}
+    </button>
+  ))}
+</div>
 
-          <div className={leftTab === "statement" ? "min-h-0 flex-1" : "hidden"}>
-            <ProblemPanel problemId={problemId} onLoaded={handleProblemLoaded} />
-          </div>
+<div className={leftTab === "statement" ? "min-h-0 flex-1" : "hidden"}>
+  <ProblemPanel problemId={problemId} onLoaded={handleProblemLoaded} />
+</div>
 
-          <div className={leftTab === "submissions" ? "min-h-0 flex-1" : "hidden"}>
-            <SubmissionHistory
-              problemId={problemId}
-              refreshKey={historyRefreshKey}
-              onLoadCode={handleLoadCode}
-            />
-          </div>
+<div className={leftTab === "submissions" ? "min-h-0 flex-1" : "hidden"}>
+  <SubmissionHistory
+    problemId={problemId}
+    refreshKey={historyRefreshKey}
+    onLoadCode={handleLoadCode}
+  />
+</div>
+
+<div className={leftTab === "editorial" ? "min-h-0 flex-1" : "hidden"}>
+  <EditorialPanel problem={problem} />
+</div>
         </div>
 
         <div

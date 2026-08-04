@@ -27,6 +27,8 @@ export interface ProblemDetail {
   memoryLimitMb: number;
   examples: ProblemExample[];
   languages: ProblemLanguageConfig[];
+  editorial?: string;
+  weekEnded?: boolean;
 }
 
 export interface APISuccess<T> {

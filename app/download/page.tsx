@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
   Monitor,
   Apple,
-  Terminal,
   CheckCircle2,
   ExternalLink,
   Copy,
@@ -21,9 +20,9 @@ const SETUP_DOWNLOAD_URL = "https://github.com/codexllamma/runtime-frontend/rele
 
 export default function SetupGuide() {
   const [activeTab, setActiveTab] = useState('windows');
-  const [copiedKey, setCopiedKey] = useState<any>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const handleCopy = (text: any, key: any) => {
+  const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
@@ -150,7 +149,7 @@ export default function SetupGuide() {
                     <ShieldAlert className="w-4 h-4" /> Why does Chrome or Windows flag this executable?
                   </div>
                   <p className="text-xs text-[var(--color-text-mid)] leading-relaxed">
-                    Because this is a freshly compiled open-source executable created by a student developer committee (without paying $500+/yr for EV enterprise signing certificates), modern browsers (Chrome, Edge) and Windows SmartScreen automatically flag new <code className="text-[var(--color-text-hi)] font-mono">.exe</code> files as <em>"untrusted downloads"</em> until thousands of users download them. This is completely normal for new developer tooling.
+                    Because this is a freshly compiled open-source executable created by a student developer committee (without paying $500+/yr for EV enterprise signing certificates), modern browsers (Chrome, Edge) and Windows SmartScreen automatically flag new <code className="text-[var(--color-text-hi)] font-mono">.exe</code> files as <em>&quot;untrusted downloads&quot;</em> until thousands of users download them. This is completely normal for new developer tooling.
                   </p>
                 </div>
 
@@ -161,8 +160,8 @@ export default function SetupGuide() {
                   </div>
                   <ol className="list-decimal list-inside text-xs text-[var(--color-text-hi)]/90 space-y-1.5 leading-relaxed">
                     <li>Do not just click the small popup box in the top right, as browser defaults try to block it there.</li>
-                    <li>Open your browser's Downloads page by pressing <kbd className="bg-[var(--color-bg)] border border-[var(--color-border)] px-1.5 py-0.5 rounded font-mono text-[10px]">Ctrl + J</kbd> (or go to <code className="text-[var(--color-gold)]">chrome://downloads</code>).</li>
-                    <li>Locate <code className="text-[var(--color-text-hi)]">CodeCellSetup-v1.0.0.exe</code> and click <strong>"Download unverified file"</strong> / <strong>"Keep anyways"</strong>.</li>
+                    <li>Open your browser&apos;s Downloads page by pressing <kbd className="bg-[var(--color-bg)] border border-[var(--color-border)] px-1.5 py-0.5 rounded font-mono text-[10px]">Ctrl + J</kbd> (or go to <code className="text-[var(--color-gold)]">chrome://downloads</code>).</li>
+                    <li>Locate <code className="text-[var(--color-text-hi)]">CodeCellSetup-v1.0.0.exe</code> and click <strong>&quot;Download unverified file&quot;</strong> / <strong>&quot;Keep anyways&quot;</strong>.</li>
                   </ol>
                 </div>
 
@@ -173,7 +172,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-1-download-blocked.png"
                       alt="Chrome Unverified Download Blocked"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -185,7 +184,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-2-download-unverified.png"
                       alt="Download Unverified File Option"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -196,11 +195,11 @@ export default function SetupGuide() {
                     <AlertTriangle className="w-4 h-4" /> Windows Protected Your PC / SmartScreen Warning
                   </div>
                   <p className="text-xs text-[var(--color-text-mid)] leading-relaxed">
-                    When opening the installer, Windows SmartScreen may show a purple prompt stating <em>"Windows protected your PC"</em>:
+                    When opening the installer, Windows SmartScreen may show a purple prompt stating <em>&quot;Windows protected your PC&quot;</em>:
                   </p>
                   <ol className="list-decimal list-inside text-xs text-[var(--color-text-hi)]/90 space-y-1.5 leading-relaxed">
-                    <li>Click the underlined <strong>"More info"</strong> link on the prompt.</li>
-                    <li>A button labeled <strong>"Run anyway"</strong> will appear at the bottom—click it to launch the setup wizard.</li>
+                    <li>Click the underlined <strong>&quot;More info&quot;</strong> link on the prompt.</li>
+                    <li>A button labeled <strong>&quot;Run anyway&quot;</strong> will appear at the bottom—click it to launch the setup wizard.</li>
                   </ol>
                 </div>
 
@@ -211,7 +210,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-3-smartscreen-more-info.png"
                       alt="Windows Defender SmartScreen More Info"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -223,7 +222,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-4-smartscreen-run-anyway.png"
                       alt="Windows Defender SmartScreen Run Anyway Button"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -284,7 +283,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-5-components-detected.png"
                       alt="Components Automatically Detected"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -296,7 +295,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-6-components-selected.png"
                       alt="Explicitly Selecting Toolchain to Install"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -319,7 +318,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-7-ready-to-install.png"
                       alt="Ready to Install Confirmation Screen"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -342,7 +341,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-8-downloading-toolchains.png"
                       alt="Downloading Toolchain Progress Bar"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -354,7 +353,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-9-finishing-install.png"
                       alt="Finishing Installation Progress Screen"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -377,7 +376,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-10-finish-success.png"
                       alt="Completing Setup Wizard Screen"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -400,7 +399,7 @@ export default function SetupGuide() {
                       src="/screenshots/win-11-dashboard-running.png"
                       alt="CodeCell Runtime Active Dashboard"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -452,7 +451,7 @@ brew install codecell-runtime`}
                       src="/screenshots/mac-1-brew-install.png"
                       alt="macOS Brew Installation Terminal"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -487,7 +486,7 @@ brew services list`}
                       src="/screenshots/mac-2-brew-services.png"
                       alt="macOS Brew Services Active List"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -556,7 +555,7 @@ brew services list`}
                       src="/screenshots/mac-3-curl-response.png"
                       alt="macOS Curl Install Response"
                       className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                      onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
                 </div>
@@ -633,7 +632,7 @@ brew services list`}
                     src="/screenshots/verification-pass.png"
                     alt="Code Execution Verification Pass"
                     className="max-h-[420px] max-w-full w-auto h-auto rounded-lg object-contain"
-                    onError={(e: any) => { e.currentTarget.style.display = 'none'; }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 </div>
               </div>

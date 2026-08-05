@@ -20,7 +20,6 @@ function normalizeDisplayMath(source: string) {
 export function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
   const components: Components = {
     code({ className, children, ...props }) {
-      const match = /language-(\w+)/.exec(className || "");
       const isInline = !className || !className.startsWith("language-");
       return isInline ? (
         <code

@@ -1,21 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
   Terminal,
   Award,
   Laptop,
   Sparkles,
   Trophy,
-  Gift,
   ChevronLeft,
   ChevronRight,
   X,
-  Sticker,
   Users,
   Calendar,
 } from "lucide-react";
@@ -23,43 +19,9 @@ import {
   SectionHeader,
   SectionWrap,
   GlassCard,
-  HexButton,
   AnimatedNumber,
-  PremiumFaq,
   BentoMotion,
-  type FaqItem,
 } from "./SectionKit";
-
-const SpotlightText = ({ text }: { text: string }) => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLHeadingElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  return (
-    <h2
-      className="text-h1-scale font-bold uppercase mb-6 relative inline-block cursor-default"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0)}
-    >
-      <span className="text-[#F0EDE6]">{text}</span>
-      <span
-        className="absolute inset-0 bg-gradient-to-r from-[#E8FF00] via-[#4BE2C4] to-[#E8FF00] bg-[length:200%_auto] bg-clip-text text-transparent pointer-events-none transition-opacity duration-300"
-        style={{
-          opacity,
-          WebkitMaskImage: `radial-gradient(100px circle at ${position.x}px ${position.y}px, black 0%, transparent 100%)`,
-          maskImage: `radial-gradient(100px circle at ${position.x}px ${position.y}px, black 0%, transparent 100%)`,
-        }}
-      >
-        {text}
-      </span>
-    </h2>
-  );
-};
 
 const sponsorLogos = [
   { src: "/sponsors/appwrite.png", alt: "Appwrite", scale: 1.6 },
@@ -79,15 +41,6 @@ const sponsorLogos = [
   { src: "/sponsors/smaaash.png", alt: "Smaaash", scale: 2.2 },
   { src: "/sponsors/visionx.png", alt: "VisionX" },
   { src: "/sponsors/wolfram-language-text-logo.png", alt: "Wolfram Language", scale: 1.6 },
-];
-
-const swagPerks = [
-  { label: "Workshop Access", icon: Laptop },
-  { label: "Guild Stickers", icon: Sticker },
-  { label: "Leaderboard XP", icon: Trophy },
-  { label: "Event Goodies", icon: Gift },
-  { label: "Mentorship", icon: Sparkles },
-  { label: "Hackathon Swag", icon: Award },
 ];
 
 const stats = [
@@ -509,13 +462,10 @@ export default function HomeSections() {
   }, [isGalleryOpen]);
 
   const SPEED = 48; // Pixels per second
-  const PERK_ITEM_WIDTH = 228;
   const SPONSOR_ITEM_WIDTH = 180;
 
-  const perksRepeats = 4;
   const sponsorsRepeats = 4;
 
-  const perkDuration = (swagPerks.length * perksRepeats * PERK_ITEM_WIDTH) / (2 * SPEED);
   const sponsorDuration = (sponsorLogos.length * sponsorsRepeats * SPONSOR_ITEM_WIDTH) / (2 * SPEED);
 
   return (

@@ -1,5 +1,4 @@
-import { ProblemDetail } from "./types/problem";
-import type{ SubmitRequest,RunRequest,RunResponse,RunResult,SubmitResponse,SubmissionResult,} from "./types/submission";
+import type { SubmitRequest, RunRequest, RunResponse, RunResult } from "./types/submission";
 import {
   LeaderboardKind,
   LeaderboardTab,
@@ -7,152 +6,67 @@ import {
   WeeklyLeaderboardResponse,
   SeasonLeaderboardResponse,
 } from "./types/leaderboard";
+import { z } from "zod";
+import { parseOrThrow } from "./schemas/common";
+import {
+  weeklyLeaderboardResponseSchema,
+  seasonLeaderboardResponseSchema,
+} from "./schemas/leaderboard";
+import { weekListSchema, weekProblemListSchema } from "./schemas/week";
+import { problemDetailSchema } from "./schemas/problem";
+import { userProfileSchema } from "./schemas/profile";
+import {
+  submitResponseSchema,
+  submissionDetailSchema,
+  problemSubmissionListSchema,
+} from "./schemas/submission";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export interface Week {
-  id: string;
-  week_number: number;
-  chapter_name: string; // display title
-  theme?: string;
-  description?: string;
-  starts_at: string; // ISO datetime
-  ends_at: string;
-  is_active: boolean;
-  scoring_system: "FULL" | "PARTIAL";
-  contest_type: "OPEN" | "FIXED";
-  created_at: string;
-  updated_at: string;
-}
- 
-// Backend model: Problem
-export interface Problem {
-  id: string;
-  week_id?: string;
-  event_id?: string;
-  title: string;
-  slug: string;
-  statement: string;
-  input_format?: string;
-  output_format?: string;
-  constraints?: string;
-  base_points: number;
-  time_limit_ms: number;
-  memory_limit_mb: number;
-  difficulty: string;
-  checker_type: string;
-  editorial?: string;
-  is_published: boolean;
-  created_by?: string;
-  created_at: string;
-  updated_at: string;
-}
+export type { Week, WeekProblem } from "./schemas/week";
+export type { ProblemDetail, ProblemExample, ProblemLanguageConfig } from "./schemas/problem";
+export type { UserProfile, ProfileWarning } from "./schemas/profile";
+export type {
+  SubmitResponse,
+  SubmissionDetail,
+  ProblemSubmission,
+  SubmissionTestResult,
+} from "./schemas/submission";
+export { SchemaError } from "./schemas/common";
 
-export interface WeekProblem {
-  id: string;
-  week_id: string;
-  title: string;
-  slug: string;
-  difficulty: string;
-  base_points: number;
-  time_limit_ms: number;
-  memory_limit_mb: number;
-  solved: boolean;
-  week_ended: boolean;
-}
+import type { Week, WeekProblem } from "./schemas/week";
+import type { ProblemDetail } from "./schemas/problem";
+import type { UserProfile } from "./schemas/profile";
+import type {
+  SubmitResponse,
+  SubmissionDetail,
+  ProblemSubmission,
+} from "./schemas/submission";
 
-
-// Backend DTO: EventResponse (camelCase — distinct from the raw Event model)
 export type EventStatus = "UPCOMING" | "LIVE" | "ENDED";
- 
+
 export interface Event {
   id: string;
   title: string;
   description?: string;
-  startTime: string; // ISO datetime
+  startTime: string;
   endTime: string;
   status: EventStatus;
 }
 
-// ---------- Profile ----------
+const eventSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  startTime: z.string(),
+  endTime: z.string(),
+  status: z.enum(["UPCOMING", "LIVE", "ENDED"]),
+});
 
-export interface ProfileWarning {
-  id: string;
-  stage: number;
-  reason: string;
-  created_at: string;
-}
-
-export interface UserProfile {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  rating: number;
-  total_problems_solved: number;
-  college_name: string;
-  year: string;
-  course: string;
-  location: string;
-  is_tsec_user: boolean;
-  is_registered: boolean;
-  is_banned: boolean;
-  ban_reason: string;
-  banned_at: string | null;
-  warning_count: number;
-  warnings: ProfileWarning[];
-}
-
-// The HttpOnly cookie is the only credential. There used to be a localStorage
-// Bearer fallback here, which meant a browser could hold two identities at
-// once: submits authenticated as the cookie's user while reads authenticated
-// as whoever a stale stored token belonged to, and submissions quietly landed
-// on another account.
-export async function getProfile(): Promise<UserProfile | null> {
-  const res = await fetch("/api/profile", {
-    method: "GET",
-    headers: { Accept: "application/json" },
-    credentials: "include",
-    cache: "no-store",
-  });
-
-  if (res.status === 401) {
-    return null;
-  }
-
-  const body = (await readBody(res)) as Envelope<UserProfile> | null;
-
-  if (!res.ok || !body?.success) {
-    throw errorFrom(res, body);
-  }
-
-  return body.data as UserProfile;
-}
-
-export const LOGIN_URL = `${BASE_URL}/oauth/google/login`;
-export const LOGOUT_URL = `${BASE_URL}/oauth/logout`;
-
-// ---------- Problems ----------
-
-export function getProblem(
-  problemId: string,
-  apiBaseUrl?: string
-): Promise<ProblemDetail> {
-  return apiGetEnveloped<ProblemDetail>(
-    `/api/problems/${problemId}`,
-    apiBaseUrl
-  );
-}
-
-
-
-
-
-
-
- 
-// ---------- Shared fetch helper ----------
+const eventListSchema = z
+  .array(eventSchema)
+  .nullable()
+  .transform((value) => value ?? []);
 
 interface Envelope<T> {
   success: boolean;
@@ -169,22 +83,6 @@ class ApiError extends Error {
     this.code = code;
     this.name = "ApiError";
   }
-}
-
-async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
-
-  const body = await readBody(res);
-
-  if (!res.ok) {
-    throw errorFrom(res, body);
-  }
-
-  return body as T;
 }
 
 async function readBody(res: Response): Promise<unknown> {
@@ -219,25 +117,34 @@ function errorFrom(res: Response, body: unknown): ApiError {
   return new ApiError(res.status, res.statusText || "Request failed");
 }
 
-async function apiGetEnveloped<T>(path: string, baseUrl?: string): Promise<T> {
+async function apiGetEnveloped<T extends z.ZodTypeAny>(
+  path: string,
+  schema: T,
+  baseUrl?: string
+): Promise<z.infer<T>> {
   const urlBase = baseUrl ?? BASE_URL;
   if (!urlBase) throw new ApiError(0, "API base URL is not set");
+
   const res = await fetch(`${urlBase}${path}`, {
     method: "GET",
-    headers: { "Accept": "application/json" },
+    headers: { Accept: "application/json" },
     credentials: "include",
   });
 
-  const body = (await readBody(res)) as Envelope<T> | null;
+  const body = (await readBody(res)) as Envelope<unknown> | null;
 
   if (!res.ok || !body?.success) {
     throw errorFrom(res, body);
   }
 
-  return body.data as T;
+  return parseOrThrow(schema, body.data, `GET ${path}`);
 }
 
-async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: TRequest): Promise<TResponse> {
+async function apiPostEnveloped<TRequest, TSchema extends z.ZodTypeAny>(
+  path: string,
+  requestBody: TRequest,
+  schema: TSchema
+): Promise<z.infer<TSchema>> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -245,28 +152,70 @@ async function apiPostEnveloped<TRequest, TResponse>(path: string, requestBody: 
     body: JSON.stringify(requestBody),
   });
 
-  const response = (await readBody(res)) as Envelope<TResponse> | null;
+  const response = (await readBody(res)) as Envelope<unknown> | null;
 
   if (!res.ok || !response?.success) {
     throw errorFrom(res, response);
   }
 
-  return response.data as TResponse;
+  return parseOrThrow(schema, response.data, `POST ${path}`);
 }
 
-export async function getWeeks(): Promise<Week[]> {
-  const res = await fetch("/api/weeks", {
-    cache: "no-store",
-    credentials: "include",
+async function proxyGet<T extends z.ZodTypeAny>(
+  path: string,
+  schema: T
+): Promise<z.infer<T>> {
+  const res = await fetch(path, {
+    method: "GET",
     headers: { Accept: "application/json" },
+    credentials: "include",
+    cache: "no-store",
   });
 
+  const body = await readBody(res);
+
   if (!res.ok) {
-    throw errorFrom(res, await readBody(res));
+    throw errorFrom(res, body);
   }
 
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data?.data ?? []);
+  const payload =
+    body !== null && typeof body === "object" && "data" in (body as object)
+      ? (body as { data: unknown }).data
+      : body;
+
+  return parseOrThrow(schema, payload, `GET ${path}`);
+}
+
+export const LOGIN_URL = `${BASE_URL}/oauth/google/login`;
+export const LOGOUT_URL = `${BASE_URL}/oauth/logout`;
+
+export async function getProfile(): Promise<UserProfile | null> {
+  const res = await fetch("/api/profile", {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (res.status === 401) {
+    return null;
+  }
+
+  const body = (await readBody(res)) as Envelope<unknown> | null;
+
+  if (!res.ok || !body?.success) {
+    throw errorFrom(res, body);
+  }
+
+  return parseOrThrow(userProfileSchema, body.data, "GET /api/profile");
+}
+
+export function getProblem(problemId: string, apiBaseUrl?: string): Promise<ProblemDetail> {
+  return apiGetEnveloped(`/api/problems/${problemId}`, problemDetailSchema, apiBaseUrl);
+}
+
+export function getWeeks(): Promise<Week[]> {
+  return proxyGet("/api/weeks", weekListSchema);
 }
 
 export async function getWeek(id: string): Promise<Week | null> {
@@ -277,72 +226,41 @@ export async function getWeek(id: string): Promise<Week | null> {
     return null;
   }
 }
- 
-export async function getWeekProblems(id: string): Promise<WeekProblem[]> {
-  const res = await fetch(`/api/weeks/${id}/problems`, {
-    cache: "no-store",
-    credentials: "include",
-    headers: { Accept: "application/json" },
-  });
 
-  if (!res.ok) {
-    throw errorFrom(res, await readBody(res));
-  }
-
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data?.data ?? []);
+export function getWeekProblems(id: string): Promise<WeekProblem[]> {
+  return proxyGet(`/api/weeks/${id}/problems`, weekProblemListSchema);
 }
- 
-// ---------- Events ----------
- 
+
 export function getEvents(): Promise<Event[]> {
-  return apiGetEnveloped<Event[]>("/api/events");
+  return apiGetEnveloped("/api/events", eventListSchema);
 }
- 
+
 export function getEvent(id: string): Promise<Event> {
-  return apiGetEnveloped<Event>(`/api/events/${id}`);
+  return apiGetEnveloped(`/api/events/${id}`, eventSchema);
 }
 
-export function runCode(
-    problemId: string,
-    body: RunRequest
-): Promise<RunResponse> {
-    return apiPostEnveloped(
-        `/api/problems/${problemId}/run`,
-        body
-    );
+export function runCode(problemId: string, body: RunRequest): Promise<RunResponse> {
+  return apiPostEnveloped(
+    `/api/problems/${problemId}/run`,
+    body,
+    z.custom<RunResponse>()
+  );
 }
 
-export function getRun(
-    runId: string
-): Promise<RunResult> {
-    return apiGetEnveloped(
-        `/api/runs/${runId}`
-    );
+export function getRun(runId: string): Promise<RunResult> {
+  return apiGetEnveloped(`/api/runs/${runId}`, z.custom<RunResult>());
 }
 
-export function submitCode(
-    problemId: string,
-    body: SubmitRequest
-): Promise<SubmitResponse> {
-    return apiPostEnveloped(
-        `/api/problems/${problemId}/submit`,
-        body
-    );
+export function submitCode(problemId: string, body: SubmitRequest): Promise<SubmitResponse> {
+  return apiPostEnveloped(`/api/problems/${problemId}/submit`, body, submitResponseSchema);
 }
 
-export function getSubmission(
-    submissionId: string
-): Promise<SubmissionResult> {
-    return apiGetEnveloped(
-        `/api/submissions/${submissionId}`
-    );
+export function getSubmission(submissionId: string): Promise<SubmissionDetail> {
+  return apiGetEnveloped(`/api/submissions/${submissionId}`, submissionDetailSchema);
 }
 
-export function getSubmissionHistory(
-  problemId: string
-): Promise<SubmissionResult[]> {
-  return apiGetEnveloped(`/api/problems/${problemId}/submissions`);
+export function getSubmissionHistory(problemId: string): Promise<ProblemSubmission[]> {
+  return apiGetEnveloped(`/api/problems/${problemId}/submissions`, problemSubmissionListSchema);
 }
 
 function buildLeaderboardEndpoint(kind: LeaderboardKind, tab: LeaderboardTab) {
@@ -351,6 +269,24 @@ function buildLeaderboardEndpoint(kind: LeaderboardKind, tab: LeaderboardTab) {
   return `/${audience}/${kind}_leaderboard`;
 }
 
+export function getLeaderboard(
+  kind: "weekly",
+  role: UserRole | undefined,
+  tab: LeaderboardTab,
+  opts: { page: number; limit: number; weekId?: string }
+): Promise<WeeklyLeaderboardResponse>;
+export function getLeaderboard(
+  kind: "season",
+  role: UserRole | undefined,
+  tab: LeaderboardTab,
+  opts: { page: number; limit: number; weekId?: string }
+): Promise<SeasonLeaderboardResponse>;
+export function getLeaderboard(
+  kind: LeaderboardKind,
+  role: UserRole | undefined,
+  tab: LeaderboardTab,
+  opts: { page: number; limit: number; weekId?: string }
+): Promise<WeeklyLeaderboardResponse | SeasonLeaderboardResponse>;
 export async function getLeaderboard(
   kind: LeaderboardKind,
   role: UserRole | undefined,
@@ -363,12 +299,11 @@ export async function getLeaderboard(
   if (kind === "weekly" && opts.weekId) params.set("week_id", opts.weekId);
 
   const endpoint = buildLeaderboardEndpoint(kind, tab);
-  const headers: Record<string, string> = { Accept: "application/json" };
+  const path = `/api/leaderboard${endpoint}?${params.toString()}`;
 
-  // Route through the Next.js API proxy to avoid CORS issues
-  const res = await fetch(`/api/leaderboard${endpoint}?${params.toString()}`, {
+  const res = await fetch(path, {
     method: "GET",
-    headers,
+    headers: { Accept: "application/json" },
     credentials: "include",
     cache: "no-store",
   });
@@ -379,8 +314,10 @@ export async function getLeaderboard(
     throw errorFrom(res, body);
   }
 
-  return body as WeeklyLeaderboardResponse | SeasonLeaderboardResponse;
-}
+  const schema =
+    kind === "weekly" ? weeklyLeaderboardResponseSchema : seasonLeaderboardResponseSchema;
 
+  return parseOrThrow(schema, body, `GET ${path}`);
+}
 
 export { ApiError };

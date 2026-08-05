@@ -10,17 +10,13 @@ import {
   Medal,
   Loader2,
   LogIn,
-  KeyRound,
-  Check,
   X,
   Users,
   Flame,
-  Zap,
   ChevronDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LOGIN_URL } from "@/lib/api-client";
-import { useAuth } from "@/hooks/useAuth";
 
 /* ── Pixel font for the "Hall of Champions" header block ── */
 const PIXEL_FONT_STYLE = `

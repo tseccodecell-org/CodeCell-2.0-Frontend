@@ -12,8 +12,22 @@ import {
   Check,
   FileCode2,
 } from "lucide-react";
-import { getSubmissionHistory, getSubmission, ApiError } from "@/lib/api-client";
-import type { SubmissionResult, Language } from "@/lib/types/submission";
+import {
+  getSubmissionHistory,
+  getSubmission,
+  ApiError,
+  type ProblemSubmission,
+  type SubmissionDetail,
+} from "@/lib/api-client";
+import type { Language } from "@/lib/types/submission";
+
+const LANGUAGES: readonly Language[] = ["CPP", "JAVA", "PYTHON"];
+
+function asLanguage(value: string | undefined): Language | null {
+  if (!value) return null;
+  const upper = value.toUpperCase() as Language;
+  return LANGUAGES.includes(upper) ? upper : null;
+}
 
 const tokens = {
   panelAlt: "#0d0f14",
@@ -36,11 +50,7 @@ interface SubmissionHistoryProps {
   onLoadCode?: (language: Language, code: string) => void;
 }
 
-function verdictColor(
-  status: SubmissionResult["status"],
-  verdict: string,
-  invalidated?: boolean
-) {
+function verdictColor(status: string, verdict: string, invalidated?: boolean) {
   if (invalidated) return tokens.violet;
   if (status === "FAILED") return tokens.red;
   if (status === "QUEUED" || status === "RUNNING") return tokens.gold;
@@ -53,11 +63,11 @@ export default function SubmissionHistory({
   refreshKey = 0,
   onLoadCode,
 }: SubmissionHistoryProps) {
-  const [items, setItems] = useState<SubmissionResult[]>([]);
+  const [items, setItems] = useState<ProblemSubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [details, setDetails] = useState<Record<string, SubmissionResult>>({});
+  const [details, setDetails] = useState<Record<string, SubmissionDetail>>({});
   const [detailLoading, setDetailLoading] = useState<string | null>(null);
   const [detailError, setDetailError] = useState<Record<string, string>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -110,7 +120,7 @@ export default function SubmissionHistory({
     setError(null);
     try {
       const data = await getSubmissionHistory(problemId);
-      setItems(data ?? []);
+      setItems(data);
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -186,7 +196,8 @@ export default function SubmissionHistory({
           const isOpen = expandedId === item.id;
           const detail = details[item.id];
           const rowError = detailError[item.id];
-          const language = detail?.language ?? item.language;
+          const language = asLanguage(detail?.language ?? item.language);
+          const executionTimeMs = detail?.executionTimeMs;
 
           return (
             <div
@@ -236,7 +247,7 @@ export default function SubmissionHistory({
                       <span style={item.invalidated ? { textDecoration: "line-through" } : undefined}>
                         {item.score ?? 0} pts
                       </span>
-                      <span>{item.executionTimeMs} ms</span>
+                      {executionTimeMs !== undefined && <span>{executionTimeMs} ms</span>}
                     </>
                   )}
                   {item.invalidated && (

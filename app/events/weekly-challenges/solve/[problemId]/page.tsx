@@ -19,6 +19,7 @@ import type { LanguageKey, RunResponse } from "@/lib/runtime-api";
 
 import type { ProblemDetail } from "@/lib/types/problem";
 import type { SubmissionState, Language } from "@/lib/types/submission";
+import { toSubmissionStatus, isTerminalStatus } from "@/lib/schemas/submission";
 
 type PageProps = {
   params: Promise<{ problemId: string }>;
@@ -153,17 +154,17 @@ export default function Solve({ params }: PageProps) {
 
       setSubmission((prev) => ({
         ...prev,
-        status: result.status,
+        status: toSubmissionStatus(result.status),
         verdict: result.verdict,
         score: result.score,
         executionTime: result.executionTimeMs,
         memoryUsed: result.memoryUsedKb,
         queuePosition: result.queuePosition,
-        testResults: result.testResults ?? [],
+        testResults: result.testResults,
         errorMessage: result.errorMessage,
       }));
 
-      if (result.status === "COMPLETED" || result.status === "FAILED") {
+      if (isTerminalStatus(result.status)) {
         setActiveAction(null);
         stopPolling();
         setHistoryRefreshKey((k) => k + 1);
@@ -218,7 +219,7 @@ export default function Solve({ params }: PageProps) {
 
       pollErrorCountRef.current = 0;
 
-      const done = result.status === "COMPLETED" || result.status === "FAILED";
+      const done = isTerminalStatus(result.status);
 
       setSubmission((prev) => ({
         ...prev,
@@ -363,7 +364,7 @@ export default function Solve({ params }: PageProps) {
 
       if (!isMountedRef.current) return;
 
-      const settled = response.status === "COMPLETED" || response.status === "FAILED";
+      const settled = isTerminalStatus(response.status);
 
       setSubmission((prev) => ({
         ...prev,

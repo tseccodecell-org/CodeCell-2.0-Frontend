@@ -86,7 +86,7 @@ export default function CodeOfConductPage() {
               <span className="text-[#4BE2C4]">2.</span> Fair Play and Academic Integrity
             </h2>
             <p className="mb-4 text-[#8A8880] font-mono text-xs">
-              Weekly Challenges is built on the principle that every participant's rank should reflect their own skill, consistency, and effort.
+              Weekly Challenges is built on the principle that every participant&apos;s rank should reflect their own skill, consistency, and effort.
             </p>
             <p className="mb-3 font-semibold text-[#F0EDE6]">Participants must:</p>
             <ul className="space-y-3 list-none font-sans mb-6">
@@ -144,7 +144,7 @@ export default function CodeOfConductPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#4BE2C4] mt-1">•</span>
-                <span>Every weekly challenge contributes to the participant's overall standing; consistency across all six weeks is essential.</span>
+                <span>Every weekly challenge contributes to the participant&apos;s overall standing; consistency across all six weeks is essential.</span>
               </li>
             </ul>
           </section>
@@ -245,7 +245,7 @@ export default function CodeOfConductPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#FF4D4D] mt-1">•</span>
-                    <span>Submit another participant's work.</span>
+                    <span>Submit another participant&apos;s work.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#FF4D4D] mt-1">•</span>
@@ -328,7 +328,7 @@ export default function CodeOfConductPage() {
               <span className="text-[#4BE2C4]">9.</span> Internship Opportunities
             </h2>
             <p className="mb-3 text-[#C0BEB8]">
-              Round 2 qualifiers become eligible for internship opportunities offered by the event's hiring partners.
+              Round 2 qualifiers become eligible for internship opportunities offered by the event&apos;s hiring partners.
             </p>
             <p className="text-[#8A8880]">
               Eligibility for internship opportunities may be revoked if any participant is later found violating the Code of Conduct or Fair Play Policy.
@@ -356,7 +356,7 @@ export default function CodeOfConductPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#FF4D4D] mt-1">•</span>
-                <span>Interfere with another participant's submission.</span>
+                <span>Interfere with another participant&apos;s submission.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#FF4D4D] mt-1">•</span>
@@ -437,7 +437,7 @@ export default function CodeOfConductPage() {
             </div>
 
             <p className="mt-6 text-xs font-mono text-[#8A8880] italic">
-              These consequences align with the event's Fair Play Policy.
+              These consequences align with the event&apos;s Fair Play Policy.
             </p>
           </section>
 

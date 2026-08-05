@@ -16,7 +16,7 @@ export function Editorials() {
           >
             Grandmaster <span className="text-gold">Analysis</span>
           </motion.h2>
-          <p className="text-white/60">Study the optimal moves. Learn from the organizers' solutions.</p>
+          <p className="text-white/60">Study the optimal moves. Learn from the organizers&apos; solutions.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

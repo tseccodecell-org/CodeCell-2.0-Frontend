@@ -211,17 +211,9 @@ export function RegistrationForm() {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#4BE2C4]/10 to-[#E8FF00]/10 rounded-full blur-2xl pointer-events-none" />
 
                                 <div className="flex items-center gap-3.5 border-b border-zinc-800/80 pb-4 relative z-10">
-                                    {false ? (
-                                        <img
-                                            src=""
-                                            alt={formData.fullName}
-                                            className="w-10 h-10 rounded-full border border-zinc-800"
-                                        />
-                                    ) : (
-                                        <div className="w-10 h-10 rounded-full bg-[#4BE2C4]/10 border border-[#4BE2C4]/20 flex items-center justify-center text-[#4BE2C4] font-bold text-sm">
-                                            {formData.fullName ? formData.fullName[0].toUpperCase() : "U"}
-                                        </div>
-                                    )}
+                                    <div className="w-10 h-10 rounded-full bg-[#4BE2C4]/10 border border-[#4BE2C4]/20 flex items-center justify-center text-[#4BE2C4] font-bold text-sm">
+                                        {formData.fullName ? formData.fullName[0].toUpperCase() : "U"}
+                                    </div>
                                     <div>
                                         <h4 className="font-bold text-white text-sm leading-snug">{formData.fullName}</h4>
                                         <span className="text-xs text-zinc-400">{profile?.email}</span>
@@ -309,17 +301,9 @@ export function RegistrationForm() {
                                     {profile && (
                                         <div className="flex items-center gap-3.5 bg-[#141414]/90 border border-zinc-800/80 rounded-2xl p-3.5 mb-4 relative overflow-hidden">
                                             <div className="absolute right-0 top-0 w-16 h-16 bg-[#4BE2C4]/5 rounded-full blur-xl pointer-events-none" />
-                                            {false ? (
-                                                <img
-                                                    src=""
-                                                    alt="Avatar"
-                                                    className="w-10 h-10 rounded-full border border-zinc-800"
-                                                />
-                                            ) : (
-                                                <div className="w-10 h-10 rounded-full bg-[#4BE2C4]/10 border border-[#4BE2C4]/20 flex items-center justify-center text-[#4BE2C4] font-bold text-sm">
-                                                    {profile.name ? profile.name[0].toUpperCase() : "U"}
-                                                </div>
-                                            )}
+                                            <div className="w-10 h-10 rounded-full bg-[#4BE2C4]/10 border border-[#4BE2C4]/20 flex items-center justify-center text-[#4BE2C4] font-bold text-sm">
+                                                {profile.name ? profile.name[0].toUpperCase() : "U"}
+                                            </div>
                                             <div className="flex flex-col min-w-0">
                                                 <span className="text-[9px] text-[#4BE2C4] uppercase font-bold tracking-wider block">Verified Account</span>
                                                 <span className="text-xs font-bold text-zinc-100 truncate pr-2 mt-0.5">{profile.name || profile.username}</span>

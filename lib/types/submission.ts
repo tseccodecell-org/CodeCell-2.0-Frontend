@@ -1,14 +1,17 @@
-export type SubmissionStatus =
-  | "IDLE"
-  | "QUEUED"
-  | "RUNNING"
-  | "COMPLETED"
-  | "FAILED";
+export type {
+  SubmissionStatus,
+  SubmissionTestResult,
+  SubmitResponse,
+  SubmissionDetail,
+  ProblemSubmission,
+} from "@/lib/schemas/submission";
 
-export type Language =
-  | "CPP"
-  | "JAVA"
-  | "PYTHON";
+import type {
+  SubmissionStatus,
+  SubmissionTestResult,
+} from "@/lib/schemas/submission";
+
+export type Language = "CPP" | "JAVA" | "PYTHON";
 
 export interface RunRequest {
   language: Language;
@@ -42,21 +45,6 @@ export interface SubmitRequest {
   sourceCode: string;
 }
 
-export interface SubmissionTestResult {
-  passed: unknown;
-  testCaseId: string;
-  orderNum: number;
-  verdict: string;
-  timeMs?: number;
-  memoryKb?: number;
-}
-
-export interface SubmitResponse {
-  submissionId: string;
-  status: SubmissionStatus;
-  queuePosition?: number;
-}
-
 export interface SubmissionState {
   status: SubmissionStatus;
   verdict?: string;
@@ -68,24 +56,6 @@ export interface SubmissionState {
   stderr?: string;
   submissionId?: string;
   errorMessage?: string;
-  queuePosition?: number;          // new
-  testResults: SubmissionTestResult[];
-}
-
-// used by history list — optional so existing single-submission usage is unaffected
-export interface SubmissionResult {
-  id: string;
-  status: SubmissionStatus;
-  verdict: string;
-  score: number;
-  executionTimeMs: number;
-  memoryUsedKb: number;
-  errorMessage?: string;
-  testResults: SubmissionTestResult[];
-  submittedAt?: string;
-  judgedAt?: string;
-  language?: Language;
-  sourceCode?: string;
   queuePosition?: number;
-  invalidated?: boolean;
+  testResults: SubmissionTestResult[];
 }

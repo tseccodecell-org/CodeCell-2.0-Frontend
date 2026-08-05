@@ -909,7 +909,7 @@ export function GeometricNodeArraySvg() {
 /* ============================================================
    18. Hexagon Badge with text
    ============================================================ */
-export function HexagonBadgeSvg({ text }: { text: string }) {
+export function HexagonBadgeSvg(_props: { text: string }) {
   const gradId = React.useId();
   return (
     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"

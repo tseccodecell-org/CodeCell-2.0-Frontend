@@ -34,7 +34,7 @@ function useTypewriter(text: string, speed: number, start: boolean, startDelay: 
       clearTimeout(timeout);
       if (interval) clearInterval(interval);
     };
-  }, [start]);
+  }, [start, text, speed, startDelay]);
 
   return output;
 }

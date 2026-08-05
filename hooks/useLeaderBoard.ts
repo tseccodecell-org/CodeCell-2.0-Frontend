@@ -26,7 +26,7 @@ export function useLeaderboard({
   limit = 25,
   weekId,
 }: UseLeaderboardOptions) {
-  const { user, isTsecStudent, isAuthenticated } = useAuth();
+  const { user, isTsecStudent } = useAuth();
 
   const [selectedTab, setSelectedTab] = useState<LeaderboardTab>("GLOBAL");
   const [data, setData] = useState<LeaderboardResponse | null>(null);

@@ -6,17 +6,11 @@ import Link from "next/link";
 import {
   Lock,
   Check,
-  Zap,
   Swords,
-  Trophy,
-  Users,
-  Clock,
   ArrowRight,
   ShieldAlert,
-  Flame,
-  Award,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { getWeeks, type Week as BackendWeek } from "@/lib/api-client";
 
 type WeekStatus = "completed" | "live" | "locked";

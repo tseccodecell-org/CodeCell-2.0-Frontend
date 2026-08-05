@@ -25,6 +25,23 @@ const eslintConfig = [
   {
     rules: {
       "react/jsx-no-comment-textnodes": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      "components/sections/leaderboard/LeaderboardTable.tsx",
+      "components/sections/weekly-challenges/Sponsors.tsx",
+    ],
+    rules: {
+      "@next/next/no-img-element": "off",
     },
   },
 ];

@@ -1,4 +1,3 @@
-import * as THREE from "three";
 
 interface ChessPieceProps {
   type: string;

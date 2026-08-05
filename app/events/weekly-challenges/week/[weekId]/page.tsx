@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Check, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { getWeek, getWeekProblems } from "@/lib/api-client";
 
 type Difficulty = "easy" | "medium" | "hard";

@@ -23,7 +23,7 @@ export default function GlitchText({ text, className = "", triggerOnMount = fals
     const intervalTime = 50; // ~50ms per step
 
     const interval = setInterval(() => {
-      setDisplayText((prev) => {
+      setDisplayText(() => {
         return text
           .split("")
           .map((char, index) => {

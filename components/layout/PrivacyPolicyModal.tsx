@@ -55,7 +55,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: { isOpen: boolea
               <section>
                 <h3 className="font-mono text-[11px] text-[#4BE2C4] uppercase tracking-widest mb-2">1. Data Collection</h3>
                 <p className="leading-relaxed">
-                  TSEC CodeCell ("we", "our", or "us") respects your privacy. We collect minimal personal information (such as name, email, and academic details) only when you voluntarily submit it through our membership forms, event registrations, or contact forms.
+                  TSEC CodeCell (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy. We collect minimal personal information (such as name, email, and academic details) only when you voluntarily submit it through our membership forms, event registrations, or contact forms.
                 </p>
               </section>
               <section>

@@ -285,7 +285,7 @@ function PanelError({ message, onRetry }: { message: string; onRetry?: () => voi
         <AlertTriangle size={16} style={{ color: tokens.red }} />
       </div>
       <span className="text-[11px] font-mono font-bold uppercase tracking-wide" style={{ color: tokens.red }}>
-        Couldn't load this problem
+        Couldn&apos;t load this problem
       </span>
       <p className="text-[13px] font-sans" style={{ color: tokens.muted }}>
         {message}

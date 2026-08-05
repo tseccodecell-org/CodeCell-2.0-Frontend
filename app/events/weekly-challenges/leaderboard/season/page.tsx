@@ -1,4 +1,3 @@
-// app/leaderboard/season/page.tsx
 "use client";
 
 import { useState, useMemo } from "react";
@@ -7,7 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import { useLeaderboard } from "@/hooks/useLeaderBoard";
 import LeaderboardToggle from "@/components/sections/leaderboard/LeaderboardToggle";
 import LeaderboardTable, { LeaderboardRow } from "@/components/sections/leaderboard/LeaderboardTable";
-import { SeasonLeaderboardResponse } from "@/lib/types/leaderboard";
+import type { SeasonLeaderboardResponse } from "@/lib/types/leaderboard";
 
 export default function SeasonLeaderboardPage() {
   const [page, setPage] = useState(1);
@@ -23,32 +22,23 @@ export default function SeasonLeaderboardPage() {
     showToggle,
   } = useLeaderboard({ kind: "season", page, limit: 25 });
 
-  const response = data as any;
+  const response = data as SeasonLeaderboardResponse | null;
 
   const rows: LeaderboardRow[] = useMemo(() => {
     if (!response) return [];
 
-    let list: any[] = [];
-    if (Array.isArray(response)) {
-      list = response;
-    } else if (Array.isArray(response.data)) {
-      list = response.data;
-    } else if (Array.isArray(response?.data?.data)) {
-      list = response.data.data;
-    }
-
-    return list.map((entry: any, index: number) => ({
-      rank: entry.rank ?? index + 1,
-      id: entry.user_id ?? entry.id ?? entry.username ?? index,
-      name: entry.name ?? entry.username ?? "Anonymous",
-      primaryValue: entry.final_rating ?? entry.rating ?? entry.season_xp ?? 0,
+    return response.data.map((entry) => ({
+      rank: entry.rank,
+      id: entry.user_id,
+      name: entry.name,
+      primaryValue: entry.final_rating,
       primaryLabel: "FINAL RATING",
-      secondaryValue: entry.season_xp ?? entry.xp ?? 0,
+      secondaryValue: entry.season_xp,
       secondaryLabel: "SEASON XP",
     }));
   }, [response]);
 
-  const hasNext = Boolean(response?.has_next ?? response?.data?.has_next ?? false);
+  const hasNext = response?.has_next ?? false;
 
   return (
     <>

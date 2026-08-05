@@ -37,6 +37,7 @@ const eslintConfig = [
   },
   {
     files: [
+      "app/download/page.tsx",
       "components/sections/leaderboard/LeaderboardTable.tsx",
       "components/sections/weekly-challenges/Sponsors.tsx",
     ],

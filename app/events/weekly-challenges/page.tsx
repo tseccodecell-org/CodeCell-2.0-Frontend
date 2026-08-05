@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Trophy, Zap, ShieldCheck } from "lucide-react";
+import { X, ArrowRight, Trophy, Zap, ShieldCheck, Download } from "lucide-react";
 import { Hero } from "@/components/sections/weekly-challenges/Hero";
 import { Overview } from "@/components/sections/weekly-challenges/Overview";
 import { Prizes } from "@/components/sections/weekly-challenges/Prizes";
@@ -28,7 +28,7 @@ export default function WeeklyChallengesPage() {
       <Overview />
       <FAQ />
 
-      {/* Bottom CTA with Trigger */}
+      {/* Bottom CTA Section */}
       <div className="relative pb-12 sm:pb-16 flex justify-center px-4">
         {isAuthenticated && isProfileComplete ? (
           <Link
@@ -56,33 +56,15 @@ export default function WeeklyChallengesPage() {
 
       <FinalCTA />
 
-      {/* Floating Glowing CTA Button (Sticky Bottom Right) — hidden on small mobile to avoid overlap */}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 hidden sm:block">
-        {isAuthenticated && isProfileComplete ? (
-          <Link
-            href="/events/weekly-challenges/timeline"
-            className="relative flex items-center gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
-          >
-            <span>Go to Timeline</span>
-            <ArrowRight size={14} />
-          </Link>
-        ) : isAuthenticated && !isProfileComplete ? (
-          <Link
-            href="/register"
-            className="relative flex items-center gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
-          >
-            <span>Fill Details (Step 2)</span>
-            <ArrowRight size={14} />
-          </Link>
-        ) : (
-          <button
-            onClick={() => setShowRegisterModal(true)}
-            className="relative flex items-center gap-2 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
-          >
-            <span>Register Now</span>
-            <ArrowRight size={14} />
-          </button>
-        )}
+      {/* Floating Glowing CTA Button (Sticky Bottom Right) */}
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
+        <Link
+          href="/download"
+          className="relative flex items-center gap-2.5 px-5 py-3 sm:px-7 sm:py-3.5 rounded-full bg-gradient-to-r from-[#eab308] via-[#f59e0b] to-[#eab308] text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_45px_rgba(234,179,8,0.9)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-[#eab308]/50 animate-pulse"
+        >
+          <Download size={15} />
+          <span>Install CodeCell Runtime</span>
+        </Link>
       </div>
 
       {/* Registration Dialog Modal */}

@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { useLeaderboard } from "@/hooks/useLeaderBoard";
+import { useAuth } from "@/hooks/useAuth";
 import LeaderboardToggle from "@/components/sections/leaderboard/LeaderboardToggle";
 import LeaderboardTable, { LeaderboardRow } from "@/components/sections/leaderboard/LeaderboardTable";
 import type { WeeklyLeaderboardResponse } from "@/lib/types/leaderboard";
 
 export default function WeeklyLeaderboardPage() {
-  const [page, setPage] = useState(1);
+  const { user } = useAuth();
 
   const {
     data,
@@ -20,7 +21,7 @@ export default function WeeklyLeaderboardPage() {
     selectedTab,
     setSelectedTab,
     showToggle,
-  } = useLeaderboard({ kind: "weekly", page, limit: 25 });
+  } = useLeaderboard({ kind: "weekly", page: 1, limit: 1000 });
 
   const response = data as WeeklyLeaderboardResponse | null;
 
@@ -38,7 +39,28 @@ export default function WeeklyLeaderboardPage() {
     }));
   }, [response]);
 
-  const hasNext = response?.has_next ?? false;
+  const [persistentUserRow, setPersistentUserRow] = useState<LeaderboardRow | undefined>(undefined);
+
+  useEffect(() => {
+    if (user?.id) {
+      const found = rows.find((r) => String(r.id) === String(user.id));
+      if (found) {
+        setPersistentUserRow(found);
+      } else if (!isLoading && !persistentUserRow) {
+        setPersistentUserRow({
+          id: user.id,
+          name: user.name || "Anonymous",
+          rank: 0,
+          primaryValue: 0,
+          primaryLabel: "WEEKLY SCORE",
+          secondaryValue: 0,
+          secondaryLabel: "SOLVED",
+        });
+      }
+    }
+  }, [rows, user?.id, persistentUserRow, user?.name, isLoading]);
+
+  const totalCount = response?.total ?? rows.length;
 
   return (
     <>
@@ -60,16 +82,14 @@ export default function WeeklyLeaderboardPage() {
         error={error}
         forbidden={forbidden}
         unauthorized={unauthorized}
-        page={page}
-        hasNext={hasNext}
-        onPageChange={setPage}
+        currentUserRow={persistentUserRow}
+        totalCount={totalCount}
         controls={
           <LeaderboardToggle
             show={showToggle}
             selectedTab={selectedTab}
             onChange={(tab) => {
               setSelectedTab(tab);
-              setPage(1);
             }}
           />
         }

@@ -26,17 +26,26 @@ export function useLeaderboard({
   limit = 25,
   weekId,
 }: UseLeaderboardOptions) {
-  const { user, isTsecStudent } = useAuth();
+  const { user, isTsecStudent, isLoading: isAuthLoading } = useAuth();
 
+  const showToggle = isTsecStudent;
+
+  const [hasInitTab, setHasInitTab] = useState(false);
   const [selectedTab, setSelectedTab] = useState<LeaderboardTab>("GLOBAL");
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isAuthLoading && !hasInitTab) {
+      setSelectedTab(isTsecStudent ? "TSEC" : "GLOBAL");
+      setHasInitTab(true);
+    }
+  }, [isAuthLoading, isTsecStudent, hasInitTab]);
   const [error, setError] = useState<string | null>(null);
   const [forbidden, setForbidden] = useState(false);
   const [unauthorized, setUnauthorized] = useState(false);
   const [refetchToken, setRefetchToken] = useState(0);
 
-  const showToggle = isTsecStudent;
 
   const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);
@@ -73,14 +82,20 @@ export function useLeaderboard({
   }, [kind, user?.role, selectedTab, page, limit, weekId]);
 
   useEffect(() => {
-    fetchLeaderboard();
-  }, [fetchLeaderboard, refetchToken]);
+    if (hasInitTab) {
+      fetchLeaderboard();
+    }
+  }, [fetchLeaderboard, refetchToken, hasInitTab]);
 
   useEffect(() => {
-    if (!showToggle && selectedTab === "TSEC") {
-      setSelectedTab("GLOBAL");
-    }
-  }, [showToggle, selectedTab]);
+    setSelectedTab((current) => {
+      // When their TSEC profile loads, instantly move them to the TSEC tab!
+      if (showToggle && current === "GLOBAL") return "TSEC";
+      // If they log out or lose TSEC status, move them back to GLOBAL
+      if (!showToggle && current === "TSEC") return "GLOBAL";
+      return current;
+    });
+  }, [showToggle]);
 
   return {
     data,

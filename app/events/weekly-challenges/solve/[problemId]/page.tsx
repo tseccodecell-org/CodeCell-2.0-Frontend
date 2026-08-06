@@ -91,6 +91,7 @@ export default function Solve({ params }: PageProps) {
     testResults: [],
   });
   const [leftTab, setLeftTab] = useState<"statement" | "submissions" | "editorial">("statement");
+  const [mobilePane, setMobilePane] = useState<"problem" | "code" | "result">("problem");
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [resultMode, setResultMode] = useState<"RUN" | "SUBMIT" | null>(null);
   const [lastInput, setLastInput] = useState("");
@@ -325,6 +326,7 @@ export default function Solve({ params }: PageProps) {
     try {
       setActiveAction("RUN");
       setResultMode("RUN");
+      setMobilePane("result");
       setLastInput(stdin);
       pollErrorCountRef.current = 0;
       setSubmission({
@@ -416,6 +418,7 @@ export default function Solve({ params }: PageProps) {
       if (!isMountedRef.current) return;
 
       setResultMode("SUBMIT");
+      setMobilePane("result");
       setActiveAction(null);
       setSubmission({
         status: "QUEUED",
@@ -535,7 +538,7 @@ export default function Solve({ params }: PageProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-3 font-mono text-[11px] text-[#8B93A7]">
+        <div className="hidden items-center gap-3 font-mono text-[11px] text-[#8B93A7] sm:flex">
           {problem && (
             <>
               <span>{problem.timeLimitMs} ms</span>
@@ -548,10 +551,34 @@ export default function Solve({ params }: PageProps) {
         </div>
       </header>
 
-      <div ref={containerRef} className="relative flex min-h-0 flex-1">
+      <div className="flex h-10 shrink-0 items-center gap-1 border-b border-[#1a1c24] bg-[#0d0f14] px-2 md:hidden">
+        {(
+          [
+            { key: "problem", text: "Problem" },
+            { key: "code", text: "Code" },
+            { key: "result", text: "Result" },
+          ] as const
+        ).map((pane) => (
+          <button
+            key={pane.key}
+            onClick={() => setMobilePane(pane.key)}
+            className={`flex-1 rounded px-2.5 py-1 text-center font-mono text-[11px] tracking-wide transition-colors cursor-pointer ${
+              mobilePane === pane.key
+                ? "bg-[#151821] text-[#D9A404]"
+                : "text-[#8B93A7] hover:text-[#F4F1EA]"
+            }`}
+          >
+            {pane.text}
+          </button>
+        ))}
+      </div>
+
+      <div ref={containerRef} className="relative flex min-h-0 flex-1 flex-col md:flex-row">
         <div
-          style={{ width: `${leftWidth}%` }}
-          className="flex h-full shrink-0 flex-col overflow-hidden border-r border-[#1a1c24] bg-[#0b0d13]"
+          style={{ ["--left-w" as string]: `${leftWidth}%` }}
+          className={`h-full w-full flex-col overflow-hidden border-[#1a1c24] bg-[#0b0d13] md:h-full md:w-(--left-w) md:shrink-0 md:border-r ${
+            mobilePane === "problem" ? "flex" : "hidden"
+          } md:flex`}
         >
           <div className="flex h-10 shrink-0 items-center gap-1 border-b border-[#1a1c24] bg-[#0d0f14] px-2">
   {(
@@ -594,17 +621,21 @@ export default function Solve({ params }: PageProps) {
 
         <div
           onMouseDown={() => startDrag("horizontal")}
-          className="w-1 shrink-0 cursor-col-resize bg-[#1a1c24] transition-colors hover:bg-[#D9A404]/40"
+          className="hidden w-1 shrink-0 cursor-col-resize bg-[#1a1c24] transition-colors hover:bg-[#D9A404]/40 md:block"
         />
 
         <div
           ref={rightColRef}
-          style={{ width: `calc(${100 - leftWidth}% - 4px)` }}
-          className="flex h-full min-w-0 flex-col"
+          style={{ ["--right-w" as string]: `calc(${100 - leftWidth}% - 4px)` }}
+          className={`h-full w-full min-w-0 flex-col md:flex md:w-(--right-w) ${
+            mobilePane === "code" || mobilePane === "result" ? "flex" : "hidden"
+          }`}
         >
           <div
-            style={{ height: `${editorHeight}%` }}
-            className="min-h-0 shrink-0 overflow-hidden"
+            style={{ ["--editor-h" as string]: `${editorHeight}%` }}
+            className={`min-h-0 w-full flex-col overflow-hidden md:h-(--editor-h) md:shrink-0 ${
+              mobilePane === "code" ? "flex flex-1" : "hidden"
+            } md:flex md:flex-none`}
           >
             <CodeEditor
               problemId={problemId}
@@ -621,10 +652,14 @@ export default function Solve({ params }: PageProps) {
 
           <div
             onMouseDown={() => startDrag("vertical")}
-            className="h-1 shrink-0 cursor-row-resize bg-[#1a1c24] transition-colors hover:bg-[#D9A404]/40"
+            className="hidden h-1 shrink-0 cursor-row-resize bg-[#1a1c24] transition-colors hover:bg-[#D9A404]/40 md:block"
           />
 
-          <div className="min-h-0 flex-1">
+          <div
+            className={`min-h-0 w-full flex-1 md:flex ${
+              mobilePane === "result" ? "flex" : "hidden"
+            }`}
+          >
             <VerdictPanel
               status={submission.status}
               mode={resultMode}

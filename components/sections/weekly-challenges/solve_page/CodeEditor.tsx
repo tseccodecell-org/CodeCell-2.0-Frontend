@@ -229,8 +229,8 @@ export default function CodeEditor({
           : "flex h-full flex-col bg-[#0b0d13]"
       }
     >
-      <div className="flex h-10 shrink-0 items-center justify-between border-b border-[#1a1c24] bg-[#0d0f14] px-2">
-        <div className="flex items-center gap-1">
+      <div className="flex h-10 shrink-0 items-center justify-between gap-2 overflow-x-auto border-b border-[#1a1c24] bg-[#0d0f14] px-2">
+        <div className="flex shrink-0 items-center gap-1">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.id}
@@ -246,7 +246,7 @@ export default function CodeEditor({
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span
             title={
               runsLocally
@@ -261,14 +261,16 @@ export default function CodeEditor({
             }}
           >
             <span
-              className="h-1.5 w-1.5 rounded-full"
+              className="h-1.5 w-1.5 shrink-0 rounded-full"
               style={{ background: runsLocally ? "#D9A404" : "#5A5850" }}
             />
-            {localReady === null
-              ? "Checking runtime"
-              : runsLocally
-                ? "CodeCell Runtime"
-                : "Server Judge"}
+            <span className="hidden sm:inline">
+              {localReady === null
+                ? "Checking runtime"
+                : runsLocally
+                  ? "CodeCell Runtime"
+                  : "Server Judge"}
+            </span>
           </span>
 
           <button

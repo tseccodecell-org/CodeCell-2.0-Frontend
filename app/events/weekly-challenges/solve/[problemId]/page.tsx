@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ProblemPanel from "@/components/sections/weekly-challenges/solve_page/ProblemPanel";
 import CodeEditor from "@/components/sections/weekly-challenges/solve_page/CodeEditor";
 import VerdictPanel from "@/components/sections/weekly-challenges/solve_page/VerdictPanel";
@@ -82,6 +83,7 @@ const difficultyColor = (difficulty?: string) => {
 
 export default function Solve({ params }: PageProps) {
   const { problemId } = React.use(params);
+  const router = useRouter();
   const { isBanned } = useAuth();
 
   const [problem, setProblem] = useState<ProblemDetail | null>(null);
@@ -516,13 +518,13 @@ export default function Solve({ params }: PageProps) {
   return (
     <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
-        <Link
-          href="/events/weekly-challenges/timeline"
-          className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-[#8B93A7] transition-colors hover:text-[#F4F1EA]"
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-[#8B93A7] transition-colors hover:text-[#F4F1EA] cursor-pointer"
         >
           <ArrowLeft size={14} />
           Challenges
-        </Link>
+        </button>
 
         <div className="flex min-w-0 items-center gap-2">
           <span className="truncate font-sans text-sm font-semibold text-[#F4F1EA]">

@@ -50,7 +50,7 @@ const FEATURES = [
     icon: "♞",
     subtitle: "KNIGHT",
     title: "Internship Opportunities",
-    description: "Top 20 participants on the season leaderboard get a shot at an internship with Engaze. Your grind on the board translates straight into a real-world opportunity.",
+    description: "Top 20 participants on the season leaderboard get a shot at an internship with CampusOS by Engaze. Your grind on the board translates straight into a real-world opportunity.",
     badge: "Top 20 Perk",
     highlightIcon: true
   }
@@ -60,7 +60,7 @@ export function Overview() {
   return (
     <section id="what-to-expect" className="relative py-24 bg-[#02040A] overflow-hidden border-b border-[#eab308]/20">
       {/* Background Grid Pattern */}
-      <div 
+      <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
           backgroundImage: `
@@ -71,11 +71,11 @@ export function Overview() {
           backgroundPosition: 'center center'
         }}
       />
-      
+
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-        
+
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -114,7 +114,7 @@ export function Overview() {
                     </h3>
                   </div>
                 </div>
-                
+
                 <p className="text-[#8A8A8A] text-[13px] md:text-sm leading-relaxed mb-6">
                   {feature.description}
                 </p>

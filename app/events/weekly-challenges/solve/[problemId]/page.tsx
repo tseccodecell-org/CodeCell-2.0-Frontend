@@ -492,6 +492,12 @@ export default function Solve({ params }: PageProps) {
     setProblem(loaded);
   }, []);
 
+  // back to the week's own problem list, falling back to the timeline for a
+  // problem that is not attached to a week
+  const backHref = problem?.weekId
+    ? `/events/weekly-challenges/week/${problem.weekId}`
+    : "/events/weekly-challenges/timeline";
+
   if (!problemId) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#06070B] px-6 text-center">
@@ -517,11 +523,11 @@ export default function Solve({ params }: PageProps) {
     <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
         <Link
-          href="/events/weekly-challenges/timeline"
+          href={backHref}
           className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-[#8B93A7] transition-colors hover:text-[#F4F1EA]"
         >
           <ArrowLeft size={14} />
-          Challenges
+          {problem?.weekId ? "Problems" : "Challenges"}
         </Link>
 
         <div className="flex min-w-0 items-center gap-2">

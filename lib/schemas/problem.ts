@@ -19,6 +19,7 @@ export const problemLanguageConfigSchema = z.object({
 
 export const problemDetailSchema = z.object({
   id: z.string(),
+  weekId: z.string().optional(),
   title: z.string(),
   difficulty: z.string(),
   tags: nullableArray(z.string()),

@@ -231,7 +231,7 @@ function Shell({
   notice?: string | null;
 }) {
   return (
-    <div className="h-full overflow-y-auto bg-[#0b0d13] text-[#F4F1EA]">
+    <div className="h-full w-full overflow-y-auto bg-[#0b0d13] text-[#F4F1EA]">
       {notice && (
         <div className="flex items-center gap-2 border-b border-[#D9A404]/30 bg-[#D9A404]/10 px-4 py-2 font-mono text-[11px] text-[#D9A404]">
           <Clock size={13} />

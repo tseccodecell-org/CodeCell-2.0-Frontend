@@ -30,7 +30,7 @@ const sponsorLogos = [
   { src: "/sponsors/ethindia.png", alt: "ETHIndia", scale: 1.5 },
   { src: "/sponsors/foss.png", alt: "FOSS United", scale: 1.5 },
   { src: "/sponsors/github.png", alt: "GitHub", scale: 1.5 },
-  { src: "/sponsors/hindustan.png", alt: "Hindustan" },
+  { src: "/sponsors/hindustan.png", alt: "Hindustan", scale: 1.5 },
   { src: "/sponsors/jdoodle.png", alt: "JDoodle" },
   { src: "/sponsors/orkes.png", alt: "Orkes" },
   { src: "/sponsors/patilkaki.png", alt: "Patilkaki" },
@@ -39,7 +39,7 @@ const sponsorLogos = [
   { src: "/sponsors/replit.png", alt: "Replit" },
   { src: "/sponsors/scrollconnect.png", alt: "ScrollConnect", scale: 2.1 },
   { src: "/sponsors/smaaash.png", alt: "Smaaash", scale: 2.2 },
-  { src: "/sponsors/visionx.png", alt: "VisionX" },
+  { src: "/sponsors/visionx.png", alt: "VisionX", scale: 1.5 },
   { src: "/sponsors/wolfram-language-text-logo.png", alt: "Wolfram Language", scale: 1.6 },
 ];
 
@@ -533,7 +533,7 @@ export default function HomeSections() {
             index="02 — PAST EVENTS"
             title="Event Archives"
           />
-          
+
           {/* Navigation Scroll Arrows */}
           <div className="flex items-center gap-3 mb-14">
             <button

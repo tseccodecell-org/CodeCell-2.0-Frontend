@@ -7,18 +7,21 @@ interface Sponsor {
   name: string;
   logo: string;
   url: string;
+  scale?: number;
 }
 
 const sponsors: Sponsor[] = [
   {
-    name: "Engaze",
-    logo: "/sponsors/engaze.png",
-    url: "https://engaze.in/",
+    name: "CampusOS By Engaze",
+    logo: "/sponsors/campusos.png",
+    url: "https://campusos.in/",
+    scale: 1.2,
   },
   {
     name: "VisionX",
     logo: "/sponsors/visionx.png",
     url: "https://www.visionxtechnologies.com/",
+    scale: 1.3,
   },
   {
     name: "Wolfram Alpha",
@@ -97,12 +100,17 @@ export function Sponsors() {
                 </div>
 
                 {/* White Contrast Logo Card inside Gold Cyber Container */}
-                <div className="h-28 w-full bg-white rounded-xl p-4 flex items-center justify-center mb-5 border-2 border-[#eab308]/20 group-hover:border-[#eab308] group-hover:shadow-[0_0_20px_rgba(234,179,8,0.25)] transition-all duration-300">
-                  <img
-                    src={sponsor.logo}
-                    alt={sponsor.name}
-                    className="max-h-20 max-w-[90%] object-contain transition-transform duration-300 group-hover:scale-105"
-                  />
+                <div className="h-28 w-full bg-white rounded-xl p-4 flex items-center justify-center mb-5 border-2 border-[#eab308]/20 group-hover:border-[#eab308] group-hover:shadow-[0_0_20px_rgba(234,179,8,0.25)] transition-all duration-300 overflow-hidden">
+                  <div
+                    className="w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+                    style={sponsor.scale ? { transform: `scale(${sponsor.scale})` } : undefined}
+                  >
+                    <img
+                      src={sponsor.logo}
+                      alt={sponsor.name}
+                      className="max-h-20 max-w-[90%] object-contain"
+                    />
+                  </div>
                 </div>
 
                 {/* Sponsor Name in Gold / White */}

@@ -178,7 +178,7 @@ export default function WeekPage() {
       </div>
 
       <div className="flex flex-col gap-3 relative z-10">
-        {week.problems.map((problem, i) => (
+        {[...week.problems].sort((a, b) => a.points - b.points).map((problem, i) => (
           <button
             key={problem.problemId}
             onClick={() => router.push(`/events/weekly-challenges/solve/${problem.problemId}`)}

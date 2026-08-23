@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getWeeks, type Week as BackendWeek } from "@/lib/api-client";
+import WeekTimer from "@/components/layout/WeekTimer";
 
 type WeekStatus = "completed" | "live" | "locked";
 
@@ -24,7 +25,8 @@ interface Week {
   dateRange: string;
   status: WeekStatus;
   contestType: string;
-  scoringSystem: string;
+  startsAt: string;
+  endsAt: string;
 }
 
 const GLYPHS = ["♟", "♞", "♝", "♜", "♛", "♚"];
@@ -52,7 +54,8 @@ function mapWeek(week: BackendWeek, index: number): Week {
     dateRange: formatDateRange(week.starts_at, week.ends_at),
     status: deriveStatus(week),
     contestType: week.contest_type || "OPEN",
-    scoringSystem: week.scoring_system || "FULL",
+    startsAt: week.starts_at,
+    endsAt: week.ends_at,
   };
 }
 
@@ -210,8 +213,21 @@ export default function WeeklyTimeline() {
                       <span className="text-[#F4F1EA] font-semibold">{week.dateRange}</span>
                     </div>
                     <div>
-                      <span className="text-[#5A5850] block uppercase">SCORING</span>
-                      <span className="text-[#D9A404] font-semibold">{week.scoringSystem} POINTS</span>
+                      <span className="text-[#5A5850] block uppercase">
+                        {isLive ? "CLOSES IN" : isLocked ? "OPENS IN" : "STATUS"}
+                      </span>
+                      {isLive ? (
+                        <WeekTimer endsAt={week.endsAt} suffix="left" />
+                      ) : isLocked ? (
+                        <WeekTimer
+                          endsAt={week.startsAt}
+                          suffix="to go"
+                          endedLabel="Opening"
+                          urgency={false}
+                        />
+                      ) : (
+                        <span className="font-mono text-[11px] text-[#8B93A7]">Ended</span>
+                      )}
                     </div>
                   </div>
 

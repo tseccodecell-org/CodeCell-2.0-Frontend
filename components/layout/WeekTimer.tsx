@@ -28,9 +28,16 @@ function format(ms: number) {
 export default function WeekTimer({
   endsAt,
   className = "",
+  // "left" for a week running out, "to go" for one that has not opened yet
+  suffix = "left",
+  endedLabel = "Ended",
+  urgency = true,
 }: {
   endsAt?: string;
   className?: string;
+  suffix?: string;
+  endedLabel?: string;
+  urgency?: boolean;
 }) {
   // both renders start empty so the server and the first client paint agree
   const [left, setLeft] = useState<number | null>(null);
@@ -61,18 +68,20 @@ export default function WeekTimer({
         className={`inline-flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-[#8B93A7] ${className}`}
       >
         <span className="h-1.5 w-1.5 rounded-full bg-[#5A5850]" />
-        Ended
+        {endedLabel}
       </span>
     );
   }
 
-  const urgent = left < TEN_MINUTES;
-  const soon = left < ONE_HOUR;
+  // a week that has not opened yet is not urgent, it is just scheduled, so the
+  // colour ramp only applies to time that is actually running out
+  const urgent = urgency && left < TEN_MINUTES;
+  const soon = urgency && left < ONE_HOUR;
   const colour = urgent ? "#E2574C" : soon ? "#D9A404" : "#8B93A7";
 
   return (
     <span
-      title={`Week ends ${new Date(endsAt).toLocaleString()}`}
+      title={new Date(endsAt).toLocaleString()}
       className={`inline-flex items-center gap-1.5 font-mono text-[11px] tracking-wide tabular-nums ${className}`}
       style={{ color: colour }}
     >
@@ -80,7 +89,7 @@ export default function WeekTimer({
         className={`h-1.5 w-1.5 rounded-full ${urgent ? "animate-pulse" : ""}`}
         style={{ background: colour }}
       />
-      {format(left)} left
+      {format(left)} {suffix}
     </span>
   );
 }

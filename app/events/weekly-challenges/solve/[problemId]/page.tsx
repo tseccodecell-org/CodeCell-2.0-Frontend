@@ -6,8 +6,9 @@ import ProblemPanel from "@/components/sections/weekly-challenges/solve_page/Pro
 import CodeEditor from "@/components/sections/weekly-challenges/solve_page/CodeEditor";
 import VerdictPanel from "@/components/sections/weekly-challenges/solve_page/VerdictPanel";
 import SubmissionHistory from "@/components/sections/weekly-challenges/solve_page/SubmissionHistory";
+import WeekTimer from "@/components/layout/WeekTimer";
 import { ArrowLeft, TriangleAlert } from "lucide-react";
-import { runCode, submitCode, getSubmission, getRun } from "@/lib/api-client";
+import { runCode, submitCode, getSubmission, getRun, getWeek } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 import {
   checkRuntimeHealth,
@@ -492,6 +493,27 @@ export default function Solve({ params }: PageProps) {
     setProblem(loaded);
   }, []);
 
+  // the problem itself does not carry when its week closes, so the week is
+  // looked up once from the list the page already has an endpoint for
+  const [weekEndsAt, setWeekEndsAt] = useState<string | undefined>();
+
+  useEffect(() => {
+    const weekId = problem?.weekId;
+    if (!weekId || problem?.weekEnded) return;
+
+    let cancelled = false;
+    getWeek(weekId)
+      .then((week) => {
+        if (!cancelled) setWeekEndsAt(week?.ends_at);
+      })
+      .catch(() => {
+        // a missing timer is not worth surfacing an error over
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [problem?.weekId, problem?.weekEnded]);
+
   // back to the week's own problem list, falling back to the timeline for a
   // problem that is not attached to a week
   const backHref = problem?.weekId
@@ -544,15 +566,16 @@ export default function Solve({ params }: PageProps) {
           )}
         </div>
 
-        <div className="hidden items-center gap-3 font-mono text-[11px] text-[#8B93A7] sm:flex">
+        <div className="flex items-center gap-3 font-mono text-[11px] text-[#8B93A7]">
+          <WeekTimer endsAt={weekEndsAt} />
           {problem && (
-            <>
+            <span className="hidden items-center gap-3 sm:flex">
               <span>{problem.timeLimitMs} ms</span>
               <span className="text-[#22262f]">|</span>
               <span>{problem.memoryLimitMb} MB</span>
               <span className="text-[#22262f]">|</span>
               <span>{problem.maxScore} pts</span>
-            </>
+            </span>
           )}
         </div>
       </header>

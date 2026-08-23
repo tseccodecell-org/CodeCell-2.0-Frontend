@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { getWeek, getWeekProblems } from "@/lib/api-client";
+import WeekTimer from "@/components/layout/WeekTimer";
 
 type Difficulty = "easy" | "medium" | "hard";
 
@@ -23,6 +24,7 @@ interface WeekData {
   dateRange: string;
   isLive: boolean;
   hasEnded: boolean;
+  endsAt: string;
   problems: Problem[];
 }
 
@@ -94,6 +96,7 @@ export default function WeekPage() {
           dateRange: formatDateRange(weekRes.starts_at, weekRes.ends_at),
           isLive: weekRes.is_active,
           hasEnded: new Date(weekRes.ends_at).getTime() < Date.now(),
+          endsAt: weekRes.ends_at,
           problems: problemsRes.map((p) => ({
             problemId: p.id,
             title: p.title,
@@ -161,6 +164,7 @@ export default function WeekPage() {
               LIVE
             </span>
           )}
+          {!week.hasEnded && <WeekTimer endsAt={week.endsAt} />}
         </div>
         <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight">
           <span className="text-[#F4F1EA]">{week.title}</span>

@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { ChevronLeft, ArrowRight } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
+import WeekTimer from "@/components/layout/WeekTimer";
 import StandingStrip from "@/components/sections/weekly-challenges/finale/StandingStrip";
 import ApplyLock from "@/components/sections/weekly-challenges/finale/ApplyLock";
 import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
+  FINALE_DATE_SHORT,
   FINALE_FACTS,
   FINALE_RULES,
   PARTNERS,
@@ -64,8 +66,8 @@ export default function FinalePage() {
 
           <p className="font-sans text-base md:text-lg text-[#8B93A7] mt-8 max-w-2xl leading-relaxed">
             Six weeks of problems narrow the field to {QUALIFYING_SEATS}. Those{" "}
-            {QUALIFYING_SEATS} come to campus for one offline round, and the same{" "}
-            {QUALIFYING_SEATS} go to our internship partners.
+            {QUALIFYING_SEATS} come to campus on {FINALE_DATE_SHORT} for one offline round, and the
+            same {QUALIFYING_SEATS} go to our internship partners.
           </p>
 
           <nav className="flex flex-wrap gap-3 mt-10" aria-label="On this page">
@@ -112,6 +114,15 @@ export default function FinalePage() {
                     <span className="block font-sans text-xs text-[#8B93A7] mt-2 leading-relaxed">
                       {fact.detail}
                     </span>
+                  )}
+                  {fact.countdownTo && (
+                    <WeekTimer
+                      endsAt={fact.countdownTo}
+                      className="mt-3"
+                      suffix="away"
+                      endedLabel="Today"
+                      urgency={false}
+                    />
                   )}
                 </dd>
               </div>

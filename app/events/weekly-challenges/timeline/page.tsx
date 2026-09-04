@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import LeaderboardButtons from "@/components/sections/leaderboard/LeaderboardButtons";
@@ -98,8 +99,9 @@ const Page = () => {
             </div>
           </div>
 
-          <div
-            className="border border-[#D9A404]/40 border-t-2 border-t-[#D9A404] bg-[#0b0d13] p-5 flex items-center gap-4"
+          <Link
+            href="/events/weekly-challenges/finale"
+            className="border border-[#D9A404]/40 border-t-2 border-t-[#D9A404] bg-[#0b0d13] p-5 flex items-center gap-4 transition-colors hover:bg-[#111420] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
             style={{ boxShadow: "0 0 18px rgba(217,167,4,0.12)" }}
           >
             <div
@@ -118,8 +120,11 @@ const Page = () => {
               <span className="font-mono text-base md:text-lg font-black text-[#F4F1EA] tracking-tight block">
                 INTERNSHIP ROLES
               </span>
+              <span className="font-mono text-[9px] text-[#8B93A7] uppercase tracking-wider">
+                Top 20 · see the endgame
+              </span>
             </div>
-          </div>
+          </Link>
         </div>
 
         <WeeklyTimeline />

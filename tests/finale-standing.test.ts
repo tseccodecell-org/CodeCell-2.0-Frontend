@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
-  buildSeats,
-  holdsSeat,
   findStanding,
+  holdsSeat,
 } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import { QUALIFYING_SEATS } from "@/components/sections/weekly-challenges/finale/finale-config";
 import type { SeasonLeaderboardResponse } from "@/lib/types/leaderboard";
@@ -20,50 +19,13 @@ function board(count: number): Entries {
   }));
 }
 
-describe("buildSeats", () => {
-  it("always renders exactly the qualifying number of seats", () => {
-    expect(buildSeats(board(100), null)).toHaveLength(QUALIFYING_SEATS);
-    expect(buildSeats([], null)).toHaveLength(QUALIFYING_SEATS);
-  });
-
-  it("leaves seats open when fewer people have scored than there are seats", () => {
-    const seats = buildSeats(board(3), null);
-
-    expect(seats[2].name).toBe("Player 3");
-    expect(seats[3].name).toBeNull();
-    expect(seats[3].rank).toBe(4);
-  });
-
-  it("marks the viewer's own seat and nobody else's", () => {
-    const seats = buildSeats(board(20), "u7");
-
-    expect(seats.filter((s) => s.isYou)).toHaveLength(1);
-    expect(seats[6].isYou).toBe(true);
-  });
-
-  it("does not mark a seat when the viewer is outside the cut", () => {
-    const seats = buildSeats(board(40), "u30");
-
-    expect(seats.some((s) => s.isYou)).toBe(false);
-  });
-
-  it("matches the viewer by value, since ids cross a JSON boundary as strings", () => {
-    const entries = board(5);
-    const seats = buildSeats(entries, "u3");
-
-    expect(seats[2].isYou).toBe(true);
-  });
-});
-
 describe("findStanding", () => {
   it("returns nothing for a signed-out viewer", () => {
     expect(findStanding(board(20), null)).toBeNull();
   });
 
-  it("reports a zero gap for someone holding a seat", () => {
-    const standing = findStanding(board(40), "u5");
-
-    expect(standing).toEqual({ rank: 5, xp: 960, gap: 0 });
+  it("reports a zero gap for someone already inside the cut", () => {
+    expect(findStanding(board(40), "u5")).toEqual({ rank: 5, xp: 960, gap: 0 });
   });
 
   it("measures the gap against the last qualifying seat, not first place", () => {
@@ -78,10 +40,7 @@ describe("findStanding", () => {
   });
 
   it("never reports a negative gap", () => {
-    const entries = board(40);
-    const standing = findStanding(entries, "u40");
-
-    expect(standing?.gap).toBeGreaterThanOrEqual(0);
+    expect(findStanding(board(40), "u40")?.gap).toBeGreaterThanOrEqual(0);
   });
 
   it("treats an unscored viewer as needing the whole cutoff", () => {
@@ -93,9 +52,11 @@ describe("findStanding", () => {
   });
 
   it("has no gap to measure when the board is not full yet", () => {
-    const standing = findStanding(board(4), "nobody");
+    expect(findStanding(board(4), "nobody")?.gap).toBeNull();
+  });
 
-    expect(standing?.gap).toBeNull();
+  it("matches the viewer by value, since ids cross a JSON boundary as strings", () => {
+    expect(findStanding(board(5), "u3")?.rank).toBe(3);
   });
 });
 

@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { ChevronLeft, ArrowRight } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
-import QualifierBoard from "@/components/sections/weekly-challenges/finale/QualifierBoard";
+import StandingStrip from "@/components/sections/weekly-challenges/finale/StandingStrip";
 import ApplyLock from "@/components/sections/weekly-challenges/finale/ApplyLock";
 import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
   FINALE_FACTS,
   FINALE_RULES,
-  INTERNSHIP_STEPS,
   PARTNERS,
   QUALIFYING_SEATS,
 } from "@/components/sections/weekly-challenges/finale/finale-config";
@@ -30,7 +29,7 @@ function SectionHead({ eyebrow, title }: { eyebrow: string; title: string }) {
 }
 
 export default function FinalePage() {
-  // Read once, so the seats and the apply button always agree about who is in.
+  // Read once, so your standing and the apply button always agree.
   const state = useSeasonStanding();
 
   return (
@@ -85,8 +84,8 @@ export default function FinalePage() {
           </nav>
         </header>
 
-        {/* ── The board ──────────────────────────────────────────── */}
-        <QualifierBoard state={state} />
+        {/* ── Where you stand ────────────────────────────────────── */}
+        <StandingStrip state={state} />
 
         {/* ── Act one: the offline round ─────────────────────────── */}
         <section id="offline-round" className="pt-24 scroll-mt-24">
@@ -133,6 +132,11 @@ export default function FinalePage() {
         <section id="internship" className="pt-24 scroll-mt-24">
           <SectionHead eyebrow="For the same twenty" title="The internship track" />
 
+          <p className="font-sans text-base md:text-lg text-[#F4F1EA] max-w-2xl leading-relaxed mb-10">
+            Two partners are hiring from this season. There is no form to chase and no cover letter
+            to write. Finish inside the top {QUALIFYING_SEATS} and your season record goes to them.
+          </p>
+
           <div className="grid md:grid-cols-2 gap-px bg-[#14161e] border border-[#14161e]">
             {PARTNERS.map((partner) => (
               <article key={partner.name} className="bg-[#0B0E15] p-7 md:p-9">
@@ -155,23 +159,13 @@ export default function FinalePage() {
             ))}
           </div>
 
-          <ol className="mt-12 grid md:grid-cols-3 gap-px bg-[#14161e] border border-[#14161e]">
-            {INTERNSHIP_STEPS.map((step, i) => (
-              <li key={step.title} className="bg-[#0B0E15] p-6">
-                <span className="font-mono text-xs tabular-nums" style={{ color: GOLD }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-mono text-sm text-[#F4F1EA] mt-4">{step.title}</h3>
-                <p className="font-sans text-sm text-[#8B93A7] mt-3 leading-relaxed">{step.body}</p>
-              </li>
-            ))}
-          </ol>
+          <div className="mt-8">
+            <ApplyLock state={state} />
+          </div>
 
-          <ApplyLock state={state} />
-
-          <p className="font-sans text-xs text-[#8B93A7] mt-8 leading-relaxed max-w-2xl">
-            CodeCell introduces candidates. Hiring decisions, stipend, and duration rest with the
-            partner.
+          <p className="font-sans text-xs text-[#8B93A7] mt-6 leading-relaxed max-w-2xl">
+            CodeCell introduces candidates. Roles, stipend, and duration are settled between you and
+            the partner.
           </p>
         </section>
 

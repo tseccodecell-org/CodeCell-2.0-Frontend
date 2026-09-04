@@ -6,37 +6,14 @@ import { useAuth } from "@/hooks/useAuth";
 import type { SeasonLeaderboardResponse } from "@/lib/types/leaderboard";
 import { QUALIFYING_SEATS } from "./finale-config";
 
-export interface Seat {
-  rank: number;
-  name: string | null;
-  xp: number | null;
-  isYou: boolean;
-}
-
 export interface Standing {
   rank: number | null;
   xp: number;
   gap: number | null;
 }
 
-// The board only ever shows the seats. Everything below the cut is read purely
-// to work out how far off the viewer is.
-export function buildSeats(
-  entries: SeasonLeaderboardResponse["data"],
-  youId: string | null
-): Seat[] {
-  return Array.from({ length: QUALIFYING_SEATS }, (_, i) => {
-    const entry = entries[i];
-    if (!entry) return { rank: i + 1, name: null, xp: null, isYou: false };
-    return {
-      rank: entry.rank,
-      name: entry.name,
-      xp: entry.season_xp,
-      isYou: youId !== null && String(entry.user_id) === youId,
-    };
-  });
-}
-
+// Only the viewer's own position is ever shown. The rest of the board is read
+// purely to find the cutoff, so we can say how far off they are.
 export function findStanding(
   entries: SeasonLeaderboardResponse["data"],
   youId: string | null
@@ -60,7 +37,6 @@ export function holdsSeat(standing: Standing | null): boolean {
 }
 
 export interface SeasonStanding {
-  seats: Seat[];
   standing: Standing | null;
   qualified: boolean;
   sealed: boolean;
@@ -68,8 +44,8 @@ export interface SeasonStanding {
   error: string | null;
 }
 
-// One read of the season board, shared by everything on the finale page, so the
-// seats and the apply button can never disagree about who is in.
+// One read of the season board, shared by the standing strip and the apply
+// button, so the two can never disagree about whether the viewer is in.
 export function useSeasonStanding(): SeasonStanding {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { data, isLoading, error, forbidden, unauthorized } = useLeaderboard({
@@ -82,14 +58,13 @@ export function useSeasonStanding(): SeasonStanding {
   const entries = useMemo(() => response?.data ?? [], [response]);
   const youId = user?.id != null ? String(user.id) : null;
 
-  const seats = useMemo(() => buildSeats(entries, youId), [entries, youId]);
   const standing = useMemo(() => findStanding(entries, youId), [entries, youId]);
 
   // Auth settles after the first paint. Until it does the page waits rather
-  // than declaring itself sealed, so a signed-in viewer never sees the seats
-  // flash locked before their own name lands.
+  // than declaring itself sealed, so a signed-in viewer never sees the locked
+  // copy flash before their own position lands.
   const pending = isAuthLoading || isLoading;
   const sealed = !pending && (unauthorized || forbidden || !isAuthenticated);
 
-  return { seats, standing, qualified: holdsSeat(standing), sealed, pending, error };
+  return { standing, qualified: holdsSeat(standing), sealed, pending, error };
 }

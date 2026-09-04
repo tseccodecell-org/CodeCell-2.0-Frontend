@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   buildSeats,
+  holdsSeat,
   findStanding,
-} from "@/components/sections/weekly-challenges/finale/QualifierBoard";
+} from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import { QUALIFYING_SEATS } from "@/components/sections/weekly-challenges/finale/finale-config";
 import type { SeasonLeaderboardResponse } from "@/lib/types/leaderboard";
 
@@ -95,5 +96,26 @@ describe("findStanding", () => {
     const standing = findStanding(board(4), "nobody");
 
     expect(standing?.gap).toBeNull();
+  });
+});
+
+describe("holdsSeat", () => {
+  it("is false for a signed-out viewer", () => {
+    expect(holdsSeat(null)).toBe(false);
+  });
+
+  it("is false for someone who has never scored", () => {
+    expect(holdsSeat(findStanding(board(40), "nobody"))).toBe(false);
+  });
+
+  it("is true on the last qualifying seat and false one past it", () => {
+    const entries = board(40);
+
+    expect(holdsSeat(findStanding(entries, `u${QUALIFYING_SEATS}`))).toBe(true);
+    expect(holdsSeat(findStanding(entries, `u${QUALIFYING_SEATS + 1}`))).toBe(false);
+  });
+
+  it("is true for first place", () => {
+    expect(holdsSeat(findStanding(board(40), "u1"))).toBe(true);
   });
 });

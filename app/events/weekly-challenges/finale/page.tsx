@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ChevronLeft, ArrowRight } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 import QualifierBoard from "@/components/sections/weekly-challenges/finale/QualifierBoard";
+import ApplyLock from "@/components/sections/weekly-challenges/finale/ApplyLock";
+import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
   FINALE_FACTS,
   FINALE_RULES,
@@ -28,6 +30,9 @@ function SectionHead({ eyebrow, title }: { eyebrow: string; title: string }) {
 }
 
 export default function FinalePage() {
+  // Read once, so the seats and the apply button always agree about who is in.
+  const state = useSeasonStanding();
+
   return (
     <main className="min-h-screen bg-[#05070C] text-[#F4F1EA]">
       <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-16 py-12 md:py-16">
@@ -81,7 +86,7 @@ export default function FinalePage() {
         </header>
 
         {/* ── The board ──────────────────────────────────────────── */}
-        <QualifierBoard />
+        <QualifierBoard state={state} />
 
         {/* ── Act one: the offline round ─────────────────────────── */}
         <section id="offline-round" className="pt-24 scroll-mt-24">
@@ -161,6 +166,8 @@ export default function FinalePage() {
               </li>
             ))}
           </ol>
+
+          <ApplyLock state={state} />
 
           <p className="font-sans text-xs text-[#8B93A7] mt-8 leading-relaxed max-w-2xl">
             CodeCell introduces candidates. Hiring decisions, stipend, and duration rest with the

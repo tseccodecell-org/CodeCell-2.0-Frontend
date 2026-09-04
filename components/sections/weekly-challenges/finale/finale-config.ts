@@ -71,3 +71,11 @@ export const INTERNSHIP_STEPS: { title: string; body: string }[] = [
     body: "Partners reach out to the candidates they want. Roles, stipend, and duration are settled between you and them, not through us.",
   },
 ];
+
+// Applications stay shut until the season is decided. Flip this to true and
+// point APPLICATIONS_URL at the form to open them.
+export const APPLICATIONS_OPEN = false;
+export const APPLICATIONS_URL: string | null = null;
+
+// An ISO timestamp here turns the locked button into a live countdown.
+export const APPLICATIONS_OPEN_AT: string | null = null;

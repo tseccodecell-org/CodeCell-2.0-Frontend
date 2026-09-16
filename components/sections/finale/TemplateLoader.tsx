@@ -35,31 +35,19 @@ function slotFromTemplate(template: TemplateResponse): WorkingSlot {
   };
 }
 
-function buildInitialSlots(initialTemplates: TemplateResponse[]): Record<Language, WorkingSlot> {
+function buildBlankSlots(): Record<Language, WorkingSlot> {
   let seq = 0;
   const blank = (): WorkingSlot => ({ key: `blank-${seq++}`, name: "", sourceCode: "" });
-  const slots: Record<Language, WorkingSlot> = {
+  return {
     CPP: blank(),
     JAVA: blank(),
     PYTHON: blank(),
   };
-
-  const seen = new Set<Language>();
-  for (const template of initialTemplates) {
-    if (seen.has(template.language)) continue;
-    seen.add(template.language);
-    slots[template.language] = slotFromTemplate(template);
-  }
-  return slots;
 }
 
 export default function TemplateLoader({ initialTemplates, onContinue }: TemplateLoaderProps) {
-  const [activeLanguage, setActiveLanguage] = useState<Language>(
-    () => initialTemplates[0]?.language ?? "CPP"
-  );
-  const [slots, setSlots] = useState<Record<Language, WorkingSlot>>(() =>
-    buildInitialSlots(initialTemplates)
-  );
+  const [activeLanguage, setActiveLanguage] = useState<Language>("CPP");
+  const [slots, setSlots] = useState<Record<Language, WorkingSlot>>(buildBlankSlots);
   const [templates, setTemplates] = useState<TemplateResponse[]>(initialTemplates);
   const newSlotSeq = useRef(0);
 

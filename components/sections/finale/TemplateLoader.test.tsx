@@ -78,6 +78,7 @@ describe("TemplateLoader autosave", () => {
 
     render(<TemplateLoader initialTemplates={[cppTemplate]} onContinue={vi.fn()} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     typeCode("// fast io");
     expect(screen.getByText("Saving…")).toBeVisible();
 
@@ -97,6 +98,7 @@ describe("TemplateLoader autosave", () => {
 
     render(<TemplateLoader initialTemplates={[cppTemplate]} onContinue={vi.fn()} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     typeCode("x");
 
     await act(async () => {
@@ -113,6 +115,7 @@ describe("TemplateLoader autosave", () => {
 
     render(<TemplateLoader initialTemplates={[cppTemplate]} onContinue={vi.fn()} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     typeCode("x");
     await act(async () => {
       await vi.advanceTimersByTimeAsync(800);
@@ -143,6 +146,7 @@ describe("TemplateLoader autosave", () => {
 
     render(<TemplateLoader initialTemplates={[cppTemplate]} onContinue={vi.fn()} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     typeCode("v1");
     await act(async () => {
       await vi.advanceTimersByTimeAsync(800);
@@ -172,6 +176,15 @@ describe("TemplateLoader autosave", () => {
 });
 
 describe("TemplateLoader language buffers", () => {
+  it("initialTemplates only seeds the picker list, not any working buffer", () => {
+    render(<TemplateLoader initialTemplates={[cppTemplate, javaTemplate]} onContinue={vi.fn()} />);
+
+    expect(screen.getByLabelText("Template code")).toHaveValue("");
+
+    fireEvent.click(screen.getByRole("button", { name: "Java" }));
+    expect(screen.getByLabelText("Template code")).toHaveValue("");
+  });
+
   it("selecting a template only fills its own language's buffer", async () => {
     mockedUpdateTemplate.mockResolvedValue(cppTemplate);
 
@@ -180,10 +193,14 @@ describe("TemplateLoader language buffers", () => {
       <TemplateLoader initialTemplates={[cppTemplate, javaTemplate]} onContinue={onContinue} />
     );
 
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     typeCode("-cpp-edit");
     expect(screen.getByLabelText("Template code")).toHaveValue("int main(){}-cpp-edit");
 
     fireEvent.click(screen.getByRole("button", { name: "Java" }));
+    expect(screen.getByLabelText("Template code")).toHaveValue("");
+
+    fireEvent.click(screen.getByRole("button", { name: "Fast Java" }));
     expect(screen.getByLabelText("Template code")).toHaveValue("class Main {}");
 
     fireEvent.click(screen.getByRole("button", { name: "C++" }));
@@ -207,21 +224,34 @@ describe("TemplateLoader language buffers", () => {
       />
     );
 
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     expect(screen.getByLabelText("Template code")).toHaveValue("int main(){}");
 
     fireEvent.click(screen.getByRole("button", { name: "Brute Force" }));
     expect(screen.getByLabelText("Template code")).toHaveValue("// brute force");
 
     fireEvent.click(screen.getByRole("button", { name: "Java" }));
-    expect(screen.getByLabelText("Template code")).toHaveValue("class Main {}");
+    expect(screen.getByLabelText("Template code")).toHaveValue("");
   });
 });
 
 describe("TemplateLoader Continue payload", () => {
-  it("only reports languages the user actually touched", () => {
+  it("reports no buffers when the user never selected or edited any template", () => {
     const onContinue = vi.fn();
     render(<TemplateLoader initialTemplates={[cppTemplate]} onContinue={onContinue} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    const [buffers, activeLanguage] = onContinue.mock.calls[0];
+    expect(buffers).toEqual({});
+    expect(activeLanguage).toBe("CPP");
+  });
+
+  it("only reports languages the user actually selected or edited", () => {
+    const onContinue = vi.fn();
+    render(<TemplateLoader initialTemplates={[cppTemplate]} onContinue={onContinue} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Fast C++" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     const [buffers, activeLanguage] = onContinue.mock.calls[0];

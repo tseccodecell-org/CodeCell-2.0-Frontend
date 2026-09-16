@@ -20,6 +20,11 @@ import {
   submissionDetailSchema,
   problemSubmissionListSchema,
 } from "./schemas/submission";
+import {
+  finaleStatusSchema,
+  templateSchema,
+  templateListSchema,
+} from "./schemas/finale";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -32,6 +37,13 @@ export type {
   ProblemSubmission,
   SubmissionTestResult,
 } from "./schemas/submission";
+export type {
+  FinaleState,
+  FinaleAccessMode,
+  FinaleStatusResponse,
+  TemplateLanguage,
+  TemplateResponse,
+} from "./schemas/finale";
 export { SchemaError } from "./schemas/common";
 
 import type { Week, WeekProblem } from "./schemas/week";
@@ -42,6 +54,8 @@ import type {
   SubmissionDetail,
   ProblemSubmission,
 } from "./schemas/submission";
+import type { FinaleStatusResponse, TemplateResponse } from "./schemas/finale";
+import type { TemplateRequest } from "./types/finale";
 
 export type EventStatus = "UPCOMING" | "LIVE" | "ENDED";
 
@@ -186,6 +200,33 @@ async function proxyGet<T extends z.ZodTypeAny>(
   return parseOrThrow(schema, payload, `GET ${path}`);
 }
 
+async function proxyMutate<TRequest, TSchema extends z.ZodTypeAny>(
+  method: "POST" | "PUT" | "DELETE",
+  path: string,
+  requestBody: TRequest | undefined,
+  schema: TSchema
+): Promise<z.infer<TSchema>> {
+  const res = await fetch(path, {
+    method,
+    headers: requestBody !== undefined ? { "Content-Type": "application/json" } : {},
+    credentials: "include",
+    body: requestBody !== undefined ? JSON.stringify(requestBody) : undefined,
+  });
+
+  const body = await readBody(res);
+
+  if (!res.ok) {
+    throw errorFrom(res, body);
+  }
+
+  const payload =
+    body !== null && typeof body === "object" && "data" in (body as object)
+      ? (body as { data: unknown }).data
+      : body;
+
+  return parseOrThrow(schema, payload, `${method} ${path}`);
+}
+
 export const LOGIN_URL = `${BASE_URL}/oauth/google/login`;
 export const LOGOUT_URL = `${BASE_URL}/oauth/logout`;
 
@@ -229,6 +270,38 @@ export async function getWeek(id: string): Promise<Week | null> {
 
 export function getWeekProblems(id: string): Promise<WeekProblem[]> {
   return proxyGet(`/api/weeks/${id}/problems`, weekProblemListSchema);
+}
+
+export function getFinaleStatus(weekId: string): Promise<FinaleStatusResponse> {
+  return proxyGet(`/api/finales/${weekId}/status`, finaleStatusSchema);
+}
+
+export function getFinaleProblems(weekId: string): Promise<WeekProblem[]> {
+  return proxyGet(`/api/finales/${weekId}/problems`, weekProblemListSchema);
+}
+
+export function listTemplates(): Promise<TemplateResponse[]> {
+  return proxyGet("/api/templates", templateListSchema);
+}
+
+export function createTemplate(body: TemplateRequest): Promise<TemplateResponse> {
+  return proxyMutate("POST", "/api/templates", body, templateSchema);
+}
+
+export function updateTemplate(
+  templateId: string,
+  body: TemplateRequest
+): Promise<TemplateResponse> {
+  return proxyMutate("PUT", `/api/templates/${templateId}`, body, templateSchema);
+}
+
+export function deleteTemplate(templateId: string): Promise<{ success: true }> {
+  return proxyMutate(
+    "DELETE",
+    `/api/templates/${templateId}`,
+    undefined,
+    z.object({ success: z.literal(true) })
+  );
 }
 
 export function getEvents(): Promise<Event[]> {

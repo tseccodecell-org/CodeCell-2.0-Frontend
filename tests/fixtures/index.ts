@@ -121,6 +121,24 @@ export const problemSubmissionsFixture = [
   },
 ];
 
+export const finaleStatusFixture = {
+  weekId: "3f2b1c4d-0000-4000-8000-000000000001",
+  state: "LIVE",
+  accessMode: "RESTRICTED",
+  remainingSeconds: 1800,
+  scoringActive: true,
+  liveSince: "2026-09-16T12:00:00Z",
+};
+
+export const templateFixture = {
+  id: "cccc3333-0000-4000-8000-000000000001",
+  name: "Fast C++",
+  language: "CPP",
+  sourceCode: "int main(){}",
+  createdAt: "2026-09-16T10:00:00Z",
+  updatedAt: "2026-09-16T10:00:00Z",
+};
+
 export const profileFixture = {
   id: 178,
   name: "Wilbert",

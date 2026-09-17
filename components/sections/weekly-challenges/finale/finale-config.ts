@@ -23,7 +23,7 @@ export const FINALE_FACTS: FinaleFact[] = [
   { label: "Date", value: "3 October 2026", detail: "Saturday", countdownTo: FINALE_STARTS_AT },
   { label: "Venue", value: null, detail: "TSEC campus, Bandra" },
   { label: "Format", value: "On-site, individual", detail: "Your machine, our judge" },
-  { label: "Duration", value: null },
+  { label: "Duration", value: "3 hours", detail: "Single sitting" },
 ];
 
 export const FINALE_RULES: { title: string; body: string }[] = [

@@ -21,7 +21,10 @@ import {
   problemSubmissionListSchema,
 } from "./schemas/submission";
 import { wrappedSchema, wrappedInsightSchema } from "./schemas/wrapped";
-import { internshipApplicationSchema } from "./schemas/internship";
+import {
+  internshipApplicationSchema,
+  internshipEligibilitySchema,
+} from "./schemas/internship";
 import {
   finaleStatusSchema,
   templateSchema,
@@ -50,6 +53,7 @@ export type { WrappedResponse, WrappedInsightResponse } from "./schemas/wrapped"
 export type {
   InternshipApplication,
   InternshipApplicationRequest,
+  InternshipEligibility,
 } from "./schemas/internship";
 export { SchemaError } from "./schemas/common";
 
@@ -66,6 +70,7 @@ import type { WrappedResponse, WrappedInsightResponse } from "./schemas/wrapped"
 import type {
   InternshipApplication,
   InternshipApplicationRequest,
+  InternshipEligibility,
 } from "./schemas/internship";
 import type { TemplateRequest } from "./types/finale";
 
@@ -328,6 +333,10 @@ export function getWrapped(): Promise<WrappedResponse> {
 
 export function getWrappedInsight(): Promise<WrappedInsightResponse> {
   return proxyGet("/api/wrapped/insight", wrappedInsightSchema);
+}
+
+export function getInternshipEligibility(): Promise<InternshipEligibility> {
+  return proxyGet("/api/internship/eligibility", internshipEligibilitySchema);
 }
 
 export function getMyInternshipApplication(): Promise<InternshipApplication> {

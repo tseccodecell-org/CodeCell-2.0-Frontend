@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Check, LogIn } from "lucide-react";
+import { ChevronLeft, Check, LogIn, Lock } from "lucide-react";
 
 import {
   applyForInternship,
   getMyInternshipApplication,
+  getInternshipEligibility,
   ApiError,
   LOGIN_URL,
 } from "@/lib/api-client";
@@ -84,9 +85,28 @@ export default function InternshipApply() {
   const [form, setForm] = useState<InternshipApplicationRequest>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [unauthenticated, setUnauthenticated] = useState(false);
+  const [invited, setInvited] = useState<boolean | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getInternshipEligibility()
+      .then((result) => {
+        if (!cancelled) setInvited(result.invited);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 401) setUnauthenticated(true);
+        setInvited(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -149,6 +169,27 @@ export default function InternshipApply() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (invited === false && !unauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#05070C] px-6 py-20 text-[#F4F1EA]">
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-5 text-center">
+          <Lock size={26} style={{ color: GOLD }} />
+          <h1 className="font-sans text-2xl font-bold">This track is invitation only</h1>
+          <p className="font-sans text-sm leading-relaxed text-[#8B93A7]">
+            The internship track is open to the participants the organisers seated for the finale.
+            Your account is not on that list, so there is nothing to fill in here.
+          </p>
+          <Link
+            href="/events/finale"
+            className="inline-flex items-center gap-2 border border-[#1a1c24] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] text-[#8B93A7] transition-colors hover:border-[#4A3E1C] hover:text-[#F4F1EA]"
+          >
+            Back to the finale
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (unauthenticated) {

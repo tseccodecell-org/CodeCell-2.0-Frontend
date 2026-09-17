@@ -26,10 +26,16 @@ function noteFor({ sealed, pending, qualified, standing }: SeasonStanding) {
   return `Opens to the top ${QUALIFYING_SEATS} once the season closes.`;
 }
 
-export default function ApplyLock({ state }: { state: SeasonStanding }) {
+export default function ApplyLock({
+  state,
+  invited,
+}: {
+  state: SeasonStanding;
+  invited: boolean;
+}) {
   const note = noteFor(state);
   const warm = state.qualified;
-  const unlocked = true;
+  const unlocked = invited;
 
   return (
     <div className="border" style={{ borderColor: warm ? GOLD : "#14161e" }}>
@@ -39,7 +45,7 @@ export default function ApplyLock({ state }: { state: SeasonStanding }) {
             className="font-mono text-[10px] tracking-[0.24em] uppercase"
             style={{ color: warm ? GOLD : BRONZE }}
           >
-            Open
+            {unlocked ? "Open" : "Invitation only"}
           </p>
           <h3 className="font-mono text-base text-[#F4F1EA] mt-3">Apply to the partners</h3>
           <p className="font-sans text-sm text-[#8B93A7] mt-2 max-w-md leading-relaxed">{note}</p>

@@ -5,6 +5,7 @@ import { ChevronLeft, ArrowRight } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 import WeekTimer from "@/components/layout/WeekTimer";
 import StandingStrip from "@/components/sections/weekly-challenges/finale/StandingStrip";
+import SeatGate, { useSeatState } from "@/components/sections/weekly-challenges/finale/SeatGate";
 import ApplyLock from "@/components/sections/weekly-challenges/finale/ApplyLock";
 import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
@@ -33,6 +34,7 @@ function SectionHead({ eyebrow, title }: { eyebrow: string; title: string }) {
 export default function FinalePage() {
   // Read once, so your standing and the apply button always agree.
   const state = useSeasonStanding();
+  const seat = useSeatState();
 
   return (
     <main className="min-h-screen bg-[#05070C] text-[#F4F1EA]">
@@ -59,29 +61,13 @@ export default function FinalePage() {
             offline round, and go forward to our internship partners.
           </p>
 
-          <div className="flex flex-wrap gap-3 mt-7">
-            <Link
-              href="/events/finale/templates"
-              className="inline-flex items-center justify-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#05070C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-            >
-              Load your templates <ArrowRight size={13} />
-            </Link>
-            <Link
-              href="/events/finale/internship"
-              className="inline-flex items-center justify-center gap-2 border border-[#1a1c24] px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#F4F1EA] hover:border-[#4A3E1C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-            >
-              Apply for the internship <ArrowRight size={13} />
-            </Link>
-            <Link
-              href="/events/finale/recap"
-              className="inline-flex items-center justify-center gap-2 border border-[#1a1c24] px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#F4F1EA] hover:border-[#4A3E1C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-            >
-              Your season recap <ArrowRight size={13} />
-            </Link>
-          </div>
         </header>
 
         <StandingStrip state={state} />
+
+        <div className="mt-6">
+          <SeatGate seat={seat} />
+        </div>
 
         <nav className="flex flex-wrap gap-3 mt-8" aria-label="On this page">
           <a
@@ -191,7 +177,7 @@ export default function FinalePage() {
           </div>
 
           <div className="mt-8">
-            <ApplyLock state={state} />
+            <ApplyLock state={state} invited={seat === "invited"} />
           </div>
 
           <p className="font-sans text-xs text-[#8B93A7] mt-6 leading-relaxed max-w-2xl">

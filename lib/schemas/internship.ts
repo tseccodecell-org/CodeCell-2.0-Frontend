@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const internshipEligibilitySchema = z.object({
+  invited: z.boolean(),
+});
+
+export type InternshipEligibility = z.infer<typeof internshipEligibilitySchema>;
+
 export const internshipApplicationSchema = z.object({
   id: z.string(),
   userId: z.number(),

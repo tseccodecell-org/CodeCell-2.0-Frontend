@@ -19,14 +19,14 @@ const FLAG = "#E2574C";
 
 const TEMPLATE_ALLOWED = [
   "Input and output scaffolding: fast readers, buffered writers, the main you start every problem from.",
-  "Macros, typedefs and small helpers you reach for on every problem, whatever it turns out to be.",
-  "Debug and timing utilities you strip out before you submit.",
+  "Standard algorithms kept as reusable library code: segment trees, sieves, DSU, string matching and the like.",
+  "Macros, typedefs, debug and timing helpers you reach for whatever the problem turns out to be.",
 ];
 
 const TEMPLATE_FORBIDDEN = [
   "A solution, or any part of one, to a specific problem.",
-  "Code kept from a past contest, editorial or judge submission to paste in on the day.",
-  "Anything written for one problem rather than for every problem.",
+  "Code kept from a past contest, editorial or judge submission that answers a particular problem.",
+  "Anything written for one problem rather than for any problem that might need it.",
 ];
 
 type LoadState =
@@ -299,9 +299,10 @@ export default function FinaleLobby() {
         <section className="mt-12">
           <h2 className="font-sans text-xl font-semibold">What a template may contain</h2>
           <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-[#8B93A7]">
-            Bring the scaffolding you would otherwise retype, so you start the round writing the
-            solution instead of the setup. Every template is read before the round, and anything
-            that amounts to a stored answer is removed.
+            Bring the scaffolding and library code you would otherwise retype, so you start the
+            round solving the problem instead of rebuilding your toolkit. General-purpose
+            algorithms are fine. Every template is read before the round, and anything that amounts
+            to a stored answer to a specific problem is removed.
           </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">

@@ -35,13 +35,24 @@ function slotFromTemplate(template: TemplateResponse): WorkingSlot {
   };
 }
 
+// the backend rejects a template with no name, so a fresh slot starts with one
+// the participant can rename instead of an empty box autosave would choke on
+function defaultNameFor(language: Language): string {
+  const label = LANGUAGES.find((l) => l.id === language)?.label ?? language;
+  return `Untitled ${label}`;
+}
+
 function buildBlankSlots(): Record<Language, WorkingSlot> {
   let seq = 0;
-  const blank = (): WorkingSlot => ({ key: `blank-${seq++}`, name: "", sourceCode: "" });
+  const blank = (language: Language): WorkingSlot => ({
+    key: `blank-${seq++}`,
+    name: defaultNameFor(language),
+    sourceCode: "",
+  });
   return {
-    CPP: blank(),
-    JAVA: blank(),
-    PYTHON: blank(),
+    CPP: blank("CPP"),
+    JAVA: blank("JAVA"),
+    PYTHON: blank("PYTHON"),
   };
 }
 
@@ -83,7 +94,11 @@ export default function TemplateLoader({ initialTemplates, onContinue }: Templat
     [activeSlot, activeLanguage]
   );
 
-  const { saving, saved, error, retry } = useTemplateAutosave(autosaveInput, 800, handleSaved);
+  const { saving, saved, error, needsName, retry } = useTemplateAutosave(
+    autosaveInput,
+    800,
+    handleSaved
+  );
 
   const selectTemplate = (template: TemplateResponse) => {
     setActiveLanguage(template.language);
@@ -94,7 +109,11 @@ export default function TemplateLoader({ initialTemplates, onContinue }: Templat
     newSlotSeq.current += 1;
     setSlots((prev) => ({
       ...prev,
-      [activeLanguage]: { key: `new-${newSlotSeq.current}`, name: "", sourceCode: "" },
+      [activeLanguage]: {
+        key: `new-${newSlotSeq.current}`,
+        name: defaultNameFor(activeLanguage),
+        sourceCode: "",
+      },
     }));
   };
 
@@ -181,7 +200,13 @@ export default function TemplateLoader({ initialTemplates, onContinue }: Templat
               placeholder="Template name"
               className="min-w-0 flex-1 rounded border border-[#22262f] bg-[#0b0d13] px-2.5 py-1.5 font-sans text-sm text-[#F4F1EA] placeholder:text-[#5A5850] focus:border-[#D9A404]/50 focus:outline-none"
             />
-            <SaveStatus saving={saving} saved={saved} error={error} retry={retry} />
+            <SaveStatus
+              saving={saving}
+              saved={saved}
+              error={error}
+              needsName={needsName}
+              retry={retry}
+            />
           </div>
 
           <div className="relative min-h-0 flex-1">
@@ -236,13 +261,23 @@ function SaveStatus({
   saving,
   saved,
   error,
+  needsName,
   retry,
 }: {
   saving: boolean;
   saved: boolean;
   error: string | null;
+  needsName: boolean;
   retry: () => void;
 }) {
+  if (needsName) {
+    return (
+      <span className="shrink-0 font-mono text-[11px] tracking-wide text-[#D9A404]">
+        Add a name to save
+      </span>
+    );
+  }
+
   if (error) {
     return (
       <div className="flex shrink-0 items-center gap-2 font-mono text-[11px] tracking-wide text-[#E05252]">

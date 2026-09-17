@@ -21,7 +21,7 @@ interface CodeEditorProps {
   status: SubmissionStatus;
   activeAction: "RUN" | "SUBMIT" | null;
   starterCode?: Partial<Record<Language, string>>;
-  loadRequest?: { language: Language; code: string; nonce: number } | null;
+  loadRequest?: { language: Language; code: string; nonce: number; skipConfirm?: boolean } | null;
   cooldownLeft?: number;
   banned?: boolean;
   onRun?: (code: string, language: Language, stdin: string) => Promise<void>;
@@ -161,7 +161,7 @@ export default function CodeEditor({
     if (!loadRequest) return;
     const target = loadRequest.language;
 
-    if (editedRef.current[target]) {
+    if (editedRef.current[target] && !loadRequest.skipConfirm) {
       const ok = window.confirm(
         `Replace your current ${target} code with this submission? Your unsaved changes will be lost.`
       );

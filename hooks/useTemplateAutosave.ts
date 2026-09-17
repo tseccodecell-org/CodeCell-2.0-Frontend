@@ -18,6 +18,7 @@ export interface UseTemplateAutosaveResult {
   saving: boolean;
   saved: boolean;
   error: string | null;
+  needsName: boolean;
   retry: () => void;
 }
 
@@ -91,6 +92,16 @@ export function useTemplateAutosave(
       return;
     }
 
+    // the backend requires a name, so an unnamed template waits here instead of
+    // being sent off to come back as a 400 the participant cannot interpret
+    if (!template.name.trim()) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setSaving(false);
+      setSaved(false);
+      setError(null);
+      return;
+    }
+
     setSaving(true);
     setSaved(false);
     setError(null);
@@ -107,10 +118,11 @@ export function useTemplateAutosave(
   }, [template.key, template.id, template.name, template.sourceCode, template.language, delayMs]);
 
   const retry = useCallback(() => {
+    if (!template.name.trim()) return;
     if (timerRef.current) clearTimeout(timerRef.current);
     performSave(template);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [performSave, template.key, template.id, template.name, template.sourceCode, template.language]);
 
-  return { saving, saved, error, retry };
+  return { saving, saved, error, needsName: !template.name.trim(), retry };
 }

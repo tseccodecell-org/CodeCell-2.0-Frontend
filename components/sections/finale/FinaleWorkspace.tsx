@@ -31,7 +31,8 @@ function readSavedBuffers(): {
   try {
     const raw = sessionStorage.getItem(FINALE_BUFFERS_KEY);
     if (!raw) return { buffers: {} };
-    sessionStorage.removeItem(FINALE_BUFFERS_KEY);
+    // the buffers stay for the whole session so every problem the participant
+    // opens gets their templates, not just the first one
     const parsed = JSON.parse(raw) as {
       buffers: Partial<Record<Language, string>>;
       activeLanguage?: Language;
@@ -39,6 +40,18 @@ function readSavedBuffers(): {
     return { buffers: parsed.buffers ?? {}, activeLanguage: parsed.activeLanguage };
   } catch {
     return { buffers: {} };
+  }
+}
+
+function readCachedCode(problemId: string, language: Language): string | undefined {
+  if (typeof window === "undefined" || !problemId) return undefined;
+  try {
+    const raw = localStorage.getItem(`codecell_code_${problemId}`);
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw) as Partial<Record<Language, string>>;
+    return parsed?.[language] || undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -129,9 +142,12 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   const [resultMode, setResultMode] = useState<"RUN" | "SUBMIT" | null>(null);
   const [lastInput, setLastInput] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
-  const [loadRequest, setLoadRequest] = useState<{ language: Language; code: string; nonce: number } | null>(
-    null
-  );
+  const [loadRequest, setLoadRequest] = useState<{
+    language: Language;
+    code: string;
+    nonce: number;
+    skipConfirm?: boolean;
+  } | null>(null);
   const [cooldownLeft, setCooldownLeft] = useState(0);
 
   const [finaleState, setFinaleState] = useState<FinaleState | null>(null);
@@ -208,13 +224,15 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
 
   // switch to the language the participant picked in the template loader so
   // the workspace doesn't open on an empty CPP tab while their real code
-  // sits under a different one
+  // sits under a different one. code already cached for this problem wins over
+  // the template, otherwise reopening a problem would wipe work in progress.
+  // skipConfirm because nothing is at risk yet on an initial load
   useEffect(() => {
     const lang = savedBuffers.activeLanguage;
     if (!lang) return;
-    const code = savedBuffers.buffers[lang];
+    const code = readCachedCode(problemId, lang) ?? savedBuffers.buffers[lang];
     if (code === undefined) return;
-    setLoadRequest({ language: lang, code, nonce: -1 });
+    setLoadRequest({ language: lang, code, nonce: -1, skipConfirm: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

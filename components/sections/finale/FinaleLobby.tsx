@@ -27,6 +27,8 @@ function getFinaleWeekId(): string | undefined {
 export const FINALE_LOADER_DONE_KEY = "codecell_finale_loader_done";
 export const FINALE_BUFFERS_KEY = "codecell_finale_buffers";
 
+const FINALE_STATUS_REFRESH_MS = 30000;
+
 type LoadState =
   | { kind: "loading" }
   | { kind: "ready"; status: FinaleStatusResponse }
@@ -104,19 +106,22 @@ export default function FinaleLobby() {
   const [entryTarget, setEntryTarget] = useState<string | null>(null);
   const [loaderOpen, setLoaderOpen] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     const weekId = getFinaleWeekId();
     if (!weekId) {
-      setState({ kind: "unconfigured" });
+      if (!silent) setState({ kind: "unconfigured" });
       return;
     }
 
-    setState({ kind: "loading" });
+    if (!silent) setState({ kind: "loading" });
 
     try {
       const status = await getFinaleStatus(weekId);
       setState({ kind: "ready", status });
     } catch (err) {
+      // a background refresh that fails keeps the last known status on screen
+      // rather than throwing the participant onto an error page mid-wait
+      if (silent) return;
       if (err instanceof ApiError) {
         if (err.status === 401) {
           setState({ kind: "unauthenticated" });
@@ -142,6 +147,16 @@ export default function FinaleLobby() {
 
   useEffect(() => {
     load();
+  }, [load]);
+
+  // participants sit on this screen waiting for an organizer to start, pause or
+  // end the contest, so the lobby has to keep asking rather than trusting the
+  // status it read on mount
+  useEffect(() => {
+    const interval = setInterval(() => {
+      load(true);
+    }, FINALE_STATUS_REFRESH_MS);
+    return () => clearInterval(interval);
   }, [load]);
 
   useEffect(() => {

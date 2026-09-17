@@ -206,6 +206,18 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
     setLoadRequest({ language, code, nonce: Date.now() });
   }, []);
 
+  // switch to the language the participant picked in the template loader so
+  // the workspace doesn't open on an empty CPP tab while their real code
+  // sits under a different one
+  useEffect(() => {
+    const lang = savedBuffers.activeLanguage;
+    if (!lang) return;
+    const code = savedBuffers.buffers[lang];
+    if (code === undefined) return;
+    setLoadRequest({ language: lang, code, nonce: -1 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const stopPolling = () => {
     if (pollTimeoutRef.current) {
       clearTimeout(pollTimeoutRef.current);

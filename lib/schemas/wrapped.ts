@@ -24,3 +24,11 @@ export const wrappedSchema = z.object({
 });
 
 export type WrappedResponse = z.infer<typeof wrappedSchema>;
+
+export const wrappedInsightSchema = z.object({
+  available: z.boolean(),
+  headline: z.string().optional(),
+  observations: z.array(z.string()).default([]),
+});
+
+export type WrappedInsightResponse = z.infer<typeof wrappedInsightSchema>;

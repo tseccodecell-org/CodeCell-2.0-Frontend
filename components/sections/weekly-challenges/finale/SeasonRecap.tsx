@@ -5,8 +5,8 @@ import Link from "next/link";
 import { ChevronLeft, Camera, LogIn } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 
-import { getWrapped, ApiError, LOGIN_URL } from "@/lib/api-client";
-import type { WrappedResponse } from "@/lib/api-client";
+import { getWrapped, getWrappedInsight, ApiError, LOGIN_URL } from "@/lib/api-client";
+import type { WrappedResponse, WrappedInsightResponse } from "@/lib/api-client";
 
 const playfair = Playfair_Display({ subsets: ["latin"] });
 
@@ -63,6 +63,8 @@ function Stat({
 
 export default function SeasonRecap() {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
+  const [insight, setInsight] = useState<WrappedInsightResponse | null>(null);
+  const [insightPending, setInsightPending] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,6 +86,27 @@ export default function SeasonRecap() {
               ? err.message
               : "Couldn't load your recap. Check your connection and try again.",
         });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // asked for separately so the numbers render immediately: the model can take
+  // seconds, and the recap has to stand on its own if it never answers
+  useEffect(() => {
+    let cancelled = false;
+
+    getWrappedInsight()
+      .then((result) => {
+        if (!cancelled) setInsight(result);
+      })
+      .catch(() => {
+        if (!cancelled) setInsight(null);
+      })
+      .finally(() => {
+        if (!cancelled) setInsightPending(false);
       });
 
     return () => {
@@ -176,6 +199,30 @@ export default function SeasonRecap() {
             {dateLabel(w.firstSubmission)} to {dateLabel(w.lastSubmission)}
           </p>
         </header>
+
+        {insightPending && (
+          <p className="mt-8 font-mono text-xs uppercase tracking-widest text-[#5A5850]">
+            Reading between the lines
+          </p>
+        )}
+
+        {insight?.available && insight.headline && (
+          <section className="mt-8 border-l-2 pl-6" style={{ borderColor: GOLD }}>
+            <h2 className={`${playfair.className} text-2xl md:text-3xl text-[#F4F1EA]`}>
+              {insight.headline}
+            </h2>
+            <ul className="mt-4 space-y-3">
+              {insight.observations.map((line) => (
+                <li
+                  key={line}
+                  className="font-sans text-sm leading-relaxed text-[#8B93A7] max-w-2xl"
+                >
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <Stat

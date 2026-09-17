@@ -20,7 +20,7 @@ import {
   submissionDetailSchema,
   problemSubmissionListSchema,
 } from "./schemas/submission";
-import { wrappedSchema } from "./schemas/wrapped";
+import { wrappedSchema, wrappedInsightSchema } from "./schemas/wrapped";
 import { internshipApplicationSchema } from "./schemas/internship";
 import {
   finaleStatusSchema,
@@ -46,7 +46,7 @@ export type {
   TemplateLanguage,
   TemplateResponse,
 } from "./schemas/finale";
-export type { WrappedResponse } from "./schemas/wrapped";
+export type { WrappedResponse, WrappedInsightResponse } from "./schemas/wrapped";
 export type {
   InternshipApplication,
   InternshipApplicationRequest,
@@ -62,7 +62,7 @@ import type {
   ProblemSubmission,
 } from "./schemas/submission";
 import type { FinaleStatusResponse, TemplateResponse } from "./schemas/finale";
-import type { WrappedResponse } from "./schemas/wrapped";
+import type { WrappedResponse, WrappedInsightResponse } from "./schemas/wrapped";
 import type {
   InternshipApplication,
   InternshipApplicationRequest,
@@ -324,6 +324,10 @@ export function deleteTemplate(templateId: string): Promise<{ success: true }> {
 
 export function getWrapped(): Promise<WrappedResponse> {
   return proxyGet("/api/wrapped", wrappedSchema);
+}
+
+export function getWrappedInsight(): Promise<WrappedInsightResponse> {
+  return proxyGet("/api/wrapped/insight", wrappedInsightSchema);
 }
 
 export function getMyInternshipApplication(): Promise<InternshipApplication> {

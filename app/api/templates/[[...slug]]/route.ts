@@ -4,8 +4,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.tseccodece
 
 // the finale and template handlers are mounted under the backend's /api group,
 // unlike older routes such as /weeks which sit at the root
-function backendPathFor(slug: string[]): string {
-  return slug.length ? `/api/templates/${slug.join("/")}` : `/api/templates`;
+function backendPathFor(slug: string[] | undefined): string {
+  return slug?.length ? `/api/templates/${slug.join("/")}` : `/api/templates`;
 }
 
 function forwardedHeaders(req: NextRequest, withBody: boolean): Record<string, string> {
@@ -43,7 +43,7 @@ function unreachableResponse() {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string[] }> }
+  { params }: { params: Promise<{ slug?: string[] }> }
 ) {
   const { slug } = await params;
 
@@ -70,7 +70,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string[] }> }
+  { params }: { params: Promise<{ slug?: string[] }> }
 ) {
   const { slug } = await params;
 
@@ -99,7 +99,7 @@ export async function POST(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string[] }> }
+  { params }: { params: Promise<{ slug?: string[] }> }
 ) {
   const { slug } = await params;
 
@@ -128,7 +128,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string[] }> }
+  { params }: { params: Promise<{ slug?: string[] }> }
 ) {
   const { slug } = await params;
 

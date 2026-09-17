@@ -8,7 +8,7 @@ import {
   POST as templatesPOST,
   PUT as templatesPUT,
   DELETE as templatesDELETE,
-} from "@/app/api/templates/[...slug]/route";
+} from "@/app/api/templates/[[...slug]]/route";
 import {
   weeklyLeaderboardFixture,
   weekProblemsFixture,
@@ -282,6 +282,34 @@ describe("templates proxy route", () => {
     });
 
     expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/api/templates`);
+  });
+
+  // the bare /api/templates path gives the handler no slug at all. a required
+  // catch-all never matched it, so creating a template 404d before this route
+  // was ever reached
+  it("handles the bare collection path, where the router supplies no slug", async () => {
+    fetchMock().mockResolvedValueOnce(upstream([templateFixture]));
+
+    await templatesGET(request("http://localhost/api/templates"), {
+      params: Promise.resolve({ slug: undefined }),
+    });
+
+    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/api/templates`);
+  });
+
+  it("creates a template on the bare collection path", async () => {
+    fetchMock().mockResolvedValueOnce(upstream(templateFixture));
+
+    const res = await templatesPOST(
+      request("http://localhost/api/templates", {
+        method: "POST",
+        body: JSON.stringify({ name: "Fast C++", language: "CPP", sourceCode: "int main(){}" }),
+      }),
+      { params: Promise.resolve({ slug: undefined }) }
+    );
+
+    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/api/templates`);
+    expect(res.status).toBe(200);
   });
 
   it("appends the slug when a single template is addressed", async () => {

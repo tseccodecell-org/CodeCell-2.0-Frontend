@@ -80,12 +80,8 @@ export default function StandingStrip({ state }: { state: SeasonStanding }) {
           {standing.rank === null ? "Unranked" : `#${standing.rank}`}
         </Cell>
 
-        <Cell label={qualified ? "Your seat" : `To seat ${QUALIFYING_SEATS}`} accent={qualified}>
-          {qualified
-            ? "Held"
-            : standing.gap === null
-              ? "Not set"
-              : `${standing.gap} XP`}
+        <Cell label="Season rating" accent={qualified}>
+          {`${standing.xp} XP`}
         </Cell>
 
         <Cell label="Season">{"Running"}</Cell>

@@ -6,7 +6,6 @@ import { Playfair_Display } from "next/font/google";
 import WeekTimer from "@/components/layout/WeekTimer";
 import StandingStrip from "@/components/sections/weekly-challenges/finale/StandingStrip";
 import SeatGate, { useSeatState } from "@/components/sections/weekly-challenges/finale/SeatGate";
-import ApplyLock from "@/components/sections/weekly-challenges/finale/ApplyLock";
 import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
   FINALE_DATE_SHORT,
@@ -66,7 +65,7 @@ export default function FinalePage() {
         <StandingStrip state={state} />
 
         <div className="mt-6">
-          <SeatGate seat={seat} />
+          <SeatGate seat={seat} standing={state} />
         </div>
 
         <nav className="flex flex-wrap gap-3 mt-8" aria-label="On this page">
@@ -174,10 +173,6 @@ export default function FinalePage() {
                 </p>
               </article>
             ))}
-          </div>
-
-          <div className="mt-8">
-            <ApplyLock state={state} invited={seat === "invited"} />
           </div>
 
           <p className="font-sans text-xs text-[#8B93A7] mt-6 leading-relaxed max-w-2xl">

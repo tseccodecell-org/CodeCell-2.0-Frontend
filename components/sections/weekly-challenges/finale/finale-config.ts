@@ -3,6 +3,9 @@
 
 export const QUALIFYING_SEATS = 20;
 
+// where everything about the day is announced. only shown to finalists.
+export const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/HadfP0Rotkh6jb3HLtYEeo";
+
 // Midnight IST on the day itself. Set the real start time here once it is
 // fixed and the countdown follows it.
 export const FINALE_STARTS_AT = "2026-09-26T00:00:00+05:30";

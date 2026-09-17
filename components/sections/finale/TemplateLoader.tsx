@@ -157,7 +157,7 @@ export default function TemplateLoader({
 
   return (
     <div className="flex h-full flex-col bg-[#06070B] text-[#F4F1EA]">
-      <div className="flex h-10 shrink-0 items-center gap-1 border-b border-[#1a1c24] bg-[#0d0f14] px-2">
+      <div className="flex h-10 shrink-0 items-center gap-1 overflow-x-auto border-b border-[#1a1c24] bg-[#0d0f14] px-2">
         {LANGUAGES.map((lang) => (
           <button
             key={lang.id}
@@ -173,8 +173,8 @@ export default function TemplateLoader({
         ))}
       </div>
 
-      <div className="flex min-h-0 flex-1">
-        <div className="flex w-56 shrink-0 flex-col border-r border-[#1a1c24] bg-[#0b0d13]">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+        <div className="flex max-h-40 shrink-0 flex-col border-b border-[#1a1c24] bg-[#0b0d13] md:max-h-none md:w-56 md:border-b-0 md:border-r">
           <div className="flex items-center justify-between border-b border-[#1a1c24] px-3 py-2">
             <span className="font-mono text-[11px] tracking-wide text-[#8B93A7]">
               {current.label} templates
@@ -212,14 +212,14 @@ export default function TemplateLoader({
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="flex shrink-0 items-center gap-3 border-b border-[#1a1c24] bg-[#0d0f14] px-3 py-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[#1a1c24] bg-[#0d0f14] px-3 py-2 sm:flex-nowrap sm:gap-3">
             <input
               aria-label="Template name"
               value={activeSlot.name}
               readOnly={readOnly}
               onChange={(e) => updateName(e.target.value)}
               placeholder="Template name"
-              className="min-w-0 flex-1 rounded border border-[#22262f] bg-[#0b0d13] px-2.5 py-1.5 font-sans text-sm text-[#F4F1EA] placeholder:text-[#5A5850] focus:border-[#D9A404]/50 focus:outline-none"
+              className="w-full min-w-0 flex-1 rounded border border-[#22262f] bg-[#0b0d13] px-2.5 py-1.5 font-sans text-sm text-[#F4F1EA] placeholder:text-[#5A5850] focus:border-[#D9A404]/50 focus:outline-none sm:w-auto"
             />
             {readOnly ? (
               <span className="shrink-0 font-mono text-[11px] tracking-wide text-[#8B93A7]">
@@ -255,7 +255,7 @@ export default function TemplateLoader({
                 readOnly,
                 automaticLayout: true,
                 minimap: { enabled: false },
-                fontSize: 14,
+                fontSize: 13,
                 lineNumbersMinChars: 3,
                 scrollBeyondLastLine: false,
                 fontLigatures: true,

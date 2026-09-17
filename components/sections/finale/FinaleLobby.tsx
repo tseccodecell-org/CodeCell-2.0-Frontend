@@ -331,7 +331,7 @@ export default function FinaleLobby() {
             </p>
           )}
 
-          <div className="mt-6 h-[560px] overflow-hidden rounded-lg border border-[#14161e]">
+          <div className="mt-6 h-[70vh] min-h-[420px] overflow-hidden rounded-lg border border-[#14161e] md:h-[560px]">
             {templatesLoaded ? (
               <TemplateLoader
                 initialTemplates={templates}

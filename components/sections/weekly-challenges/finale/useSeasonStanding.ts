@@ -23,11 +23,12 @@ export function findStanding(
   const cutoff = entries[QUALIFYING_SEATS - 1];
 
   if (!mine) return { rank: null, xp: 0, gap: cutoff ? roundXp(cutoff.season_xp) : null };
-  if (mine.rank <= QUALIFYING_SEATS) return { rank: mine.rank, xp: mine.season_xp, gap: 0 };
+  if (mine.rank <= QUALIFYING_SEATS)
+    return { rank: mine.rank, xp: roundXp(mine.season_xp), gap: 0 };
 
   return {
     rank: mine.rank,
-    xp: mine.season_xp,
+    xp: roundXp(mine.season_xp),
     gap: cutoff ? roundXp(Math.max(0, cutoff.season_xp - mine.season_xp)) : null,
   };
 }

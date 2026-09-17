@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { Loader2, Plus } from "lucide-react";
 
@@ -12,6 +12,8 @@ interface TemplateLoaderProps {
   initialTemplates: TemplateResponse[];
   onContinue: (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => void;
   continueLabel?: string;
+  showContinue?: boolean;
+  onBuffersChange?: (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => void;
 }
 
 interface WorkingSlot {
@@ -61,6 +63,8 @@ export default function TemplateLoader({
   initialTemplates,
   onContinue,
   continueLabel = "Continue",
+  showContinue = true,
+  onBuffersChange,
 }: TemplateLoaderProps) {
   const [activeLanguage, setActiveLanguage] = useState<Language>("CPP");
   const [slots, setSlots] = useState<Record<Language, WorkingSlot>>(buildBlankSlots);
@@ -130,13 +134,21 @@ export default function TemplateLoader({
     setSlots((prev) => ({ ...prev, [activeLanguage]: { ...prev[activeLanguage], sourceCode } }));
   };
 
-  const handleContinue = () => {
+  const currentBuffers = useMemo(() => {
     const buffers: Partial<Record<Language, string>> = {};
     for (const lang of LANGUAGES) {
       const slot = slots[lang.id];
       if (slot.sourceCode) buffers[lang.id] = slot.sourceCode;
     }
-    onContinue(buffers, activeLanguage);
+    return buffers;
+  }, [slots]);
+
+  useEffect(() => {
+    onBuffersChange?.(currentBuffers, activeLanguage);
+  }, [currentBuffers, activeLanguage, onBuffersChange]);
+
+  const handleContinue = () => {
+    onContinue(currentBuffers, activeLanguage);
   };
 
   const templatesForActiveLanguage = templates.filter((t) => t.language === activeLanguage);
@@ -247,6 +259,7 @@ export default function TemplateLoader({
             />
           </div>
 
+          {showContinue && (
           <div className="flex h-12 shrink-0 items-center justify-end border-t border-[#1a1c24] bg-[#0d0f14] px-3">
             <button
               onClick={handleContinue}
@@ -256,6 +269,7 @@ export default function TemplateLoader({
               {continueLabel}
             </button>
           </div>
+          )}
         </div>
       </div>
     </div>

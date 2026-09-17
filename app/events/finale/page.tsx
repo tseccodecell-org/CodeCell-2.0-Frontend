@@ -90,8 +90,7 @@ export default function FinalePage() {
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               href="/events/finale/contest"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#05070C] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-              style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}
+              className="inline-flex items-center justify-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#05070C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
             >
               Enter the contest <ArrowRight size={13} />
             </Link>
@@ -125,11 +124,22 @@ export default function FinalePage() {
                       Announced soon
                     </span>
                   )}
-                  {fact.detail && (
-                    <span className="block font-sans text-xs text-[#8B93A7] mt-2 leading-relaxed">
-                      {fact.detail}
-                    </span>
-                  )}
+                  {fact.detail &&
+                    (fact.href ? (
+                      <a
+                        href={fact.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 font-sans text-xs text-[#D9A404] underline underline-offset-4 hover:text-[#F5C451] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
+                      >
+                        {fact.detail}
+                        <ArrowRight size={11} />
+                      </a>
+                    ) : (
+                      <span className="block font-sans text-xs text-[#8B93A7] mt-2 leading-relaxed">
+                        {fact.detail}
+                      </span>
+                    ))}
                   {fact.countdownTo && (
                     <WeekTimer
                       endsAt={fact.countdownTo}

@@ -5,10 +5,10 @@ export const QUALIFYING_SEATS = 20;
 
 // Midnight IST on the day itself. Set the real start time here once it is
 // fixed and the countdown follows it.
-export const FINALE_STARTS_AT = "2026-10-03T00:00:00+05:30";
+export const FINALE_STARTS_AT = "2026-09-26T00:00:00+05:30";
 
 // Used in running prose, where the full date reads long.
-export const FINALE_DATE_SHORT = "3 October";
+export const FINALE_DATE_SHORT = "26 September";
 
 // Anything left as null renders as an "announced soon" placeholder instead of
 // an empty cell, so the page reads as deliberate while details are pending.
@@ -17,11 +17,17 @@ export interface FinaleFact {
   value: string | null;
   detail?: string;
   countdownTo?: string;
+  href?: string;
 }
 
 export const FINALE_FACTS: FinaleFact[] = [
-  { label: "Date", value: "3 October 2026", detail: "Saturday", countdownTo: FINALE_STARTS_AT },
-  { label: "Venue", value: "TSEC campus, Bandra", detail: "Room announced closer to the date" },
+  { label: "Date", value: "26 September 2026", detail: "Saturday", countdownTo: FINALE_STARTS_AT },
+  {
+    label: "Venue",
+    value: "TSEC campus, Bandra",
+    detail: "Open in Maps",
+    href: "https://maps.app.goo.gl/BRqSgJiYNUy3Dwc76",
+  },
   { label: "Format", value: "On-site, individual", detail: "Your machine, our judge" },
   { label: "Duration", value: "3 hours", detail: "Single sitting" },
 ];

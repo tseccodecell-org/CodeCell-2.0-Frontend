@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import FinalePage from "./page";
 import { getCurrentFinale, getFinaleProblems, listTemplates, ApiError } from "@/lib/api-client";
 import type { FinaleState } from "@/lib/schemas/finale";
@@ -87,19 +87,20 @@ describe("finale lobby page states", () => {
     expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
   });
 
-  it("lets a participant prepare code templates before the finale goes live", async () => {
+  it("puts the template editor on the lobby itself, with the review rules", async () => {
     mockFinaleStatus({ state: "DRAFT" });
     render(<FinalePage />);
     await screen.findByText("Finale lobby");
 
-    fireEvent.click(await screen.findByText("Prepare code templates"));
-
     expect(await screen.findByLabelText("Template name")).toBeVisible();
+    expect(await screen.findByLabelText("Template code")).toBeVisible();
     expect(mockedListTemplates).toHaveBeenCalled();
 
-    fireEvent.click(await screen.findByText("Save & return to lobby"));
-
-    await screen.findByText("Finale lobby");
+    expect(screen.getByText("Bring this")).toBeVisible();
+    expect(screen.getByText("Leave this out")).toBeVisible();
+    expect(
+      screen.getByText(/A solution, or any part of one, to a specific problem/)
+    ).toBeVisible();
   });
 
   it("shows a timer while the finale is live", async () => {

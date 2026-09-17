@@ -8,6 +8,7 @@ export default function FooterWrapper() {
 
   const hideFooter =
     pathname.startsWith("/events/weekly-challenges/solve") ||
+    pathname.startsWith("/events/finale/workspace") ||
     pathname.startsWith("/terminal");
 
   if (hideFooter) {

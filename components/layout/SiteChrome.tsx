@@ -8,7 +8,7 @@ import AccountStatusBanner from "@/components/layout/AccountStatusBanner";
 import NotificationPopup from "@/components/layout/NotificationPopup";
 import RegistrationGate from "@/components/layout/RegistrationGate";
 
-const BARE_ROUTES = ["/events/weekly-challenges/solve"];
+const BARE_ROUTES = ["/events/weekly-challenges/solve", "/events/finale/workspace"];
 
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

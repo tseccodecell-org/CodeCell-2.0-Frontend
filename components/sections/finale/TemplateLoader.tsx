@@ -11,6 +11,7 @@ import { useTemplateAutosave, type AutosaveTemplateInput } from "@/hooks/useTemp
 interface TemplateLoaderProps {
   initialTemplates: TemplateResponse[];
   onContinue: (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => void;
+  continueLabel?: string;
 }
 
 interface WorkingSlot {
@@ -56,7 +57,11 @@ function buildBlankSlots(): Record<Language, WorkingSlot> {
   };
 }
 
-export default function TemplateLoader({ initialTemplates, onContinue }: TemplateLoaderProps) {
+export default function TemplateLoader({
+  initialTemplates,
+  onContinue,
+  continueLabel = "Continue",
+}: TemplateLoaderProps) {
   const [activeLanguage, setActiveLanguage] = useState<Language>("CPP");
   const [slots, setSlots] = useState<Record<Language, WorkingSlot>>(buildBlankSlots);
   const [templates, setTemplates] = useState<TemplateResponse[]>(initialTemplates);
@@ -248,7 +253,7 @@ export default function TemplateLoader({ initialTemplates, onContinue }: Templat
               className="flex items-center gap-1.5 rounded px-4 py-1.5 font-mono text-xs font-bold text-[#06070B] transition-opacity hover:opacity-90 cursor-pointer"
               style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}
             >
-              Continue
+              {continueLabel}
             </button>
           </div>
         </div>

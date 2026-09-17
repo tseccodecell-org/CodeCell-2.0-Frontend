@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import FinalePage from "./page";
 import { getFinaleStatus, getFinaleProblems, listTemplates, ApiError } from "@/lib/api-client";
 import type { FinaleState } from "@/lib/schemas/finale";
@@ -20,6 +20,25 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next/link", () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock("@monaco-editor/react", () => ({
+  default: ({
+    value,
+    onChange,
+    language,
+  }: {
+    value: string;
+    onChange: (v: string | undefined) => void;
+    language: string;
+  }) => (
+    <textarea
+      aria-label="Template code"
+      data-language={language}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  ),
 }));
 
 const mockedGetFinaleStatus = getFinaleStatus as unknown as ReturnType<typeof vi.fn>;
@@ -67,6 +86,21 @@ describe("finale lobby page states", () => {
     render(<FinalePage />);
     await screen.findByText("Contest ended");
     expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
+  });
+
+  it("lets a participant prepare code templates before the finale goes live", async () => {
+    mockFinaleStatus({ state: "DRAFT" });
+    render(<FinalePage />);
+    await screen.findByText("Finale lobby");
+
+    fireEvent.click(await screen.findByText("Prepare code templates"));
+
+    expect(await screen.findByLabelText("Template name")).toBeVisible();
+    expect(mockedListTemplates).toHaveBeenCalled();
+
+    fireEvent.click(await screen.findByText("Save & return to lobby"));
+
+    await screen.findByText("Finale lobby");
   });
 
   it("shows a timer while the finale is live", async () => {

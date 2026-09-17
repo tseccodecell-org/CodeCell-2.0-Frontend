@@ -197,6 +197,20 @@ export default function FinaleLobby() {
     [router]
   );
 
+  // lets a participant write and autosave their language templates before the
+  // contest goes live, instead of only reaching the loader through "Enter
+  // contest" once it's already LIVE
+  const openTemplateManager = useCallback(async () => {
+    setEntryTarget(null);
+    try {
+      const list = await listTemplates();
+      setTemplates(list);
+    } catch {
+      setTemplates([]);
+    }
+    setLoaderOpen(true);
+  }, []);
+
   const handleContinue = useCallback(
     (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => {
       saveWorkspaceBuffers(buffers, activeLanguage);
@@ -206,10 +220,14 @@ export default function FinaleLobby() {
     [entryTarget, router]
   );
 
-  if (loaderOpen && entryTarget) {
+  if (loaderOpen) {
     return (
       <div className="h-screen bg-[#06070B]">
-        <TemplateLoader initialTemplates={templates} onContinue={handleContinue} />
+        <TemplateLoader
+          initialTemplates={templates}
+          onContinue={handleContinue}
+          continueLabel={entryTarget ? "Continue" : "Save & return to lobby"}
+        />
       </div>
     );
   }
@@ -315,8 +333,14 @@ export default function FinaleLobby() {
           <h1 className="font-sans text-2xl font-bold">Finale lobby</h1>
           <p className="font-sans text-sm text-[#8B93A7]">
             The finale hasn&apos;t started yet. Once it goes live you&apos;ll be able to enter the
-            contest from here.
+            contest from here. In the meantime you can get your code templates ready.
           </p>
+          <button
+            onClick={openTemplateManager}
+            className="flex items-center gap-2 rounded-xl border border-[#22262f] px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-[#F4F1EA] transition-colors hover:border-[#D9A404]/60 cursor-pointer"
+          >
+            Prepare code templates
+          </button>
         </>
       )}
 

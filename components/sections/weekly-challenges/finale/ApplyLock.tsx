@@ -4,9 +4,7 @@ import Link from "next/link";
 import { Lock, ArrowRight } from "lucide-react";
 import WeekTimer from "@/components/layout/WeekTimer";
 import {
-  APPLICATIONS_OPEN,
   APPLICATIONS_OPEN_AT,
-  APPLICATIONS_URL,
   INTERNSHIP_STEPS,
   QUALIFYING_SEATS,
 } from "./finale-config";
@@ -31,7 +29,7 @@ function noteFor({ sealed, pending, qualified, standing }: SeasonStanding) {
 export default function ApplyLock({ state }: { state: SeasonStanding }) {
   const note = noteFor(state);
   const warm = state.qualified;
-  const unlocked = APPLICATIONS_OPEN && state.qualified && APPLICATIONS_URL !== null;
+  const unlocked = true;
 
   return (
     <div className="border" style={{ borderColor: warm ? GOLD : "#14161e" }}>
@@ -41,7 +39,7 @@ export default function ApplyLock({ state }: { state: SeasonStanding }) {
             className="font-mono text-[10px] tracking-[0.24em] uppercase"
             style={{ color: warm ? GOLD : BRONZE }}
           >
-            {unlocked ? "Open" : "Locked"}
+            Open
           </p>
           <h3 className="font-mono text-base text-[#F4F1EA] mt-3">Apply to the partners</h3>
           <p className="font-sans text-sm text-[#8B93A7] mt-2 max-w-md leading-relaxed">{note}</p>
@@ -60,7 +58,7 @@ export default function ApplyLock({ state }: { state: SeasonStanding }) {
 
         {unlocked ? (
           <Link
-            href={APPLICATIONS_URL as string}
+            href="/events/finale/internship"
             className="shrink-0 inline-flex items-center justify-center gap-2 border border-[#D9A404] bg-[#D9A404] text-[#05070C] px-7 py-4 font-mono text-[11px] tracking-[0.16em] uppercase hover:bg-[#F5C451] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
           >
             Start your application <ArrowRight size={14} />

@@ -45,66 +45,61 @@ export default function FinalePage() {
           BACK TO TIMELINE
         </Link>
 
-        {/* ── Hero ───────────────────────────────────────────────── */}
-        <header className="pt-14 pb-16 md:pt-20 md:pb-24">
+        <header className="pt-10 pb-10">
           <p className="font-mono text-[10px] tracking-[0.28em] uppercase" style={{ color: GOLD }}>
-            Weekly Challenges · Season 2026
+            Weekly Challenges &middot; Season 2026
           </p>
 
-          <h1
-            className={`${playfair.className} text-5xl sm:text-6xl md:text-8xl leading-[0.95] mt-5`}
-          >
+          <h1 className={`${playfair.className} text-4xl sm:text-5xl md:text-6xl leading-[0.95] mt-3`}>
             The Endgame
           </h1>
 
-          {/* The season narrows; so do the rules. The last one is the twenty. */}
-          <div aria-hidden className="mt-8 space-y-2 max-w-2xl">
-            <div className="h-px w-full" style={{ background: BRONZE }} />
-            <div className="h-px w-[55%]" style={{ background: BRONZE }} />
-            <div className="h-px w-[18%]" style={{ background: GOLD }} />
-          </div>
-
-          <p className="font-sans text-base md:text-lg text-[#8B93A7] mt-8 max-w-2xl leading-relaxed">
-            Six weeks of problems narrow the field to {QUALIFYING_SEATS}. Those{" "}
-            {QUALIFYING_SEATS} come to campus on {FINALE_DATE_SHORT} for one offline round, and the
-            same {QUALIFYING_SEATS} go to our internship partners.
+          <p className="font-sans text-sm md:text-base text-[#8B93A7] mt-4 max-w-2xl leading-relaxed">
+            The top {QUALIFYING_SEATS} of the season come to campus on {FINALE_DATE_SHORT} for one
+            offline round, and go forward to our internship partners.
           </p>
 
-          <nav className="flex flex-wrap gap-3 mt-10" aria-label="On this page">
-            <a
-              href="#offline-round"
-              className="inline-flex items-center gap-2 border border-[#D9A404] px-5 py-3 font-mono text-[11px] tracking-[0.16em] uppercase text-[#D9A404] hover:bg-[#D9A404] hover:text-[#05070C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-            >
-              The offline round <ArrowRight size={13} />
-            </a>
-            <a
-              href="#internship"
-              className="inline-flex items-center gap-2 border border-[#1a1c24] px-5 py-3 font-mono text-[11px] tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#F4F1EA] hover:border-[#4A3E1C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-            >
-              The internship track <ArrowRight size={13} />
-            </a>
-          </nav>
-
-          {/* the one door into the contest itself. open to everyone here: the
-              lobby is what checks sign-in and whether a seat was granted */}
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex flex-wrap gap-3 mt-7">
             <Link
               href="/events/finale/templates"
               className="inline-flex items-center justify-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#05070C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
             >
               Load your templates <ArrowRight size={13} />
             </Link>
-            <span className="font-sans text-xs text-[#8B93A7]">
-              For qualified participants. Save the templates you want on hand before the round starts.
-            </span>
+            <Link
+              href="/events/finale/internship"
+              className="inline-flex items-center justify-center gap-2 border border-[#1a1c24] px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#F4F1EA] hover:border-[#4A3E1C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
+            >
+              Apply for the internship <ArrowRight size={13} />
+            </Link>
+            <Link
+              href="/events/finale/recap"
+              className="inline-flex items-center justify-center gap-2 border border-[#1a1c24] px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#F4F1EA] hover:border-[#4A3E1C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
+            >
+              Your season recap <ArrowRight size={13} />
+            </Link>
           </div>
         </header>
 
-        {/* ── Where you stand ────────────────────────────────────── */}
         <StandingStrip state={state} />
 
+        <nav className="flex flex-wrap gap-3 mt-8" aria-label="On this page">
+          <a
+            href="#offline-round"
+            className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#D9A404] transition-colors"
+          >
+            The offline round <ArrowRight size={13} />
+          </a>
+          <a
+            href="#internship"
+            className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#D9A404] transition-colors"
+          >
+            The internship track <ArrowRight size={13} />
+          </a>
+        </nav>
+
         {/* ── Act one: the offline round ─────────────────────────── */}
-        <section id="offline-round" className="pt-24 scroll-mt-24">
+        <section id="offline-round" className="pt-16 scroll-mt-24">
           <SectionHead eyebrow="On campus" title="The offline round" />
 
           <dl className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#14161e] border border-[#14161e]">
@@ -165,7 +160,7 @@ export default function FinalePage() {
         </section>
 
         {/* ── Act two: the internship track ──────────────────────── */}
-        <section id="internship" className="pt-24 scroll-mt-24">
+        <section id="internship" className="pt-16 scroll-mt-24">
           <SectionHead eyebrow="For the same twenty" title="The internship track" />
 
           <p className="font-sans text-base md:text-lg text-[#F4F1EA] max-w-2xl leading-relaxed mb-10">

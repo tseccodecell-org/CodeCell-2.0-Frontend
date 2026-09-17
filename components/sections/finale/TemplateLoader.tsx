@@ -311,7 +311,9 @@ function SaveStatus({
   if (error) {
     return (
       <div className="flex shrink-0 items-center gap-2 font-mono text-[11px] tracking-wide text-[#E05252]">
-        <span>Couldn&apos;t save</span>
+        <span title={error} className="max-w-[22rem] truncate">
+          {error}
+        </span>
         <button
           onClick={retry}
           className="rounded border border-[#E05252]/50 px-2 py-0.5 text-[#E05252] transition-colors hover:bg-[#E05252]/10 cursor-pointer"

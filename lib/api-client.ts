@@ -20,6 +20,8 @@ import {
   submissionDetailSchema,
   problemSubmissionListSchema,
 } from "./schemas/submission";
+import { wrappedSchema } from "./schemas/wrapped";
+import { internshipApplicationSchema } from "./schemas/internship";
 import {
   finaleStatusSchema,
   templateSchema,
@@ -44,6 +46,11 @@ export type {
   TemplateLanguage,
   TemplateResponse,
 } from "./schemas/finale";
+export type { WrappedResponse } from "./schemas/wrapped";
+export type {
+  InternshipApplication,
+  InternshipApplicationRequest,
+} from "./schemas/internship";
 export { SchemaError } from "./schemas/common";
 
 import type { Week, WeekProblem } from "./schemas/week";
@@ -55,6 +62,11 @@ import type {
   ProblemSubmission,
 } from "./schemas/submission";
 import type { FinaleStatusResponse, TemplateResponse } from "./schemas/finale";
+import type { WrappedResponse } from "./schemas/wrapped";
+import type {
+  InternshipApplication,
+  InternshipApplicationRequest,
+} from "./schemas/internship";
 import type { TemplateRequest } from "./types/finale";
 
 export type EventStatus = "UPCOMING" | "LIVE" | "ENDED";
@@ -308,6 +320,20 @@ export function deleteTemplate(templateId: string): Promise<{ success: true }> {
     undefined,
     z.object({ success: z.literal(true) })
   );
+}
+
+export function getWrapped(): Promise<WrappedResponse> {
+  return proxyGet("/api/wrapped", wrappedSchema);
+}
+
+export function getMyInternshipApplication(): Promise<InternshipApplication> {
+  return proxyGet("/api/internship/application", internshipApplicationSchema);
+}
+
+export function applyForInternship(
+  body: InternshipApplicationRequest
+): Promise<InternshipApplication> {
+  return proxyMutate("POST", "/api/internship/apply", body, internshipApplicationSchema);
 }
 
 export function getEvents(): Promise<Event[]> {

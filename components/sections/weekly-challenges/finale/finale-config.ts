@@ -34,20 +34,36 @@ export const FINALE_FACTS: FinaleFact[] = [
 
 export const FINALE_RULES: { title: string; body: string }[] = [
   {
-    title: "You write it there",
-    body: "The finale runs on campus, on the clock, with invigilators in the room. No remote entries and no substitutions for a seat you hold.",
+    title: "Reporting and identification",
+    body: "Report to the venue at least thirty minutes before the round begins. Carry your college ID card. Entry is verified against the name on your seat, and a seat cannot be transferred to anyone else.",
   },
   {
-    title: "Same judge, harder set",
-    body: "The problems run through the CodeCell judge you have used all season. The set is built for twenty people who have already cleared six weeks.",
+    title: "What to bring",
+    body: "Bring your own laptop and its charger. Set your development environment up before you arrive, as setup time is not compensated. Power and network access are provided at the venue.",
   },
   {
-    title: "Bring a laptop and a college ID",
-    body: "Set your environment up before you arrive. Power and network are provided. Your ID is checked against the name on your seat.",
+    title: "Permitted material",
+    body: "Only the code templates saved to your CodeCell account are permitted. Templates are reviewed and locked before the round begins. Offline notes, printed material, external storage and second devices are not allowed at your seat.",
   },
   {
-    title: "Ties break on time",
-    body: "Score first, then total time to your last accepted solve. The tiebreak is the same one the weekly boards have used since week one.",
+    title: "Conduct during the round",
+    body: "The round is invigilated. Communication with anyone other than an invigilator, use of a phone, and access to any resource beyond the contest interface are prohibited. Any such attempt ends your participation and forfeits your seat.",
+  },
+  {
+    title: "Judging and scoring",
+    body: "Problems are judged by the same CodeCell judge used through the season. Only accepted submissions score. Ties are broken on the total time to your last accepted solution.",
+  },
+  {
+    title: "Interruptions",
+    body: "If a machine, the network or the judge fails, raise your hand and wait for an invigilator. Do not attempt to resolve it yourself. Time lost to a verified technical fault is compensated at the organisers' discretion.",
+  },
+  {
+    title: "Leaving the venue",
+    body: "You may leave once you have submitted, but re-entry is not permitted after you leave. Remain seated until an invigilator confirms your submissions have been recorded.",
+  },
+  {
+    title: "Final authority",
+    body: "The organisers' decision on eligibility, conduct and results is final. Anything not covered here will be decided by the organisers on the day and communicated to everyone present.",
   },
 ];
 
@@ -85,11 +101,6 @@ export const INTERNSHIP_STEPS: { title: string; body: string }[] = [
     body: "Partners reach out to the candidates they want. Roles, stipend, and duration are settled between you and them, not through us.",
   },
 ];
-
-// Applications stay shut until the season is decided. Flip this to true and
-// point APPLICATIONS_URL at the form to open them.
-export const APPLICATIONS_OPEN = false;
-export const APPLICATIONS_URL: string | null = null;
 
 // An ISO timestamp here turns the locked button into a live countdown.
 export const APPLICATIONS_OPEN_AT: string | null = null;

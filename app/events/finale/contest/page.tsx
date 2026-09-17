@@ -1,5 +1,5 @@
-import FinaleLobby from "@/components/sections/finale/FinaleLobby";
+import FinaleContest from "@/components/sections/finale/FinaleContest";
 
-export default function FinalePage() {
-  return <FinaleLobby />;
+export default function FinaleContestPage() {
+  return <FinaleContest />;
 }

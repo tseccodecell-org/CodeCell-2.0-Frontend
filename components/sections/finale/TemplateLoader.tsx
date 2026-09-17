@@ -13,6 +13,7 @@ interface TemplateLoaderProps {
   onContinue: (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => void;
   continueLabel?: string;
   showContinue?: boolean;
+  readOnly?: boolean;
   onBuffersChange?: (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => void;
 }
 
@@ -64,6 +65,7 @@ export default function TemplateLoader({
   onContinue,
   continueLabel = "Continue",
   showContinue = true,
+  readOnly = false,
   onBuffersChange,
 }: TemplateLoaderProps) {
   const [activeLanguage, setActiveLanguage] = useState<Language>("CPP");
@@ -105,7 +107,7 @@ export default function TemplateLoader({
 
   const { saving, saved, error, needsName, retry } = useTemplateAutosave(
     autosaveInput,
-    800,
+    readOnly ? 0 : 800,
     handleSaved
   );
 
@@ -179,6 +181,7 @@ export default function TemplateLoader({
             </span>
             <button
               onClick={startNewTemplate}
+              disabled={readOnly}
               title="Start a new template"
               className="rounded p-1 text-[#8B93A7] transition-colors hover:bg-[#151821] hover:text-[#D9A404] cursor-pointer"
             >
@@ -213,10 +216,16 @@ export default function TemplateLoader({
             <input
               aria-label="Template name"
               value={activeSlot.name}
+              readOnly={readOnly}
               onChange={(e) => updateName(e.target.value)}
               placeholder="Template name"
               className="min-w-0 flex-1 rounded border border-[#22262f] bg-[#0b0d13] px-2.5 py-1.5 font-sans text-sm text-[#F4F1EA] placeholder:text-[#5A5850] focus:border-[#D9A404]/50 focus:outline-none"
             />
+            {readOnly ? (
+              <span className="shrink-0 font-mono text-[11px] tracking-wide text-[#8B93A7]">
+                Locked for review
+              </span>
+            ) : (
             <SaveStatus
               saving={saving}
               saved={saved}
@@ -224,6 +233,7 @@ export default function TemplateLoader({
               needsName={needsName}
               retry={retry}
             />
+            )}
           </div>
 
           <div className="relative min-h-0 flex-1">
@@ -242,6 +252,7 @@ export default function TemplateLoader({
                 </div>
               }
               options={{
+                readOnly,
                 automaticLayout: true,
                 minimap: { enabled: false },
                 fontSize: 14,

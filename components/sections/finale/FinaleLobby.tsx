@@ -5,14 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, LogIn, Lock, TriangleAlert, RefreshCw, Check, Ban } from "lucide-react";
 
-import {
-  getCurrentFinale,
-  getFinaleProblems,
-  listTemplates,
-  ApiError,
-  LOGIN_URL,
-} from "@/lib/api-client";
-import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/api-client";
+import { getCurrentFinale, listTemplates, ApiError, LOGIN_URL } from "@/lib/api-client";
+import type { FinaleStatusResponse, TemplateResponse } from "@/lib/api-client";
 import type { Language } from "@/lib/types/submission";
 import TemplateLoader from "./TemplateLoader";
 
@@ -42,10 +36,6 @@ type LoadState =
   | { kind: "forbidden" }
   | { kind: "not-found" }
   | { kind: "error"; message: string };
-
-function endsAtFromRemaining(remainingSeconds: number): string {
-  return new Date(Date.now() + remainingSeconds * 1000).toISOString();
-}
 
 function saveWorkspaceBuffers(buffers: Partial<Record<Language, string>>, activeLanguage: Language) {
   if (typeof window === "undefined") return;
@@ -80,7 +70,7 @@ function RuleColumn({
 
   return (
     <div className="border border-[#14161e] bg-[#0B0E15] p-6">
-      <h3 className="font-sans text-base font-semibold text-[#F4F1EA]" style={{ color: accent }}>
+      <h3 className="font-sans text-base font-semibold" style={{ color: accent }}>
         {heading}
       </h3>
       <ul className="mt-4 space-y-3">
@@ -98,7 +88,6 @@ function RuleColumn({
 export default function FinaleLobby() {
   const router = useRouter();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const [problems, setProblems] = useState<WeekProblem[]>([]);
   const [templates, setTemplates] = useState<TemplateResponse[]>([]);
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
   const buffersRef = useRef<{
@@ -113,8 +102,6 @@ export default function FinaleLobby() {
       const status = await getCurrentFinale();
       setState({ kind: "ready", status });
     } catch (err) {
-      // a background refresh that fails keeps the last known status on screen
-      // rather than throwing the participant onto an error page mid-wait
       if (silent) return;
       if (err instanceof ApiError) {
         if (err.status === 401) {
@@ -143,9 +130,6 @@ export default function FinaleLobby() {
     load();
   }, [load]);
 
-  // participants sit on this screen waiting for an organizer to start, pause or
-  // end the contest, so the lobby has to keep asking rather than trusting the
-  // status it read on mount
   useEffect(() => {
     const interval = setInterval(() => {
       load(true);
@@ -174,25 +158,6 @@ export default function FinaleLobby() {
     };
   }, [state.kind]);
 
-  useEffect(() => {
-    if (state.kind !== "ready" || state.status.state === "DRAFT") return;
-    const weekId = state.status.weekId;
-
-    let cancelled = false;
-    getFinaleProblems(weekId)
-      .then((list) => {
-        if (!cancelled) setProblems(list);
-      })
-      .catch(() => {
-        // an empty problem list here is not worth surfacing as an error, the
-        // status banner above already explains what is going on
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [state]);
-
   const handleBuffersChange = useCallback(
     (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => {
       buffersRef.current = { buffers, activeLanguage };
@@ -200,14 +165,11 @@ export default function FinaleLobby() {
     []
   );
 
-  const openWorkspace = useCallback(
-    (problemId: string) => {
-      const { buffers, activeLanguage } = buffersRef.current;
-      saveWorkspaceBuffers(buffers, activeLanguage);
-      router.push(`/events/finale/workspace/${problemId}`);
-    },
-    [router]
-  );
+  const enterContest = useCallback(() => {
+    const { buffers, activeLanguage } = buffersRef.current;
+    saveWorkspaceBuffers(buffers, activeLanguage);
+    router.push("/events/finale/contest");
+  }, [router]);
 
   if (state.kind === "loading") {
     return (
@@ -225,7 +187,7 @@ export default function FinaleLobby() {
         <Lock size={28} className="text-[#D9A404]" />
         <h1 className="font-sans text-2xl font-bold">Sign in required</h1>
         <p className="font-sans text-sm text-[#8B93A7]">
-          Sign in to check the finale&apos;s status and enter the contest.
+          Sign in to check the finale&apos;s status and load your templates.
         </p>
         <button
           onClick={() => (window.location.href = LOGIN_URL)}
@@ -282,33 +244,16 @@ export default function FinaleLobby() {
   }
 
   const { status } = state;
-  const endsAt = status.state === "LIVE" ? endsAtFromRemaining(status.remainingSeconds) : undefined;
-  const firstProblemId = problems[0]?.id;
+  const contestOpen = status.state !== "DRAFT";
+  const locked = status.templatesLocked;
 
-  const heading =
-    status.state === "DRAFT"
-      ? "Finale lobby"
-      : status.state === "LIVE"
-        ? "The finale is live"
-        : status.state === "PAUSED"
-          ? "Scoring paused"
-          : "Contest ended";
+  const heading = contestOpen ? "The contest is open" : "Finale lobby";
 
-  const standfirst =
-    status.state === "DRAFT"
-      ? "The round hasn't started. Use the time to get your templates in order, they are saved to your account as you type."
-      : status.state === "LIVE"
-        ? "Your templates are saved. Pick a problem to open your workspace."
-        : status.state === "PAUSED"
-          ? "An organizer has paused scoring. You can still write, run and submit code, it just won't count until scoring resumes."
-          : "The finale has ended. Your workspace stays open for practice, nothing you run or submit now affects the standings.";
-
-  const enterLabel =
-    status.state === "LIVE"
-      ? "Enter contest"
-      : status.state === "PAUSED"
-        ? "Open workspace"
-        : "Practice in workspace";
+  const standfirst = locked
+    ? "Templates are locked for review. You can still read what you saved, but it can no longer be edited."
+    : contestOpen
+      ? "Your templates are saved. Head through when you are ready."
+      : "The round hasn't started. Use the time to get your templates in order, they save to your account as you type.";
 
   return (
     <div className="min-h-screen bg-[#06070B] text-[#F4F1EA]">
@@ -327,24 +272,26 @@ export default function FinaleLobby() {
             <p className="mt-3 font-sans text-sm leading-relaxed text-[#8B93A7]">{standfirst}</p>
           </div>
 
-          <div className="flex flex-col items-start gap-3 sm:items-end">
-            {endsAt && (
-              <div
-                data-testid="finale-timer"
-                className="font-mono text-sm tracking-wide"
-                style={{ color: GOLD }}
-              >
-                <FinaleCountdown endsAt={endsAt} />
-              </div>
-            )}
-            {status.state !== "DRAFT" && (
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            {contestOpen ? (
               <button
-                onClick={() => firstProblemId && openWorkspace(firstProblemId)}
-                disabled={!firstProblemId}
-                className="inline-flex items-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#06070B] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                onClick={enterContest}
+                className="inline-flex items-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#06070B] cursor-pointer"
               >
-                {enterLabel}
+                Enter contest
               </button>
+            ) : (
+              <>
+                <span className="inline-flex items-center gap-2 border border-[#22262f] px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#5A5850]">
+                  <Lock size={13} />
+                  Contest locked
+                </span>
+                {status.scheduledStartAt && (
+                  <span className="font-mono text-xs text-[#8B93A7]">
+                    Opens in <FinaleCountdown target={status.scheduledStartAt} />
+                  </span>
+                )}
+              </>
             )}
           </div>
         </header>
@@ -367,9 +314,21 @@ export default function FinaleLobby() {
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 className="font-sans text-xl font-semibold">Your templates</h2>
             <p className="font-sans text-sm text-[#8B93A7]">
-              Keep as many as you like, in any of the three languages. Edits save on their own.
+              {locked
+                ? "Read-only until the organisers reopen them."
+                : "Keep as many as you like, in any of the three languages. Edits save on their own."}
             </p>
           </div>
+
+          {locked && (
+            <p
+              role="status"
+              className="mt-4 flex items-center gap-2 border border-[#22262f] bg-[#0B0E15] px-4 py-3 font-sans text-sm text-[#8B93A7]"
+            >
+              <Lock size={14} style={{ color: GOLD }} />
+              Your template library has been locked for review.
+            </p>
+          )}
 
           <div className="mt-6 h-[560px] overflow-hidden rounded-lg border border-[#14161e]">
             {templatesLoaded ? (
@@ -377,6 +336,7 @@ export default function FinaleLobby() {
                 initialTemplates={templates}
                 onContinue={() => {}}
                 showContinue={false}
+                readOnly={locked}
                 onBuffersChange={handleBuffersChange}
               />
             ) : (
@@ -388,61 +348,41 @@ export default function FinaleLobby() {
             )}
           </div>
         </section>
-
-        {problems.length > 0 && (
-          <section className="mt-12">
-            <h2 className="font-sans text-xl font-semibold">Problems</h2>
-            <div className="mt-4 flex flex-col gap-2">
-              {problems.map((problem) => (
-                <button
-                  key={problem.id}
-                  onClick={() => openWorkspace(problem.id)}
-                  className="flex items-center justify-between rounded-lg border border-[#22262f] bg-[#0d0f14] px-4 py-3 text-left font-sans text-sm text-[#F4F1EA] transition-colors hover:border-[#D9A404]/50 cursor-pointer"
-                >
-                  <span>{problem.title}</span>
-                  <span className="font-mono text-[11px] uppercase tracking-wide text-[#8B93A7]">
-                    {problem.difficulty} &middot; {problem.base_points} pts
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );
 }
 
-// a minimal, self-contained mm:ss/h:mm countdown so the lobby does not need to
-// reach for WeekTimer's ISO-endsAt semantics, which are meant for a week's
-// fixed schedule rather than a remaining-seconds figure the backend recomputes
-function FinaleCountdown({ endsAt }: { endsAt: string }) {
+export function FinaleCountdown({ target }: { target: string }) {
   const [label, setLabel] = useState("");
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
 
     const tick = () => {
-      const ms = new Date(endsAt).getTime() - Date.now();
+      const ms = new Date(target).getTime() - Date.now();
       if (ms <= 0) {
-        setLabel("0:00 left");
+        setLabel("0:00");
         return;
       }
       const totalSeconds = Math.floor(ms / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
       const formatted =
-        hours > 0
-          ? `${hours}h ${String(minutes).padStart(2, "0")}m`
-          : `${minutes}:${String(seconds).padStart(2, "0")}`;
-      setLabel(`${formatted} left`);
+        days > 0
+          ? `${days}d ${hours}h`
+          : hours > 0
+            ? `${hours}h ${String(minutes).padStart(2, "0")}m`
+            : `${minutes}:${String(seconds).padStart(2, "0")}`;
+      setLabel(formatted);
       timer = setTimeout(tick, 1000);
     };
 
     tick();
     return () => clearTimeout(timer);
-  }, [endsAt]);
+  }, [target]);
 
   return <span>{label}</span>;
 }

@@ -13,6 +13,8 @@ export const finaleStatusSchema = z.object({
   remainingSeconds: z.number(),
   scoringActive: z.boolean(),
   liveSince: z.string().optional(),
+  templatesLocked: z.boolean().default(false),
+  scheduledStartAt: z.string().optional(),
 });
 
 export type FinaleStatusResponse = z.infer<typeof finaleStatusSchema>;

@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import FinalePage from "./page";
-import { getCurrentFinale, getFinaleProblems, listTemplates, ApiError } from "@/lib/api-client";
-import type { FinaleState } from "@/lib/schemas/finale";
+import FinaleContestPage from "./page";
+import { getCurrentFinale, getFinaleProblems, listTemplates } from "@/lib/api-client";
 
 vi.mock("@/lib/api-client", async () => {
   const actual = await vi.importActual<typeof import("@/lib/api-client")>("@/lib/api-client");
@@ -22,25 +21,6 @@ vi.mock("next/link", () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock("@monaco-editor/react", () => ({
-  default: ({
-    value,
-    onChange,
-    language,
-  }: {
-    value: string;
-    onChange: (v: string | undefined) => void;
-    language: string;
-  }) => (
-    <textarea
-      aria-label="Template code"
-      data-language={language}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  ),
-}));
-
 const mockedGetCurrentFinale = getCurrentFinale as unknown as ReturnType<typeof vi.fn>;
 const mockedGetFinaleProblems = getFinaleProblems as unknown as ReturnType<typeof vi.fn>;
 const mockedListTemplates = listTemplates as unknown as ReturnType<typeof vi.fn>;
@@ -50,17 +30,24 @@ const baseStatus = {
   accessMode: "OPEN" as const,
   remainingSeconds: 1800,
   scoringActive: true,
+  templatesLocked: false,
 };
 
-function mockFinaleStatus(overrides: { state: FinaleState; scoringActive?: boolean }) {
-  mockedGetCurrentFinale.mockResolvedValue({
-    ...baseStatus,
-    ...overrides,
-  });
-}
+const problem = {
+  id: "p-1",
+  week_id: "wk-finale-1",
+  title: "Palindromic Ladders",
+  slug: "palindromic-ladders",
+  difficulty: "HARD",
+  base_points: 300,
+  time_limit_ms: 2000,
+  memory_limit_mb: 256,
+  solved: false,
+  week_ended: false,
+};
 
 beforeEach(() => {
-  mockedGetFinaleProblems.mockResolvedValue([]);
+  mockedGetFinaleProblems.mockResolvedValue([problem]);
   mockedListTemplates.mockResolvedValue([]);
 });
 
@@ -68,84 +55,73 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("finale lobby page states", () => {
-  it.each([
-    ["DRAFT", "Finale lobby"],
-    ["LIVE", "Enter contest"],
-    ["PAUSED", "Scoring paused"],
-    ["ENDED", "Contest ended"],
-  ])("renders %s safely", async (state, visibleCopy) => {
-    mockFinaleStatus({ state: state as FinaleState });
-    render(<FinalePage />);
-    expect(await screen.findByText(visibleCopy)).toBeVisible();
+describe("finale contest page", () => {
+  it("withholds the problems and counts down while the round has not started", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({
+      ...baseStatus,
+      state: "DRAFT",
+      scheduledStartAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+    });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByText("The round hasn't started")).toBeVisible();
+    expect(screen.getByText("Problems locked")).toBeVisible();
+    expect(screen.getByTestId("finale-start-countdown")).toBeVisible();
+    expect(screen.queryByText(problem.title)).not.toBeInTheDocument();
+    expect(mockedGetFinaleProblems).not.toHaveBeenCalled();
   });
 
-  it("does not render a timer after permanent end", async () => {
-    mockFinaleStatus({ state: "ENDED", scoringActive: false });
-    render(<FinalePage />);
-    await screen.findByText("Contest ended");
+  it("shows the problems and the round timer once it is live", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "LIVE" });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByText("The round is live")).toBeVisible();
+    expect(await screen.findByText(problem.title)).toBeVisible();
+    expect(screen.getByTestId("finale-timer")).toBeVisible();
+    expect(screen.queryByTestId("finale-start-countdown")).not.toBeInTheDocument();
+  });
+
+  it("drops the timer once the round has ended", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({
+      ...baseStatus,
+      state: "ENDED",
+      scoringActive: false,
+    });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByText("The round has ended")).toBeVisible();
     expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
   });
 
-  it("puts the template editor on the lobby itself, with the review rules", async () => {
-    mockFinaleStatus({ state: "DRAFT" });
-    render(<FinalePage />);
-    await screen.findByText("Finale lobby");
+  it("keeps the round instructions on the page", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "LIVE" });
 
-    expect(await screen.findByLabelText("Template name")).toBeVisible();
-    expect(await screen.findByLabelText("Template code")).toBeVisible();
-    expect(mockedListTemplates).toHaveBeenCalled();
+    render(<FinaleContestPage />);
 
-    expect(screen.getByText("Bring this")).toBeVisible();
-    expect(screen.getByText("Leave this out")).toBeVisible();
-    expect(
-      screen.getByText(/A solution, or any part of one, to a specific problem/)
-    ).toBeVisible();
+    expect(await screen.findByText("How the round works")).toBeVisible();
+    expect(screen.getByText(/Ties break on total time/)).toBeVisible();
   });
 
-  it("shows a timer while the finale is live", async () => {
-    mockFinaleStatus({ state: "LIVE" });
-    render(<FinalePage />);
-    await screen.findByText("Enter contest");
-    expect(screen.getByTestId("finale-timer")).toBeVisible();
-  });
-});
+  it("lists the templates the participant brought, read only", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "LIVE" });
+    mockedListTemplates.mockResolvedValue([
+      {
+        id: "t-1",
+        name: "Fast C++",
+        language: "CPP",
+        sourceCode: "int main(){}",
+        createdAt: "2026-09-16T10:00:00Z",
+        updatedAt: "2026-09-16T10:00:00Z",
+      },
+    ]);
 
-describe("finale lobby failure states", () => {
-  it("shows a distinct message when access is restricted (403)", async () => {
-    mockedGetCurrentFinale.mockRejectedValue(new ApiError(403, "finale is restricted"));
-    render(<FinalePage />);
-    expect(await screen.findByText("You don't have access")).toBeVisible();
-  });
+    render(<FinaleContestPage />);
 
-  it("prompts sign-in on a stale session (401) instead of a generic error", async () => {
-    mockedGetCurrentFinale.mockRejectedValue(new ApiError(401, "unauthorized"));
-    render(<FinalePage />);
-    expect(await screen.findByText("Sign in required")).toBeVisible();
-  });
-
-  it("shows a distinct message when the finale is unavailable (404)", async () => {
-    mockedGetCurrentFinale.mockRejectedValue(new ApiError(404, "finale not found"));
-    render(<FinalePage />);
-    expect(await screen.findByText("Finale not available")).toBeVisible();
-  });
-
-  it("shows a distinct message on a network failure", async () => {
-    mockedGetCurrentFinale.mockRejectedValue(new TypeError("Failed to fetch"));
-    render(<FinalePage />);
-    expect(await screen.findByText("Something went wrong")).toBeVisible();
-  });
-
-  it("does not collapse different failure modes into the same copy", async () => {
-    mockedGetCurrentFinale.mockRejectedValue(new ApiError(403, "finale is restricted"));
-    const { unmount } = render(<FinalePage />);
-    const forbiddenCopy = (await screen.findByText("You don't have access")).textContent;
-    unmount();
-
-    mockedGetCurrentFinale.mockRejectedValue(new ApiError(404, "finale not found"));
-    render(<FinalePage />);
-    const notFoundCopy = (await screen.findByText("Finale not available")).textContent;
-
-    expect(forbiddenCopy).not.toBe(notFoundCopy);
+    expect(await screen.findByText("Fast C++")).toBeVisible();
+    expect(screen.getByText("int main(){}")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Template code")).not.toBeInTheDocument();
   });
 });

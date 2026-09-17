@@ -89,13 +89,13 @@ export default function FinalePage() {
               lobby is what checks sign-in and whether a seat was granted */}
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
-              href="/events/finale/contest"
+              href="/events/finale/templates"
               className="inline-flex items-center justify-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3.5 font-mono text-[11px] font-bold tracking-[0.16em] uppercase text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#05070C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
             >
-              Enter the contest <ArrowRight size={13} />
+              Load your templates <ArrowRight size={13} />
             </Link>
             <span className="font-sans text-xs text-[#8B93A7]">
-              For qualified participants. Prepare your code templates here before the round starts.
+              For qualified participants. Save the templates you want on hand before the round starts.
             </span>
           </div>
         </header>
@@ -205,32 +205,6 @@ export default function FinalePage() {
           </p>
         </section>
 
-        {/* ── Close ──────────────────────────────────────────────── */}
-        <section className="pt-24 pb-8">
-          <div className="border border-[#14161e] bg-[#0B0E15] p-8 md:p-12">
-            <h2 className={`${playfair.className} text-2xl md:text-3xl text-[#F4F1EA]`}>
-              Seats are decided by the season board.
-            </h2>
-            <p className="font-sans text-sm text-[#8B93A7] mt-4 max-w-xl leading-relaxed">
-              There is nothing to sign up for. Solve the weekly problems, hold your rank through
-              week 6, and the seat is yours.
-            </p>
-            <div className="flex flex-wrap gap-3 mt-8">
-              <Link
-                href="/events/weekly-challenges/timeline"
-                className="inline-flex items-center gap-2 border border-[#D9A404] px-6 py-3 font-mono text-[11px] tracking-[0.16em] uppercase text-[#D9A404] hover:bg-[#D9A404] hover:text-[#05070C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-              >
-                Go to this week <ArrowRight size={13} />
-              </Link>
-              <Link
-                href="/events/weekly-challenges/leaderboard/season"
-                className="inline-flex items-center gap-2 border border-[#1a1c24] px-6 py-3 font-mono text-[11px] tracking-[0.16em] uppercase text-[#8B93A7] hover:text-[#F4F1EA] hover:border-[#4A3E1C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-              >
-                Full season board <ArrowRight size={13} />
-              </Link>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
   );

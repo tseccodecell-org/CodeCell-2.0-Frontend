@@ -100,7 +100,7 @@ const Page = () => {
           </div>
 
           <Link
-            href="/events/weekly-challenges/finale"
+            href="/events/finale"
             className="border border-[#D9A404]/40 border-t-2 border-t-[#D9A404] bg-[#0b0d13] p-5 flex items-center gap-4 transition-colors hover:bg-[#111420] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
             style={{ boxShadow: "0 0 18px rgba(217,167,4,0.12)" }}
           >

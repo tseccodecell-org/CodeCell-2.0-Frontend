@@ -475,7 +475,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
         </div>
         <p className="font-mono text-sm text-[#F4F1EA]">Problem not found.</p>
         <Link
-          href="/events/finale"
+          href="/events/finale/contest"
           className="mt-2 rounded-xl px-5 py-2 font-mono text-xs font-bold uppercase tracking-widest text-[#06070B] transition-opacity hover:opacity-90"
           style={{ background: "linear-gradient(180deg, #F5C451 0%, #D97706 100%)" }}
         >
@@ -489,7 +489,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
     <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
         <Link
-          href="/events/finale"
+          href="/events/finale/contest"
           className="flex items-center gap-1.5 font-mono text-[11px] tracking-wide text-[#8B93A7] transition-colors hover:text-[#F4F1EA]"
         >
           <ArrowLeft size={14} />

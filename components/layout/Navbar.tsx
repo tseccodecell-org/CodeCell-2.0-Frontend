@@ -21,7 +21,6 @@ const navItems: NavItem[] = [
     dropdownItems: [
       { label: "TSEC HACKS", href: "/events/tsec-hacks" },
       { label: "WEEKLY CHALLENGES", href: "/events/weekly-challenges" },
-      { label: "THE ENDGAME", href: "/events/weekly-challenges/finale" },
       { label: "MINI EVENT", href: "/events/mini-event" },
       { label: "FINALE", href: "/events/finale" },
     ],

@@ -22,14 +22,18 @@ export function findStanding(
   const mine = entries.find((e) => String(e.user_id) === youId);
   const cutoff = entries[QUALIFYING_SEATS - 1];
 
-  if (!mine) return { rank: null, xp: 0, gap: cutoff ? cutoff.season_xp : null };
+  if (!mine) return { rank: null, xp: 0, gap: cutoff ? roundXp(cutoff.season_xp) : null };
   if (mine.rank <= QUALIFYING_SEATS) return { rank: mine.rank, xp: mine.season_xp, gap: 0 };
 
   return {
     rank: mine.rank,
     xp: mine.season_xp,
-    gap: cutoff ? Math.max(0, cutoff.season_xp - mine.season_xp) : null,
+    gap: cutoff ? roundXp(Math.max(0, cutoff.season_xp - mine.season_xp)) : null,
   };
+}
+
+function roundXp(value: number): number {
+  return Math.round(value);
 }
 
 export function holdsSeat(standing: Standing | null): boolean {

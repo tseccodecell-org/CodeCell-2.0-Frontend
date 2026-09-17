@@ -29,7 +29,7 @@ export const FINALE_FACTS: FinaleFact[] = [
     href: "https://maps.app.goo.gl/BRqSgJiYNUy3Dwc76",
   },
   { label: "Format", value: "On-site, individual", detail: "Your machine, our judge" },
-  { label: "Duration", value: "3 hours", detail: "Single sitting" },
+  { label: "Duration", value: "2 hours", detail: "Single sitting" },
 ];
 
 export const FINALE_RULES: { title: string; body: string }[] = [

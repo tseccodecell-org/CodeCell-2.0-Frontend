@@ -15,7 +15,8 @@ export async function GET(
     );
   }
 
-  const backendPath = `/finales/${slug.join("/")}`;
+  // mounted under the backend's /api group, unlike older routes such as /weeks
+  const backendPath = `/api/finales/${slug.join("/")}`;
   const search = req.nextUrl.searchParams.toString();
   const url = `${API_BASE}${backendPath}${search ? `?${search}` : ""}`;
 

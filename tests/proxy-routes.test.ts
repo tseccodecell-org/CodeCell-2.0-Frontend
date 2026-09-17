@@ -196,7 +196,7 @@ describe("finales proxy route", () => {
       params: Promise.resolve({ slug: ["wk-1", "status"] }),
     });
 
-    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/finales/wk-1/status`);
+    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/api/finales/wk-1/status`);
   });
 
   it("carries the query string through", async () => {
@@ -281,7 +281,7 @@ describe("templates proxy route", () => {
       params: Promise.resolve({ slug: [] }),
     });
 
-    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/templates`);
+    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/api/templates`);
   });
 
   it("appends the slug when a single template is addressed", async () => {
@@ -291,7 +291,7 @@ describe("templates proxy route", () => {
       params: Promise.resolve({ slug: [templateFixture.id] }),
     });
 
-    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/templates/${templateFixture.id}`);
+    expect(fetchMock().mock.calls[0][0]).toBe(`${API_BASE}/api/templates/${templateFixture.id}`);
   });
 
   it("forwards the session cookie", async () => {
@@ -328,7 +328,7 @@ describe("templates proxy route", () => {
       string,
       { method: string; body: string; headers: Record<string, string> },
     ];
-    expect(url).toBe(`${API_BASE}/templates`);
+    expect(url).toBe(`${API_BASE}/api/templates`);
     expect(init.method).toBe("POST");
     expect(JSON.parse(init.body)).toEqual(payload);
     expect(init.headers["Content-Type"]).toBe("application/json");
@@ -345,7 +345,7 @@ describe("templates proxy route", () => {
     );
 
     const [url, init] = fetchMock().mock.calls[0] as [string, { method: string; body: string }];
-    expect(url).toBe(`${API_BASE}/templates/${templateFixture.id}`);
+    expect(url).toBe(`${API_BASE}/api/templates/${templateFixture.id}`);
     expect(init.method).toBe("PUT");
     expect(JSON.parse(init.body)).toEqual(payload);
   });
@@ -359,7 +359,7 @@ describe("templates proxy route", () => {
     );
 
     const [url, init] = fetchMock().mock.calls[0] as [string, { method: string }];
-    expect(url).toBe(`${API_BASE}/templates/${templateFixture.id}`);
+    expect(url).toBe(`${API_BASE}/api/templates/${templateFixture.id}`);
     expect(init.method).toBe("DELETE");
     expect(res.status).toBe(200);
   });

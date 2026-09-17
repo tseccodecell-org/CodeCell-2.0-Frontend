@@ -7,6 +7,7 @@ import {
   updateTemplate,
   deleteTemplate,
   ApiError,
+  getCurrentFinale,
 } from "@/lib/api-client";
 import { SchemaError } from "@/lib/schemas/common";
 import { mockFetchOnce, lastFetchCall, envelope } from "./helpers";
@@ -219,5 +220,23 @@ describe("deleteTemplate", () => {
 
     expect(err).toBeInstanceOf(ApiError);
     expect(err.status).toBe(404);
+  });
+});
+
+describe("getCurrentFinale", () => {
+  it("asks the backend which finale is current instead of a build-time id", async () => {
+    mockFetchOnce(envelope(finaleStatusFixture));
+
+    await getCurrentFinale();
+
+    expect(lastFetchCall()[0]).toBe("/api/finales/current");
+  });
+
+  it("carries the week id the rest of the lobby works from", async () => {
+    mockFetchOnce(envelope(finaleStatusFixture));
+
+    const status = await getCurrentFinale();
+
+    expect(status.weekId).toBe(finaleStatusFixture.weekId);
   });
 });

@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.tseccodecell.com";
 
+// the finale and template handlers are mounted under the backend's /api group,
+// unlike older routes such as /weeks which sit at the root
 function backendPathFor(slug: string[]): string {
-  return slug.length ? `/templates/${slug.join("/")}` : `/templates`;
+  return slug.length ? `/api/templates/${slug.join("/")}` : `/api/templates`;
 }
 
 function forwardedHeaders(req: NextRequest, withBody: boolean): Record<string, string> {

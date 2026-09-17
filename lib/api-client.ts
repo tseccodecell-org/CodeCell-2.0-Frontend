@@ -276,6 +276,12 @@ export function getFinaleStatus(weekId: string): Promise<FinaleStatusResponse> {
   return proxyGet(`/api/finales/${weekId}/status`, finaleStatusSchema);
 }
 
+// which finale a participant should see is the backend's call, not a build-time
+// constant: it carries the week id the rest of the lobby then works from
+export function getCurrentFinale(): Promise<FinaleStatusResponse> {
+  return proxyGet("/api/finales/current", finaleStatusSchema);
+}
+
 export function getFinaleProblems(weekId: string): Promise<WeekProblem[]> {
   return proxyGet(`/api/finales/${weekId}/problems`, weekProblemListSchema);
 }

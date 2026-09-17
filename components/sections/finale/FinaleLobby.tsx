@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogIn, Lock, TriangleAlert, RefreshCw, Settings } from "lucide-react";
+import { LogIn, Lock, TriangleAlert, RefreshCw } from "lucide-react";
 
 import {
-  getFinaleStatus,
+  getCurrentFinale,
   getFinaleProblems,
   listTemplates,
   ApiError,
@@ -14,15 +14,6 @@ import {
 import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/api-client";
 import type { Language } from "@/lib/types/submission";
 import TemplateLoader from "./TemplateLoader";
-
-// this platform runs a single finale contest at a time, and there is no
-// participant-facing "list finales" endpoint, so the lobby is pointed at the
-// one finale week via an env var rather than guessing or inventing a listing UI.
-// read lazily (not as a module-level constant) so it reflects the environment
-// at call time rather than whatever it was when this module first loaded
-function getFinaleWeekId(): string | undefined {
-  return process.env.NEXT_PUBLIC_FINALE_WEEK_ID;
-}
 
 export const FINALE_LOADER_DONE_KEY = "codecell_finale_loader_done";
 export const FINALE_BUFFERS_KEY = "codecell_finale_buffers";
@@ -35,7 +26,6 @@ type LoadState =
   | { kind: "unauthenticated" }
   | { kind: "forbidden" }
   | { kind: "not-found" }
-  | { kind: "unconfigured" }
   | { kind: "error"; message: string };
 
 function endsAtFromRemaining(remainingSeconds: number): string {
@@ -107,16 +97,10 @@ export default function FinaleLobby() {
   const [loaderOpen, setLoaderOpen] = useState(false);
 
   const load = useCallback(async (silent = false) => {
-    const weekId = getFinaleWeekId();
-    if (!weekId) {
-      if (!silent) setState({ kind: "unconfigured" });
-      return;
-    }
-
     if (!silent) setState({ kind: "loading" });
 
     try {
-      const status = await getFinaleStatus(weekId);
+      const status = await getCurrentFinale();
       setState({ kind: "ready", status });
     } catch (err) {
       // a background refresh that fails keeps the last known status on screen
@@ -160,8 +144,8 @@ export default function FinaleLobby() {
   }, [load]);
 
   useEffect(() => {
-    const weekId = getFinaleWeekId();
-    if (state.kind !== "ready" || state.status.state === "DRAFT" || !weekId) return;
+    if (state.kind !== "ready" || state.status.state === "DRAFT") return;
+    const weekId = state.status.weekId;
 
     let cancelled = false;
     getFinaleProblems(weekId)
@@ -238,18 +222,6 @@ export default function FinaleLobby() {
         <span className="font-mono text-xs uppercase tracking-widest text-[#8B93A7]">
           Loading finale status
         </span>
-      </Shell>
-    );
-  }
-
-  if (state.kind === "unconfigured") {
-    return (
-      <Shell>
-        <Settings size={28} className="text-[#8B93A7]" />
-        <h1 className="font-sans text-2xl font-bold">Finale not configured</h1>
-        <p className="font-sans text-sm text-[#8B93A7]">
-          This deployment has not been pointed at a finale contest yet. Come back later.
-        </p>
       </Shell>
     );
   }

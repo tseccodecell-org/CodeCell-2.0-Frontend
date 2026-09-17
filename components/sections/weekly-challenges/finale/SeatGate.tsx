@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Lock, LogIn, MessageCircle } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 
-import { getInternshipEligibility, ApiError, LOGIN_URL } from "@/lib/api-client";
+import { getInternshipEligibility, getCurrentFinale, ApiError, LOGIN_URL } from "@/lib/api-client";
 import { QUALIFYING_SEATS, WHATSAPP_GROUP_URL } from "./finale-config";
 import type { SeasonStanding } from "./useSeasonStanding";
 
@@ -41,6 +41,26 @@ function OpenAction({ href, label }: { href: string; label: string }) {
   );
 }
 
+export function useEntryOpen(): boolean {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentFinale()
+      .then((status) => {
+        if (!cancelled) setOpen(status.entryOpen);
+      })
+      .catch(() => {
+        if (!cancelled) setOpen(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return open;
+}
+
 export function useSeatState(): SeatState {
   const [seat, setSeat] = useState<SeatState>("loading");
 
@@ -68,9 +88,11 @@ export function useSeatState(): SeatState {
 export default function SeatGate({
   seat,
   standing,
+  entryOpen,
 }: {
   seat: SeatState;
   standing: SeasonStanding;
+  entryOpen: boolean;
 }) {
   if (seat === "signed-out" || standing.sealed) {
     return (
@@ -123,12 +145,12 @@ export default function SeatGate({
             <LockedAction label="Apply for the internship" />
           </>
         ))}
-      <Link
-        href="/events/finale/recap"
-        className="inline-flex items-center justify-center gap-2 border border-[#1a1c24] px-6 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#8B93A7] transition-colors hover:border-[#4A3E1C] hover:text-[#F4F1EA]"
-      >
-        Your season recap <ArrowRight size={13} />
-      </Link>
+      {inTheTwenty &&
+        (entryOpen ? (
+          <OpenAction href="/events/finale/contest" label="Enter contest" />
+        ) : (
+          <LockedAction label="Enter contest" />
+        ))}
     </div>
   );
 

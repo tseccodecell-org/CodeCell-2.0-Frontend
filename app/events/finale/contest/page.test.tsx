@@ -31,6 +31,7 @@ const baseStatus = {
   remainingSeconds: 1800,
   scoringActive: true,
   templatesLocked: false,
+  entryOpen: true,
 };
 
 const problem = {
@@ -123,5 +124,27 @@ describe("finale contest page", () => {
     expect(await screen.findByText("Fast C++")).toBeVisible();
     expect(screen.getByText("int main(){}")).toBeInTheDocument();
     expect(screen.queryByLabelText("Template code")).not.toBeInTheDocument();
+  });
+
+  it("keeps the room shut when entry has not been opened", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({
+      ...baseStatus,
+      state: "DRAFT",
+      entryOpen: false,
+    });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByText("The doors are not open yet")).toBeVisible();
+    expect(screen.queryByText("Problems")).not.toBeInTheDocument();
+  });
+
+  it("seals the problems while the round has not started", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "DRAFT" });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByText("Sealed until the round starts")).toBeVisible();
+    expect(screen.queryByText(problem.title)).not.toBeInTheDocument();
   });
 });

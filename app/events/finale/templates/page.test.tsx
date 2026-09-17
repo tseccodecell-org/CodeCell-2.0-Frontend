@@ -72,26 +72,13 @@ afterEach(() => {
 describe("finale lobby page states", () => {
   it.each([
     ["DRAFT", "Finale lobby"],
-    ["LIVE", "Enter contest"],
-    ["PAUSED", "Enter contest"],
-    ["ENDED", "Enter contest"],
+    ["LIVE", "The contest is open"],
+    ["PAUSED", "The contest is open"],
+    ["ENDED", "The contest is open"],
   ])("renders %s safely", async (state, visibleCopy) => {
     mockFinaleStatus({ state: state as FinaleState });
     render(<FinalePage />);
     expect(await screen.findByText(visibleCopy)).toBeVisible();
-  });
-
-  it("locks the contest and counts down while the round has not started", async () => {
-    mockedGetCurrentFinale.mockResolvedValue({
-      ...baseStatus,
-      state: "DRAFT",
-      scheduledStartAt: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
-    });
-    render(<FinalePage />);
-
-    expect(await screen.findByText("Contest locked")).toBeVisible();
-    expect(screen.getByText(/Opens in/)).toBeVisible();
-    expect(screen.queryByText("Enter contest")).not.toBeInTheDocument();
   });
 
   it("freezes the editor once templates are locked for review", async () => {

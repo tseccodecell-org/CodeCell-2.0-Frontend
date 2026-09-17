@@ -9,13 +9,17 @@ import {
   getCurrentFinale,
   getFinaleProblems,
   listTemplates,
+  getLeaderboard,
   ApiError,
   LOGIN_URL,
 } from "@/lib/api-client";
 import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/api-client";
+import type { WeeklyLeaderboardEntry } from "@/lib/schemas/leaderboard";
+import { useAuth } from "@/hooks/useAuth";
 import { FinaleCountdown } from "./FinaleLobby";
 
 const FINALE_STATUS_REFRESH_MS = 15000;
+const BOARD_REFRESH_MS = 20000;
 
 const GOLD = "#D9A404";
 
@@ -54,6 +58,8 @@ export default function FinaleContest() {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [problems, setProblems] = useState<WeekProblem[]>([]);
   const [templates, setTemplates] = useState<TemplateResponse[]>([]);
+  const [board, setBoard] = useState<WeeklyLeaderboardEntry[]>([]);
+  const { user } = useAuth();
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setState({ kind: "loading" });
@@ -115,6 +121,31 @@ export default function FinaleContest() {
       cancelled = true;
     };
   }, [state.kind]);
+
+  useEffect(() => {
+    if (state.kind !== "ready" || state.status.state === "DRAFT") return;
+    const weekId = state.status.weekId;
+
+    let cancelled = false;
+
+    const readBoard = () => {
+      getLeaderboard("weekly", user?.role, "TSEC", { page: 1, limit: 20, weekId })
+        .then((res) => {
+          if (!cancelled) setBoard(res.data);
+        })
+        .catch(() => {
+          // the board is a nicety during the round, never a blocker
+        });
+    };
+
+    readBoard();
+    const interval = setInterval(readBoard, BOARD_REFRESH_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [state, user?.role]);
 
   useEffect(() => {
     if (state.kind !== "ready" || state.status.state === "DRAFT") return;
@@ -206,6 +237,25 @@ export default function FinaleContest() {
 
   const { status } = state;
   const waiting = status.state === "DRAFT";
+
+  if (waiting && !status.entryOpen) {
+    return (
+      <Shell>
+        <Lock size={28} style={{ color: GOLD }} />
+        <h1 className="font-sans text-2xl font-bold">The doors are not open yet</h1>
+        <p className="font-sans text-sm text-[#8B93A7]">
+          An organiser opens this room shortly before the round. Keep this page open, it updates on
+          its own.
+        </p>
+        <Link
+          href="/events/finale/templates"
+          className="inline-flex items-center gap-2 border border-[#22262f] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] text-[#8B93A7] transition-colors hover:border-[#D9A404]/60 hover:text-[#F4F1EA]"
+        >
+          Back to your templates
+        </Link>
+      </Shell>
+    );
+  }
   const endsAt = status.state === "LIVE" ? endsAtFromRemaining(status.remainingSeconds) : undefined;
 
   const heading = waiting
@@ -218,7 +268,7 @@ export default function FinaleContest() {
 
   return (
     <div className="min-h-screen bg-[#06070B] text-[#F4F1EA]">
-      <div className="mx-auto max-w-5xl px-6 py-12 md:px-10 md:py-16">
+      <div className="mx-auto max-w-6xl px-6 py-12 md:px-10 md:py-16">
         <Link
           href="/events/finale/templates"
           className="inline-flex items-center gap-2 font-mono text-xs text-[#8B93A7] transition-colors hover:text-[#D9A404]"
@@ -251,13 +301,33 @@ export default function FinaleContest() {
           )}
         </header>
 
-        <section className="mt-12">
+        <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_20rem]">
+          <div>
+        <section>
           <h2 className="font-sans text-xl font-semibold">Problems</h2>
           {waiting ? (
-            <p className="mt-4 border border-[#22262f] bg-[#0B0E15] px-5 py-6 font-sans text-sm text-[#8B93A7]">
-              The problems appear here the moment an organiser starts the round. Keep this page
-              open, it updates on its own.
-            </p>
+            <div className="relative mt-4 overflow-hidden border border-[#22262f] bg-[#0B0E15]">
+              <div aria-hidden className="select-none blur-sm">
+                {["Problem one", "Problem two", "Problem three"].map((name) => (
+                  <div
+                    key={name}
+                    className="flex items-center justify-between border-b border-[#14161e] px-5 py-4 last:border-b-0"
+                  >
+                    <span className="font-sans text-sm text-[#F4F1EA]">{name}</span>
+                    <span className="font-mono text-[11px] uppercase tracking-wide text-[#8B93A7]">
+                      000 pts
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#06070B]/70 px-6 text-center">
+                <Lock size={22} style={{ color: GOLD }} />
+                <p className="font-sans text-sm text-[#F4F1EA]">Sealed until the round starts</p>
+                <p className="font-sans text-xs text-[#8B93A7]">
+                  They unlock the moment an organiser begins. This page updates on its own.
+                </p>
+              </div>
+            </div>
           ) : problems.length === 0 ? (
             <p className="mt-4 border border-[#22262f] bg-[#0B0E15] px-5 py-6 font-sans text-sm text-[#8B93A7]">
               No problems have been published for this round yet.
@@ -322,6 +392,53 @@ export default function FinaleContest() {
             </div>
           )}
         </section>
+          </div>
+
+          <aside className="lg:sticky lg:top-8 lg:self-start">
+            <h2 className="font-sans text-xl font-semibold">Live standings</h2>
+            {waiting ? (
+              <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-4 py-5 font-sans text-sm text-[#8B93A7]">
+                The board opens with the round.
+              </p>
+            ) : board.length === 0 ? (
+              <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-4 py-5 font-sans text-sm text-[#8B93A7]">
+                Nobody has scored yet. First accepted solution takes the top.
+              </p>
+            ) : (
+              <ol className="mt-4 divide-y divide-[#14161e] border border-[#14161e] bg-[#0B0E15]">
+                {board.map((entry) => {
+                  const isYou = String(entry.user_id) === String(user?.id ?? "");
+                  return (
+                    <li
+                      key={entry.user_id}
+                      className="flex items-center justify-between gap-3 px-4 py-3"
+                      style={isYou ? { background: "#0d0f14" } : undefined}
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span
+                          className="w-6 shrink-0 font-mono text-xs"
+                          style={{ color: entry.rank <= 3 ? GOLD : "#8B93A7" }}
+                        >
+                          {entry.rank}
+                        </span>
+                        <span
+                          className="truncate font-sans text-sm"
+                          style={{ color: isYou ? GOLD : "#F4F1EA" }}
+                        >
+                          {entry.name}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-mono text-xs text-[#8B93A7]">
+                        {entry.weekly_score}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            <p className="mt-2 font-sans text-xs text-[#5A5850]">Refreshes on its own.</p>
+          </aside>
+        </div>
       </div>
     </div>
   );

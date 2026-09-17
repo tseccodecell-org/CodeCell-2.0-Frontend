@@ -14,6 +14,7 @@ export const finaleStatusSchema = z.object({
   scoringActive: z.boolean(),
   liveSince: z.string().optional(),
   templatesLocked: z.boolean().default(false),
+  entryOpen: z.boolean().default(false),
   scheduledStartAt: z.string().optional(),
 });
 

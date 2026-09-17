@@ -1,13 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, LogIn, Lock, TriangleAlert, RefreshCw, Check, Ban } from "lucide-react";
 
 import { getCurrentFinale, listTemplates, ApiError, LOGIN_URL } from "@/lib/api-client";
 import type { FinaleStatusResponse, TemplateResponse } from "@/lib/api-client";
-import type { Language } from "@/lib/types/submission";
 import TemplateLoader from "./TemplateLoader";
 
 export const FINALE_BUFFERS_KEY = "codecell_finale_buffers";
@@ -36,15 +34,6 @@ type LoadState =
   | { kind: "forbidden" }
   | { kind: "not-found" }
   | { kind: "error"; message: string };
-
-function saveWorkspaceBuffers(buffers: Partial<Record<Language, string>>, activeLanguage: Language) {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(FINALE_BUFFERS_KEY, JSON.stringify({ buffers, activeLanguage }));
-  } catch {
-    // if session storage is unavailable, the workspace just starts blank
-  }
-}
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -86,14 +75,9 @@ function RuleColumn({
 }
 
 export default function FinaleLobby() {
-  const router = useRouter();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [templates, setTemplates] = useState<TemplateResponse[]>([]);
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
-  const buffersRef = useRef<{
-    buffers: Partial<Record<Language, string>>;
-    activeLanguage: Language;
-  }>({ buffers: {}, activeLanguage: "CPP" });
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setState({ kind: "loading" });
@@ -157,19 +141,6 @@ export default function FinaleLobby() {
       cancelled = true;
     };
   }, [state.kind]);
-
-  const handleBuffersChange = useCallback(
-    (buffers: Partial<Record<Language, string>>, activeLanguage: Language) => {
-      buffersRef.current = { buffers, activeLanguage };
-    },
-    []
-  );
-
-  const enterContest = useCallback(() => {
-    const { buffers, activeLanguage } = buffersRef.current;
-    saveWorkspaceBuffers(buffers, activeLanguage);
-    router.push("/events/finale/contest");
-  }, [router]);
 
   if (state.kind === "loading") {
     return (
@@ -272,28 +243,12 @@ export default function FinaleLobby() {
             <p className="mt-3 font-sans text-sm leading-relaxed text-[#8B93A7]">{standfirst}</p>
           </div>
 
-          <div className="flex flex-col items-start gap-2 sm:items-end">
-            {contestOpen ? (
-              <button
-                onClick={enterContest}
-                className="inline-flex items-center gap-2 border border-[#D9A404] bg-[#D9A404]/10 px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#06070B] cursor-pointer"
-              >
-                Enter contest
-              </button>
-            ) : (
-              <>
-                <span className="inline-flex items-center gap-2 border border-[#22262f] px-6 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#5A5850]">
-                  <Lock size={13} />
-                  Contest locked
-                </span>
-                {status.scheduledStartAt && (
-                  <span className="font-mono text-xs text-[#8B93A7]">
-                    Opens in <FinaleCountdown target={status.scheduledStartAt} />
-                  </span>
-                )}
-              </>
-            )}
-          </div>
+          <Link
+            href="/events/finale"
+            className="inline-flex items-center gap-2 border border-[#22262f] px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#8B93A7] transition-colors hover:border-[#D9A404]/60 hover:text-[#F4F1EA]"
+          >
+            Back to the finale
+          </Link>
         </header>
 
         <section className="mt-12">
@@ -338,7 +293,6 @@ export default function FinaleLobby() {
                 onContinue={() => {}}
                 showContinue={false}
                 readOnly={locked}
-                onBuffersChange={handleBuffersChange}
               />
             ) : (
               <div className="flex h-full items-center justify-center">

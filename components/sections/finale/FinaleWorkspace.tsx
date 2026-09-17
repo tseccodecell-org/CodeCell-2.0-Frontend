@@ -8,7 +8,16 @@ import ProblemPanel from "@/components/sections/weekly-challenges/solve_page/Pro
 import CodeEditor from "@/components/sections/weekly-challenges/solve_page/CodeEditor";
 import VerdictPanel from "@/components/sections/weekly-challenges/solve_page/VerdictPanel";
 import SubmissionHistory from "@/components/sections/weekly-challenges/solve_page/SubmissionHistory";
-import { runCode, submitCode, getSubmission, getRun, getFinaleStatus, ApiError } from "@/lib/api-client";
+import {
+  runCode,
+  submitCode,
+  getSubmission,
+  getRun,
+  getFinaleStatus,
+  listTemplates,
+  ApiError,
+} from "@/lib/api-client";
+import type { TemplateResponse } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 
 import type { ProblemDetail } from "@/lib/types/problem";
@@ -136,7 +145,8 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   const [problem, setProblem] = useState<ProblemDetail | null>(null);
   const [activeAction, setActiveAction] = useState<"RUN" | "SUBMIT" | null>(null);
   const [submission, setSubmission] = useState<SubmissionState>({ status: "IDLE", testResults: [] });
-  const [leftTab, setLeftTab] = useState<"statement" | "submissions">("statement");
+  const [leftTab, setLeftTab] = useState<"statement" | "submissions" | "templates">("statement");
+  const [templates, setTemplates] = useState<TemplateResponse[]>([]);
   const [mobilePane, setMobilePane] = useState<"problem" | "code" | "result">("problem");
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [resultMode, setResultMode] = useState<"RUN" | "SUBMIT" | null>(null);
@@ -217,6 +227,20 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
     // problem's own starter code for whichever languages it filled in
     return { ...map, ...savedBuffers.buffers };
   }, [problem, savedBuffers]);
+
+  useEffect(() => {
+    let cancelled = false;
+    listTemplates()
+      .then((list) => {
+        if (!cancelled) setTemplates(list);
+      })
+      .catch(() => {
+        if (!cancelled) setTemplates([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLoadCode = useCallback((language: Language, code: string) => {
     setLoadRequest({ language, code, nonce: Date.now() });
@@ -562,6 +586,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
             {(
               [
                 { key: "statement", text: "Statement" },
+                { key: "templates", text: "Templates" },
                 { key: "submissions", text: "Submissions" },
               ] as const
             ).map((tab) => (
@@ -581,6 +606,41 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
 
           <div className={leftTab === "statement" ? "min-h-0 flex-1" : "hidden"}>
             <ProblemPanel problemId={problemId} onLoaded={handleProblemLoaded} />
+          </div>
+
+          <div className={leftTab === "templates" ? "min-h-0 flex-1 overflow-y-auto" : "hidden"}>
+            {templates.length === 0 ? (
+              <p className="px-4 py-5 font-sans text-sm text-[#8B93A7]">
+                You saved no templates before the round.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2 p-3">
+                {templates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="rounded-lg border border-[#22262f] bg-[#0d0f14] p-3"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="truncate font-sans text-sm text-[#F4F1EA]">
+                        {template.name}
+                      </span>
+                      <button
+                        onClick={() => handleLoadCode(template.language, template.sourceCode)}
+                        className="shrink-0 rounded border border-[#D9A404]/60 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-[#D9A404] transition-colors hover:bg-[#D9A404] hover:text-[#06070B] cursor-pointer"
+                      >
+                        Load into editor
+                      </button>
+                    </div>
+                    <p className="mt-1 font-mono text-[10px] uppercase tracking-wide text-[#8B93A7]">
+                      {template.language}
+                    </p>
+                    <pre className="mt-2 max-h-40 overflow-auto font-mono text-[11px] leading-relaxed text-[#8B93A7]">
+                      {template.sourceCode}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className={leftTab === "submissions" ? "min-h-0 flex-1" : "hidden"}>

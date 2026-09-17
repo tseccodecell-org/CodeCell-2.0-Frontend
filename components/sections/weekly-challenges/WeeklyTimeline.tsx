@@ -63,10 +63,12 @@ export default function WeeklyTimeline() {
   const router = useRouter();
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setFailed(false);
     getWeeks()
       .then((data) => {
         if (cancelled) return;
@@ -77,6 +79,9 @@ export default function WeeklyTimeline() {
       })
       .catch((err) => {
         console.error("WeeklyTimeline: failed to fetch weeks:", err);
+        // a failed load is not the same as an empty schedule: reporting it as
+        // "nothing published" hid a real outage behind a normal-looking screen
+        if (!cancelled) setFailed(true);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -114,6 +119,19 @@ export default function WeeklyTimeline() {
           <span className="text-xs text-[#8B93A7] tracking-widest animate-pulse uppercase">
             LOADING ARENA SCHEDULE...
           </span>
+        </div>
+      ) : failed ? (
+        <div className="py-20 flex flex-col items-center justify-center text-center font-mono border border-[#1a1c24] bg-[#0b0d13]">
+          <ShieldAlert size={36} className="text-[#E2574C] mb-3" />
+          <span className="text-xs text-[#8B93A7] tracking-widest uppercase">
+            COULDN&apos;T LOAD THE SCHEDULE
+          </span>
+          <button
+            onClick={() => router.refresh()}
+            className="mt-4 border border-[#1a1c24] px-4 py-2 text-xs text-[#F4F1EA] tracking-widest uppercase transition-colors hover:border-[#D9A404]/60 cursor-pointer"
+          >
+            Try again
+          </button>
         </div>
       ) : weeks.length === 0 ? (
         <div className="py-20 flex flex-col items-center justify-center text-center font-mono border border-[#1a1c24] bg-[#0b0d13]">

@@ -10,7 +10,9 @@ export const weekSchema = z.object({
   ends_at: z.string(),
   is_active: z.boolean(),
   scoring_system: z.enum(["FULL", "PARTIAL"]),
-  contest_type: z.enum(["OPEN", "FIXED"]),
+  // display-only label. a type this build doesn't know about must not fail the
+  // parse: one unknown value rejected the whole array and blanked the schedule
+  contest_type: z.enum(["OPEN", "FIXED", "FINALE"]).catch("OPEN"),
   created_at: z.string(),
   updated_at: z.string(),
 });

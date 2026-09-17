@@ -41,6 +41,31 @@ describe("getWeeks", () => {
     await expect(getWeeks()).rejects.toBeInstanceOf(SchemaError);
   });
 
+  it("keeps the rest of the schedule when a finale week is in the list", async () => {
+    const finaleWeek = {
+      ...weekListFixture[0],
+      id: "wk-finale",
+      week_number: 7,
+      chapter_name: "Finale",
+      contest_type: "FINALE",
+    };
+    mockFetchOnce([...weekListFixture, finaleWeek]);
+
+    const weeks = await getWeeks();
+
+    expect(weeks).toHaveLength(weekListFixture.length + 1);
+    expect(weeks.map((w) => w.chapter_name)).toContain("Week 1");
+  });
+
+  it("degrades an unknown contest type instead of dropping every week", async () => {
+    mockFetchOnce([{ ...weekListFixture[0], contest_type: "SOMETHING_NEW" }]);
+
+    const weeks = await getWeeks();
+
+    expect(weeks).toHaveLength(1);
+    expect(weeks[0].contest_type).toBe("OPEN");
+  });
+
   it("goes through the proxy route, not the backend directly", async () => {
     mockFetchOnce(weekListFixture);
     await getWeeks();

@@ -46,14 +46,15 @@ export default function StandingStrip({ state }: { state: SeasonStanding }) {
     return (
       <div className="border border-[#14161e] bg-[#0B0E15] p-6 flex flex-wrap items-center justify-between gap-4">
         <p className="font-sans text-sm text-[#8B93A7]">
-          Sign in to see whether you are inside the top {QUALIFYING_SEATS}.
+          The season&apos;s top {QUALIFYING_SEATS} take the {QUALIFYING_SEATS} seats on campus.{" "}
+          <Link
+            href="/register"
+            className="text-[#D9A404] underline underline-offset-4 hover:text-[#F5C451] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
+          >
+            Sign in
+          </Link>{" "}
+          to see where you land.
         </p>
-        <Link
-          href="/register"
-          className="font-mono text-[11px] tracking-[0.16em] uppercase border border-[#4A3E1C] px-5 py-3 text-[#D9A404] hover:bg-[#D9A404] hover:text-[#05070C] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-        >
-          Sign in
-        </Link>
       </div>
     );
   }

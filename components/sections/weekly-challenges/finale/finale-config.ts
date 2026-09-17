@@ -21,7 +21,7 @@ export interface FinaleFact {
 
 export const FINALE_FACTS: FinaleFact[] = [
   { label: "Date", value: "3 October 2026", detail: "Saturday", countdownTo: FINALE_STARTS_AT },
-  { label: "Venue", value: null, detail: "TSEC campus, Bandra" },
+  { label: "Venue", value: "TSEC campus, Bandra", detail: "Room announced closer to the date" },
   { label: "Format", value: "On-site, individual", detail: "Your machine, our judge" },
   { label: "Duration", value: "3 hours", detail: "Single sitting" },
 ];

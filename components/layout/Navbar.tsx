@@ -22,6 +22,7 @@ const navItems: NavItem[] = [
       { label: "TSEC HACKS", href: "/events/tsec-hacks" },
       { label: "WEEKLY CHALLENGES", href: "/events/weekly-challenges" },
       { label: "MINI EVENT", href: "/events/mini-event" },
+      { label: "FINALE", href: "/events/finale" },
     ],
   },
   { label: "ABOUT US", href: "/about-us" },

@@ -28,6 +28,8 @@ export default defineConfig({
       "components/**/*.test.tsx",
       "hooks/**/*.test.ts",
       "hooks/**/*.test.tsx",
+      "app/**/*.test.ts",
+      "app/**/*.test.tsx",
     ],
     restoreMocks: true,
     clearMocks: true,

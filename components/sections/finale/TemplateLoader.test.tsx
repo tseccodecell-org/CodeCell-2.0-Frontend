@@ -287,3 +287,46 @@ describe("TemplateLoader Continue payload", () => {
     expect(screen.getByText("Saved")).toBeVisible();
   });
 });
+
+describe("TemplateLoader template names", () => {
+  it("gives a blank slot a per-language name so autosave never posts an empty one", async () => {
+    mockedCreateTemplate.mockResolvedValue({
+      id: "t-new-1",
+      name: "Untitled Java",
+      language: "JAVA",
+      sourceCode: "class Main {}",
+      createdAt: "2026-09-16T10:00:00Z",
+      updatedAt: "2026-09-16T10:00:00Z",
+    });
+
+    render(<TemplateLoader initialTemplates={[]} onContinue={vi.fn()} />);
+
+    expect(screen.getByLabelText("Template name")).toHaveValue("Untitled C++");
+
+    fireEvent.click(screen.getByRole("button", { name: "Java" }));
+    expect(screen.getByLabelText("Template name")).toHaveValue("Untitled Java");
+
+    typeCode("class Main {}");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(800);
+    });
+
+    expect(mockedCreateTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Untitled Java", language: "JAVA" })
+    );
+  });
+
+  it("holds the save and asks for a name when the participant clears it", async () => {
+    render(<TemplateLoader initialTemplates={[]} onContinue={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("Template name"), { target: { value: "" } });
+    typeCode("int main(){}");
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(800);
+    });
+
+    expect(mockedCreateTemplate).not.toHaveBeenCalled();
+    expect(screen.getByText("Add a name to save")).toBeVisible();
+  });
+});

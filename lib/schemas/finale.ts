@@ -38,3 +38,18 @@ export const templateListSchema = z
   .array(templateSchema)
   .nullable()
   .transform((value) => value ?? []);
+
+export const finaleBoardEntrySchema = z.object({
+  rank: z.number().int(),
+  userId: z.number(),
+  name: z.string(),
+  score: z.number(),
+  problemsSolved: z.number().int(),
+});
+
+export const finaleBoardSchema = z
+  .array(finaleBoardEntrySchema)
+  .nullable()
+  .transform((value) => value ?? []);
+
+export type FinaleBoardEntry = z.infer<typeof finaleBoardEntrySchema>;

@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import FinaleContestPage from "./page";
-import { getCurrentFinale, getFinaleProblems, listTemplates } from "@/lib/api-client";
+import {
+  getCurrentFinale,
+  getFinaleProblems,
+  listTemplates,
+  getFinaleBoard,
+} from "@/lib/api-client";
 
 vi.mock("@/lib/api-client", async () => {
   const actual = await vi.importActual<typeof import("@/lib/api-client")>("@/lib/api-client");
@@ -10,6 +15,7 @@ vi.mock("@/lib/api-client", async () => {
     getCurrentFinale: vi.fn(),
     getFinaleProblems: vi.fn(),
     listTemplates: vi.fn(),
+    getFinaleBoard: vi.fn(),
   };
 });
 
@@ -24,6 +30,7 @@ vi.mock("next/link", () => ({
 const mockedGetCurrentFinale = getCurrentFinale as unknown as ReturnType<typeof vi.fn>;
 const mockedGetFinaleProblems = getFinaleProblems as unknown as ReturnType<typeof vi.fn>;
 const mockedListTemplates = listTemplates as unknown as ReturnType<typeof vi.fn>;
+const mockedGetFinaleBoard = getFinaleBoard as unknown as ReturnType<typeof vi.fn>;
 
 const baseStatus = {
   weekId: "wk-finale-1",
@@ -50,6 +57,7 @@ const problem = {
 beforeEach(() => {
   mockedGetFinaleProblems.mockResolvedValue([problem]);
   mockedListTemplates.mockResolvedValue([]);
+  mockedGetFinaleBoard.mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -146,5 +154,19 @@ describe("finale contest page", () => {
 
     expect(await screen.findByText("Sealed until the round starts")).toBeVisible();
     expect(screen.queryByText(problem.title)).not.toBeInTheDocument();
+  });
+
+  it("shows the seated field on the board before anyone has scored", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "DRAFT" });
+    mockedGetFinaleBoard.mockResolvedValue([
+      { rank: 1, userId: 7, name: "Asha Menon", score: 0, problemsSolved: 0 },
+      { rank: 2, userId: 8, name: "Rohit Nair", score: 0, problemsSolved: 0 },
+    ]);
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByText("Asha Menon")).toBeVisible();
+    expect(screen.getByText("Rohit Nair")).toBeVisible();
+    expect(screen.queryByText("No seats have been granted yet.")).not.toBeInTheDocument();
   });
 });

@@ -26,6 +26,7 @@ import {
   internshipEligibilitySchema,
 } from "./schemas/internship";
 import {
+  finaleBoardSchema,
   finaleStatusSchema,
   templateSchema,
   templateListSchema,
@@ -42,6 +43,7 @@ export type {
   ProblemSubmission,
   SubmissionTestResult,
 } from "./schemas/submission";
+export type { FinaleBoardEntry } from "./schemas/finale";
 export type {
   FinaleState,
   FinaleAccessMode,
@@ -65,7 +67,11 @@ import type {
   SubmissionDetail,
   ProblemSubmission,
 } from "./schemas/submission";
-import type { FinaleStatusResponse, TemplateResponse } from "./schemas/finale";
+import type {
+  FinaleBoardEntry,
+  FinaleStatusResponse,
+  TemplateResponse,
+} from "./schemas/finale";
 import type { WrappedResponse, WrappedInsightResponse } from "./schemas/wrapped";
 import type {
   InternshipApplication,
@@ -297,6 +303,10 @@ export function getFinaleStatus(weekId: string): Promise<FinaleStatusResponse> {
 // constant: it carries the week id the rest of the lobby then works from
 export function getCurrentFinale(): Promise<FinaleStatusResponse> {
   return proxyGet("/api/finales/current", finaleStatusSchema);
+}
+
+export function getFinaleBoard(weekId: string): Promise<FinaleBoardEntry[]> {
+  return proxyGet(`/api/finales/${weekId}/board`, finaleBoardSchema);
 }
 
 export function getFinaleProblems(weekId: string): Promise<WeekProblem[]> {

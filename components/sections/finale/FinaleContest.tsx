@@ -9,12 +9,12 @@ import {
   getCurrentFinale,
   getFinaleProblems,
   listTemplates,
-  getLeaderboard,
+  getFinaleBoard,
   ApiError,
   LOGIN_URL,
 } from "@/lib/api-client";
 import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/api-client";
-import type { WeeklyLeaderboardEntry } from "@/lib/schemas/leaderboard";
+import type { FinaleBoardEntry } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 import { FinaleCountdown } from "./FinaleLobby";
 
@@ -58,7 +58,7 @@ export default function FinaleContest() {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [problems, setProblems] = useState<WeekProblem[]>([]);
   const [templates, setTemplates] = useState<TemplateResponse[]>([]);
-  const [board, setBoard] = useState<WeeklyLeaderboardEntry[]>([]);
+  const [board, setBoard] = useState<FinaleBoardEntry[]>([]);
   const { user } = useAuth();
 
   const load = useCallback(async (silent = false) => {
@@ -123,15 +123,15 @@ export default function FinaleContest() {
   }, [state.kind]);
 
   useEffect(() => {
-    if (state.kind !== "ready" || state.status.state === "DRAFT") return;
+    if (state.kind !== "ready") return;
     const weekId = state.status.weekId;
 
     let cancelled = false;
 
     const readBoard = () => {
-      getLeaderboard("weekly", user?.role, "TSEC", { page: 1, limit: 20, weekId })
-        .then((res) => {
-          if (!cancelled) setBoard(res.data);
+      getFinaleBoard(weekId)
+        .then((rows) => {
+          if (!cancelled) setBoard(rows);
         })
         .catch(() => {
           // the board is a nicety during the round, never a blocker
@@ -145,7 +145,7 @@ export default function FinaleContest() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [state, user?.role]);
+  }, [state]);
 
   useEffect(() => {
     if (state.kind !== "ready" || state.status.state === "DRAFT") return;
@@ -396,21 +396,17 @@ export default function FinaleContest() {
 
           <aside className="lg:sticky lg:top-8 lg:self-start">
             <h2 className="font-sans text-xl font-semibold">Live standings</h2>
-            {waiting ? (
+            {board.length === 0 ? (
               <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-4 py-5 font-sans text-sm text-[#8B93A7]">
-                The board opens with the round.
-              </p>
-            ) : board.length === 0 ? (
-              <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-4 py-5 font-sans text-sm text-[#8B93A7]">
-                Nobody has scored yet. First accepted solution takes the top.
+                No seats have been granted yet.
               </p>
             ) : (
               <ol className="mt-4 divide-y divide-[#14161e] border border-[#14161e] bg-[#0B0E15]">
                 {board.map((entry) => {
-                  const isYou = String(entry.user_id) === String(user?.id ?? "");
+                  const isYou = String(entry.userId) === String(user?.id ?? "");
                   return (
                     <li
-                      key={entry.user_id}
+                      key={entry.userId}
                       className="flex items-center justify-between gap-3 px-4 py-3"
                       style={isYou ? { background: "#0d0f14" } : undefined}
                     >
@@ -429,7 +425,7 @@ export default function FinaleContest() {
                         </span>
                       </span>
                       <span className="shrink-0 font-mono text-xs text-[#8B93A7]">
-                        {entry.weekly_score}
+                        {entry.score}
                       </span>
                     </li>
                   );

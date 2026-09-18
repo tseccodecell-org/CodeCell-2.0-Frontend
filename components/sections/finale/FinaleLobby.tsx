@@ -325,12 +325,11 @@ export function FinaleCountdown({ target }: { target: string }) {
       const hours = Math.floor((totalSeconds % 86400) / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
+      const pad = (n: number) => String(n).padStart(2, "0");
       const formatted =
         days > 0
-          ? `${days}d ${hours}h`
-          : hours > 0
-            ? `${hours}h ${String(minutes).padStart(2, "0")}m`
-            : `${minutes}:${String(seconds).padStart(2, "0")}`;
+          ? `${days}d ${hours}h ${pad(minutes)}m`
+          : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
       setLabel(formatted);
       timer = setTimeout(tick, 1000);
     };

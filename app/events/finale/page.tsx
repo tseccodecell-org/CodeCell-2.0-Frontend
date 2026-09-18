@@ -7,7 +7,7 @@ import WeekTimer from "@/components/layout/WeekTimer";
 import StandingStrip from "@/components/sections/weekly-challenges/finale/StandingStrip";
 import SeatGate, {
   useSeatState,
-  useEntryOpen,
+  useActionGates,
 } from "@/components/sections/weekly-challenges/finale/SeatGate";
 import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
@@ -37,7 +37,7 @@ export default function FinalePage() {
   // Read once, so your standing and the apply button always agree.
   const state = useSeasonStanding();
   const seat = useSeatState();
-  const entryOpen = useEntryOpen();
+  const gates = useActionGates();
 
   return (
     <main className="min-h-screen bg-[#05070C] text-[#F4F1EA]">
@@ -69,7 +69,7 @@ export default function FinalePage() {
         <StandingStrip state={state} />
 
         <div className="mt-6">
-          <SeatGate seat={seat} standing={state} entryOpen={entryOpen} />
+          <SeatGate seat={seat} standing={state} gates={gates} />
         </div>
 
         <nav className="flex flex-wrap gap-3 mt-8" aria-label="On this page">

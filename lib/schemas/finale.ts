@@ -15,6 +15,8 @@ export const finaleStatusSchema = z.object({
   liveSince: z.string().optional(),
   templatesLocked: z.boolean().default(false),
   entryOpen: z.boolean().default(false),
+  templatesOpen: z.boolean().default(false),
+  internshipOpen: z.boolean().default(false),
   scheduledStartAt: z.string().optional(),
 });
 

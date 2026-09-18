@@ -41,24 +41,39 @@ function OpenAction({ href, label }: { href: string; label: string }) {
   );
 }
 
-export function useEntryOpen(): boolean {
-  const [open, setOpen] = useState(false);
+export interface ActionGates {
+  entry: boolean;
+  templates: boolean;
+  internship: boolean;
+}
+
+export function useActionGates(): ActionGates {
+  const [gates, setGates] = useState<ActionGates>({
+    entry: false,
+    templates: false,
+    internship: false,
+  });
 
   useEffect(() => {
     let cancelled = false;
     getCurrentFinale()
       .then((status) => {
-        if (!cancelled) setOpen(status.entryOpen);
+        if (cancelled) return;
+        setGates({
+          entry: status.entryOpen,
+          templates: status.templatesOpen,
+          internship: status.internshipOpen,
+        });
       })
       .catch(() => {
-        if (!cancelled) setOpen(false);
+        if (!cancelled) setGates({ entry: false, templates: false, internship: false });
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return open;
+  return gates;
 }
 
 export function useSeatState(): SeatState {
@@ -88,11 +103,11 @@ export function useSeatState(): SeatState {
 export default function SeatGate({
   seat,
   standing,
-  entryOpen,
+  gates,
 }: {
   seat: SeatState;
   standing: SeasonStanding;
-  entryOpen: boolean;
+  gates: ActionGates;
 }) {
   if (seat === "signed-out" || standing.sealed) {
     return (
@@ -131,26 +146,22 @@ export default function SeatGate({
 
   // a finalist sees both actions, locked until an organiser opens them. someone
   // outside the twenty is not shown a door that will not open for them
+  const action = (href: string, label: string, gateOpen: boolean) =>
+    open && gateOpen ? (
+      <OpenAction href={href} label={label} />
+    ) : (
+      <LockedAction label={label} />
+    );
+
   const actions = (
     <div className="mt-7 flex flex-wrap gap-3">
-      {inTheTwenty &&
-        (open ? (
-          <>
-            <OpenAction href="/events/finale/templates" label="Load your templates" />
-            <OpenAction href="/events/finale/internship" label="Apply for the internship" />
-          </>
-        ) : (
-          <>
-            <LockedAction label="Load your templates" />
-            <LockedAction label="Apply for the internship" />
-          </>
-        ))}
-      {inTheTwenty &&
-        (entryOpen ? (
-          <OpenAction href="/events/finale/contest" label="Enter contest" />
-        ) : (
-          <LockedAction label="Enter contest" />
-        ))}
+      {inTheTwenty && (
+        <>
+          {action("/events/finale/templates", "Load your templates", gates.templates)}
+          {action("/events/finale/internship", "Apply for the internship", gates.internship)}
+          {action("/events/finale/contest", "Enter contest", gates.entry)}
+        </>
+      )}
     </div>
   );
 

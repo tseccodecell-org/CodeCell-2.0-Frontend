@@ -82,6 +82,21 @@ describe("finale contest page", () => {
     expect(mockedGetFinaleProblems).not.toHaveBeenCalled();
   });
 
+  it("says the round is starting soon once the scheduled time has passed", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({
+      ...baseStatus,
+      state: "DRAFT",
+      scheduledStartAt: new Date(Date.now() - 60 * 1000).toISOString(),
+    });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByTestId("finale-starting-soon")).toHaveTextContent("Starting soon");
+    expect(screen.getByText("Starting soon. Keep this page open.")).toBeVisible();
+    expect(screen.queryByTestId("finale-start-countdown")).not.toBeInTheDocument();
+    expect(screen.queryByText(/0:00/)).not.toBeInTheDocument();
+  });
+
   it("shows the problems and the round timer once it is live", async () => {
     mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "LIVE" });
 

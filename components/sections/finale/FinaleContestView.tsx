@@ -57,6 +57,23 @@ function useTab(initial: Tab): [Tab, (tab: Tab) => void] {
   return [tab, choose];
 }
 
+function useTimeReached(target: string | undefined): boolean {
+  const [reached, setReached] = useState(() => target !== undefined && Date.parse(target) <= Date.now());
+
+  useEffect(() => {
+    if (target === undefined) {
+      setReached(false);
+      return;
+    }
+    const check = () => setReached(Date.parse(target) <= Date.now());
+    check();
+    const timer = setInterval(check, 1000);
+    return () => clearInterval(timer);
+  }, [target]);
+
+  return reached;
+}
+
 function StatusPill({ state }: { state: FinaleStatusResponse["state"] }) {
   const look = {
     LIVE: { label: "Live", color: C.green, pulse: true },
@@ -91,6 +108,28 @@ function ContestClock({
   status: FinaleStatusResponse;
   endsAt: number | null;
 }) {
+  const startReached = useTimeReached(status.scheduledStartAt);
+
+  if (status.state === "DRAFT" && startReached) {
+    return (
+      <div data-testid="finale-starting-soon" className="text-left sm:text-right">
+        <p className="font-sans text-xs" style={{ color: C.muted }}>
+          Waiting for an organiser to begin
+        </p>
+        <p className="mt-1 flex items-center gap-2 font-sans text-2xl font-semibold sm:justify-end" style={{ color: C.gold }}>
+          <span className="relative flex h-2.5 w-2.5">
+            <span
+              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:animate-none"
+              style={{ background: C.gold }}
+            />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: C.gold }} />
+          </span>
+          Starting soon
+        </p>
+      </div>
+    );
+  }
+
   if (status.state === "DRAFT") {
     return (
       <div className="text-left sm:text-right">
@@ -240,6 +279,8 @@ function ProblemsPanel({
   you: FinaleStandingsRow | null;
   onOpenProblem: (id: string) => void;
 }) {
+  const startReached = useTimeReached(status.scheduledStartAt);
+
   if (waiting) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border px-6 py-16 text-center" style={{ borderColor: C.border, background: C.panel }}>
@@ -250,11 +291,16 @@ function ProblemsPanel({
         <p className="max-w-md font-sans text-sm" style={{ color: C.muted }}>
           Problems locked. They appear here the moment an organiser starts the round, and this page updates on its own.
         </p>
-        {status.scheduledStartAt && (
-          <p className="font-mono text-sm tabular-nums" style={{ color: C.muted }}>
-            Scheduled start in <FinaleCountdown target={status.scheduledStartAt} />
-          </p>
-        )}
+        {status.scheduledStartAt &&
+          (startReached ? (
+            <p className="font-sans text-sm font-medium" style={{ color: C.gold }}>
+              Starting soon. Keep this page open.
+            </p>
+          ) : (
+            <p className="font-mono text-sm tabular-nums" style={{ color: C.muted }}>
+              Scheduled start in <FinaleCountdown target={status.scheduledStartAt} />
+            </p>
+          ))}
       </div>
     );
   }

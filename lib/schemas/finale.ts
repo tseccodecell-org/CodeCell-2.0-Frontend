@@ -55,3 +55,46 @@ export const finaleBoardSchema = z
   .transform((value) => value ?? []);
 
 export type FinaleBoardEntry = z.infer<typeof finaleBoardEntrySchema>;
+
+export const finaleStandingsProblemSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  title: z.string().optional(),
+  points: z.number(),
+});
+
+export const finaleStandingsCellSchema = z.object({
+  problemId: z.string(),
+  solved: z.boolean(),
+  points: z.number(),
+  solvedAtSeconds: z.number().optional(),
+  wrongAttempts: z.number().int(),
+  pending: z.boolean(),
+});
+
+const listOrEmpty = <T extends z.ZodTypeAny>(item: T) =>
+  z
+    .array(item)
+    .nullable()
+    .transform((value) => value ?? []);
+
+export const finaleStandingsRowSchema = z.object({
+  rank: z.number().int(),
+  userId: z.number(),
+  name: z.string(),
+  username: z.string().default(""),
+  score: z.number(),
+  solved: z.number().int(),
+  penaltySeconds: z.number(),
+  cells: listOrEmpty(finaleStandingsCellSchema),
+});
+
+export const finaleStandingsSchema = z.object({
+  problems: listOrEmpty(finaleStandingsProblemSchema),
+  rows: listOrEmpty(finaleStandingsRowSchema),
+});
+
+export type FinaleStandingsProblem = z.infer<typeof finaleStandingsProblemSchema>;
+export type FinaleStandingsCell = z.infer<typeof finaleStandingsCellSchema>;
+export type FinaleStandingsRow = z.infer<typeof finaleStandingsRowSchema>;
+export type FinaleStandings = z.infer<typeof finaleStandingsSchema>;

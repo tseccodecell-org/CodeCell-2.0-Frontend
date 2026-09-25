@@ -9,15 +9,16 @@ import {
   getCurrentFinale,
   getFinaleProblems,
   listTemplates,
-  getFinaleBoard,
+  getFinaleStandings,
   ApiError,
   LOGIN_URL,
 } from "@/lib/api-client";
 import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/api-client";
-import type { FinaleBoardEntry } from "@/lib/api-client";
+import type { FinaleStandings } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 import { estimateRoundEnd } from "@/lib/finale-clock";
 import { FinaleCountdown } from "./FinaleLobby";
+import FinaleStandingsTable from "./FinaleStandings";
 
 const FINALE_STATUS_REFRESH_MS = 15000;
 const BOARD_REFRESH_MS = 20000;
@@ -55,7 +56,7 @@ export default function FinaleContest() {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [problems, setProblems] = useState<WeekProblem[]>([]);
   const [templates, setTemplates] = useState<TemplateResponse[]>([]);
-  const [board, setBoard] = useState<FinaleBoardEntry[]>([]);
+  const [standings, setStandings] = useState<FinaleStandings | null>(null);
   const { user } = useAuth();
 
   const load = useCallback(async (silent = false) => {
@@ -128,48 +129,51 @@ export default function FinaleContest() {
     };
   }, [state.kind]);
 
+  const weekId = state.kind === "ready" ? state.status.weekId : null;
+  const roundState = state.kind === "ready" ? state.status.state : null;
+
   useEffect(() => {
-    if (state.kind !== "ready") return;
-    const weekId = state.status.weekId;
+    if (weekId === null) return;
 
     let cancelled = false;
 
-    const readBoard = () => {
-      getFinaleBoard(weekId)
-        .then((rows) => {
-          if (!cancelled) setBoard(rows);
+    const readStandings = () => {
+      getFinaleStandings(weekId)
+        .then((next) => {
+          if (!cancelled) setStandings(next);
         })
-        .catch(() => {
-          // the board is a nicety during the round, never a blocker
-        });
+        .catch(() => {});
     };
 
-    readBoard();
-    const interval = setInterval(readBoard, BOARD_REFRESH_MS);
+    readStandings();
+    const interval = setInterval(readStandings, BOARD_REFRESH_MS);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [state]);
+  }, [weekId, roundState]);
 
   useEffect(() => {
-    if (state.kind !== "ready" || state.status.state === "DRAFT") return;
-    const weekId = state.status.weekId;
+    if (weekId === null || roundState === null || roundState === "DRAFT") return;
 
     let cancelled = false;
-    getFinaleProblems(weekId)
-      .then((list) => {
-        if (!cancelled) setProblems(list);
-      })
-      .catch(() => {
-        // the banner above already explains why the list may be empty
-      });
+    const readProblems = () => {
+      getFinaleProblems(weekId)
+        .then((list) => {
+          if (!cancelled) setProblems(list);
+        })
+        .catch(() => {});
+    };
+
+    readProblems();
+    const interval = setInterval(readProblems, FINALE_STATUS_REFRESH_MS);
 
     return () => {
       cancelled = true;
+      clearInterval(interval);
     };
-  }, [state]);
+  }, [weekId, roundState]);
 
   if (state.kind === "loading") {
     return (
@@ -262,6 +266,7 @@ export default function FinaleContest() {
       </Shell>
     );
   }
+  const labels = new Map((standings?.problems ?? []).map((p) => [p.id, p.label]));
   const endsAt = state.endsAt !== null ? new Date(state.endsAt).toISOString() : undefined;
 
   const heading = waiting
@@ -307,9 +312,7 @@ export default function FinaleContest() {
           )}
         </header>
 
-        <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_20rem]">
-          <div>
-        <section>
+        <section className="mt-12">
           <h2 className="font-sans text-xl font-semibold">Problems</h2>
           {waiting ? (
             <div className="relative mt-4 overflow-hidden border border-[#22262f] bg-[#0B0E15]">
@@ -339,14 +342,21 @@ export default function FinaleContest() {
               No problems have been published for this round yet.
             </p>
           ) : (
-            <div className="mt-4 flex flex-col gap-2">
+            <div className="mt-4 grid gap-2 md:grid-cols-2">
               {problems.map((problem) => (
                 <button
                   key={problem.id}
                   onClick={() => router.push(`/events/finale/workspace/${problem.id}`)}
-                  className="flex items-center justify-between rounded-lg border border-[#22262f] bg-[#0d0f14] px-5 py-4 text-left font-sans text-sm text-[#F4F1EA] transition-colors hover:border-[#D9A404]/50 cursor-pointer"
+                  className="flex items-center justify-between gap-4 rounded-lg border border-[#22262f] bg-[#0d0f14] px-5 py-4 text-left font-sans text-sm text-[#F4F1EA] transition-colors hover:border-[#D9A404]/50 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
                 >
-                  <span>{problem.title}</span>
+                  <span className="flex min-w-0 items-center gap-3">
+                    {labels.get(problem.id) && (
+                      <span className="w-5 shrink-0 font-mono text-sm font-semibold" style={{ color: GOLD }}>
+                        {labels.get(problem.id)}
+                      </span>
+                    )}
+                    <span className="truncate">{problem.title}</span>
+                  </span>
                   <span className="font-mono text-[11px] uppercase tracking-wide text-[#8B93A7]">
                     {problem.difficulty} &middot; {problem.base_points} pts
                   </span>
@@ -356,7 +366,13 @@ export default function FinaleContest() {
           )}
         </section>
 
-        <section className="mt-12">
+        <section className="mt-14">
+          <h2 className="font-sans text-xl font-semibold">Live standings</h2>
+          <FinaleStandingsTable standings={standings} currentUserId={user?.id} />
+        </section>
+
+        <div className="mt-14 grid gap-12 lg:grid-cols-2">
+        <section>
           <h2 className="font-sans text-xl font-semibold">How the round works</h2>
           <ul className="mt-4 space-y-3 border border-[#14161e] bg-[#0B0E15] p-6">
             {CONTEST_INSTRUCTIONS.map((line) => (
@@ -368,7 +384,7 @@ export default function FinaleContest() {
           </ul>
         </section>
 
-        <section className="mt-12">
+        <section>
           <h2 className="font-sans text-xl font-semibold">Templates you brought</h2>
           <p className="mt-2 font-sans text-sm text-[#8B93A7]">
             Reference only. Open a problem to write code.
@@ -398,48 +414,6 @@ export default function FinaleContest() {
             </div>
           )}
         </section>
-          </div>
-
-          <aside className="lg:sticky lg:top-8 lg:self-start">
-            <h2 className="font-sans text-xl font-semibold">Live standings</h2>
-            {board.length === 0 ? (
-              <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-4 py-5 font-sans text-sm text-[#8B93A7]">
-                No seats have been granted yet.
-              </p>
-            ) : (
-              <ol className="mt-4 divide-y divide-[#14161e] border border-[#14161e] bg-[#0B0E15]">
-                {board.map((entry) => {
-                  const isYou = String(entry.userId) === String(user?.id ?? "");
-                  return (
-                    <li
-                      key={entry.userId}
-                      className="flex items-center justify-between gap-3 px-4 py-3"
-                      style={isYou ? { background: "#0d0f14" } : undefined}
-                    >
-                      <span className="flex min-w-0 items-center gap-3">
-                        <span
-                          className="w-6 shrink-0 font-mono text-xs"
-                          style={{ color: entry.rank <= 3 ? GOLD : "#8B93A7" }}
-                        >
-                          {entry.rank}
-                        </span>
-                        <span
-                          className="truncate font-sans text-sm"
-                          style={{ color: isYou ? GOLD : "#F4F1EA" }}
-                        >
-                          {entry.name}
-                        </span>
-                      </span>
-                      <span className="shrink-0 font-mono text-xs text-[#8B93A7]">
-                        {entry.score}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-            <p className="mt-2 font-sans text-xs text-[#5A5850]">Refreshes on its own.</p>
-          </aside>
         </div>
       </div>
     </div>

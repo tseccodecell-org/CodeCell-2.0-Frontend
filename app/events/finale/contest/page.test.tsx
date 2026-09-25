@@ -5,7 +5,7 @@ import {
   getCurrentFinale,
   getFinaleProblems,
   listTemplates,
-  getFinaleBoard,
+  getFinaleStandings,
 } from "@/lib/api-client";
 
 vi.mock("@/lib/api-client", async () => {
@@ -15,7 +15,7 @@ vi.mock("@/lib/api-client", async () => {
     getCurrentFinale: vi.fn(),
     getFinaleProblems: vi.fn(),
     listTemplates: vi.fn(),
-    getFinaleBoard: vi.fn(),
+    getFinaleStandings: vi.fn(),
   };
 });
 
@@ -30,7 +30,7 @@ vi.mock("next/link", () => ({
 const mockedGetCurrentFinale = getCurrentFinale as unknown as ReturnType<typeof vi.fn>;
 const mockedGetFinaleProblems = getFinaleProblems as unknown as ReturnType<typeof vi.fn>;
 const mockedListTemplates = listTemplates as unknown as ReturnType<typeof vi.fn>;
-const mockedGetFinaleBoard = getFinaleBoard as unknown as ReturnType<typeof vi.fn>;
+const mockedGetFinaleStandings = getFinaleStandings as unknown as ReturnType<typeof vi.fn>;
 
 const baseStatus = {
   weekId: "wk-finale-1",
@@ -57,7 +57,7 @@ const problem = {
 beforeEach(() => {
   mockedGetFinaleProblems.mockResolvedValue([problem]);
   mockedListTemplates.mockResolvedValue([]);
-  mockedGetFinaleBoard.mockResolvedValue([]);
+  mockedGetFinaleStandings.mockResolvedValue({ problems: [], rows: [] });
 });
 
 afterEach(() => {
@@ -196,10 +196,13 @@ describe("finale contest page", () => {
 
   it("shows the seated field on the board before anyone has scored", async () => {
     mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "DRAFT" });
-    mockedGetFinaleBoard.mockResolvedValue([
-      { rank: 1, userId: 7, name: "Asha Menon", score: 0, problemsSolved: 0 },
-      { rank: 2, userId: 8, name: "Rohit Nair", score: 0, problemsSolved: 0 },
-    ]);
+    mockedGetFinaleStandings.mockResolvedValue({
+      problems: [{ id: "p-1", label: "A", points: 300 }],
+      rows: [
+        { rank: 1, userId: 7, name: "Asha Menon", username: "asha", score: 0, solved: 0, penaltySeconds: 0, cells: [] },
+        { rank: 1, userId: 8, name: "Rohit Nair", username: "rohit", score: 0, solved: 0, penaltySeconds: 0, cells: [] },
+      ],
+    });
 
     render(<FinaleContestPage />);
 

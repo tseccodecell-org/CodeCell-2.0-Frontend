@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, type KeyboardEvent } from "react";
-import Link from "next/link";
 import {
-  ChevronLeft,
   CheckCircle2,
   CircleDashed,
   XCircle,
@@ -571,17 +569,8 @@ export default function FinaleContestView({
     <FocusGuard weekId={status.weekId} counting={status.state === "LIVE" && !timeUp} required={!ended} proctor={status.proctor}>
     <div className="min-h-screen bg-[#0A0C10] text-[#E7E9EE]">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:px-8 md:py-10">
-        <Link
-          href="/events/finale/templates"
-          className="inline-flex items-center gap-1.5 font-sans text-sm transition-colors hover:text-[#E7E9EE]"
-          style={{ color: C.muted }}
-        >
-          <ChevronLeft size={16} />
-          Your templates
-        </Link>
-
         <header
-          className="mt-5 flex flex-col gap-5 rounded-xl border px-5 py-5 sm:flex-row sm:items-center sm:justify-between md:px-6"
+          className="flex flex-col gap-5 rounded-xl border px-5 py-5 sm:flex-row sm:items-center sm:justify-between md:px-6"
           style={{ borderColor: C.border, background: C.panel }}
         >
           <div>

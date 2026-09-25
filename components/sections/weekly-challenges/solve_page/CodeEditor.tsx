@@ -24,6 +24,7 @@ interface CodeEditorProps {
   loadRequest?: { language: Language; code: string; nonce: number; skipConfirm?: boolean } | null;
   cooldownLeft?: number;
   banned?: boolean;
+  closedLabel?: string;
   onRun?: (code: string, language: Language, stdin: string) => Promise<void>;
   onSubmit?: (code: string, language: Language) => Promise<void>;
 }
@@ -45,6 +46,7 @@ export default function CodeEditor({
   loadRequest,
   cooldownLeft = 0,
   banned = false,
+  closedLabel,
   onRun,
   onSubmit,
 }: CodeEditorProps) {
@@ -57,8 +59,9 @@ export default function CodeEditor({
 
   const isRunning = activeAction === "RUN";
   const isJudging = activeAction === "SUBMIT";
-  const isBusy = status === "QUEUED" || status === "RUNNING" || activeAction !== null || banned;
-  const submitBusy = activeAction !== null || cooldownLeft > 0 || banned;
+  const closed = closedLabel !== undefined;
+  const isBusy = status === "QUEUED" || status === "RUNNING" || activeAction !== null || banned || closed;
+  const submitBusy = activeAction !== null || cooldownLeft > 0 || banned || closed;
 
   const current = LANGUAGES.find((l) => l.id === language) ?? LANGUAGES[0];
   const code = codeByLang[language];
@@ -350,7 +353,13 @@ export default function CodeEditor({
           <button
             onClick={handleRunClick}
             disabled={isBusy}
-            title={banned ? "Your account is suspended, so you cannot run code." : undefined}
+            title={
+              closed
+                ? closedLabel
+                : banned
+                  ? "Your account is suspended, so you cannot run code."
+                  : undefined
+            }
             className="flex items-center gap-1.5 rounded border border-[#22262f] px-3.5 py-1.5 font-mono text-xs font-semibold text-[#F4F1EA] transition-colors hover:border-[#D9A404]/60 hover:text-[#D9A404] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             {isRunning ? (
@@ -365,7 +374,9 @@ export default function CodeEditor({
             onClick={handleSubmitClick}
             disabled={submitBusy}
             title={
-              banned
+              closed
+                ? closedLabel
+                : banned
                 ? "Your account is suspended, so you cannot submit."
                 : cooldownLeft > 0
                   ? `You have hit the submission limit, try again in ${cooldownLeft}s`
@@ -379,7 +390,7 @@ export default function CodeEditor({
             ) : (
               <Send size={14} />
             )}
-            {cooldownLeft > 0 ? `Submit in ${cooldownLeft}s` : "Submit"}
+            {closed ? closedLabel : cooldownLeft > 0 ? `Submit in ${cooldownLeft}s` : "Submit"}
           </button>
         </div>
       </div>

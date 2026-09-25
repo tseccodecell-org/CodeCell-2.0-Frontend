@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import FinaleContestPage from "./page";
 import {
   getCurrentFinale,
@@ -155,9 +155,24 @@ describe("finale contest page", () => {
 
     render(<FinaleContestPage />);
 
-    expect(await screen.findByText("The round has ended. These are the final standings.")).toBeVisible();
+    expect(await screen.findByText("The contest has ended")).toBeVisible();
+    expect(screen.getByText(/Submissions are closed and nothing more is scored/)).toBeVisible();
+    expect(screen.getByTestId("finale-ended")).toHaveTextContent("Contest ended");
     expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /Standings/ })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("ends the contest on screen when the clock runs out and asks the server again", async () => {
+    mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "LIVE", remainingSeconds: 0 });
+
+    render(<FinaleContestPage />);
+
+    expect(await screen.findByTestId("finale-ended")).toHaveTextContent("Contest ended");
+    expect(screen.getByText("Ended")).toBeVisible();
+    expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
+    expect(screen.queryByText(/0:00/)).not.toBeInTheDocument();
+    await waitFor(() => expect(mockedGetCurrentFinale.mock.calls.length).toBeGreaterThanOrEqual(2));
+    expect(screen.getByRole("button", { name: "See final standings" })).toBeVisible();
   });
 
   it("keeps the round instructions on the page", async () => {

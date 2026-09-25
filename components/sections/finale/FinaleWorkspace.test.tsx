@@ -184,6 +184,30 @@ describe("FinaleWorkspace finale status", () => {
     expect(await screen.findByTestId("finale-timer")).toBeVisible();
   });
 
+  it("closes run and submit once the round has ended", async () => {
+    loadedProblem = problemFixture;
+    mockFinaleStatus("ENDED", 0);
+
+    render(<FinaleWorkspace problemId={PROBLEM_ID} />);
+
+    expect(await screen.findByTestId("workspace-round-ended")).toBeVisible();
+    expect(screen.getByText("The contest has ended.")).toBeVisible();
+    const submit = screen.getByRole("button", { name: /Round ended/ });
+    expect(submit).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Run/ })).toBeDisabled();
+  });
+
+  it("closes the round on screen as soon as the clock runs out", async () => {
+    loadedProblem = problemFixture;
+    mockFinaleStatus("LIVE", 0);
+
+    render(<FinaleWorkspace problemId={PROBLEM_ID} />);
+
+    expect(await screen.findByTestId("workspace-round-ended")).toBeVisible();
+    expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Round ended/ })).toBeDisabled();
+  });
+
   it.each(["DRAFT", "PAUSED", "ENDED"] as FinaleState[])(
     "does not show the timer when the finale is %s",
     async (state) => {

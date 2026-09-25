@@ -25,10 +25,12 @@ export default function FocusGuard({
   weekId,
   counting,
   proctor,
+  required = true,
   children,
 }: {
   weekId: string | null;
   counting: boolean;
+  required?: boolean;
   proctor?: ProctorStatus;
   children: React.ReactNode;
 }) {
@@ -107,6 +109,13 @@ export default function FocusGuard({
       setFullscreen(isFullscreen());
     }
   };
+
+  useEffect(() => {
+    if (required || !isFullscreen()) return;
+    document.exitFullscreen?.().catch(() => {});
+  }, [required]);
+
+  if (!required) return <>{children}</>;
 
   if (locked) {
     return (

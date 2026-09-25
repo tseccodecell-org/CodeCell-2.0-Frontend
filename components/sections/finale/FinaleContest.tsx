@@ -170,6 +170,10 @@ export default function FinaleContest() {
     };
   }, [weekId, roundState]);
 
+  const roundOver = useCallback(() => {
+    load(true);
+  }, [load]);
+
   if (state.kind === "loading") {
     return (
       <Shell>
@@ -272,6 +276,7 @@ export default function FinaleContest() {
       onRefreshStandings={() => setStandingsRequest((n) => n + 1)}
       currentUserId={user?.id}
       onOpenProblem={(id) => router.push(`/events/finale/workspace/${id}`)}
+      onRoundOver={roundOver}
     />
   );
 }

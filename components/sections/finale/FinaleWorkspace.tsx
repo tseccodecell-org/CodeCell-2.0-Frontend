@@ -18,7 +18,7 @@ import {
   ApiError,
 } from "@/lib/api-client";
 import type { ProctorStatus, TemplateResponse } from "@/lib/api-client";
-import { estimateRoundEnd } from "@/lib/finale-clock";
+import { estimateRoundEnd, useTimeReached } from "@/lib/finale-clock";
 import { useAuth } from "@/hooks/useAuth";
 
 import type { ProblemDetail } from "@/lib/types/problem";
@@ -88,6 +88,7 @@ function getRunErrorMessage(err: unknown): string {
   if (isApiError(err)) {
     if (err.code === "VALIDATION_ERROR" || err.code === "PROBLEM_NOT_FOUND") return err.message;
     if (err.status === 423) return "Your round is locked. Raise your hand for an invigilator.";
+    if (err.status === 403) return "The round has ended. Submissions are closed.";
     if (err.status === 429) return err.message;
     if (err.status === 400) return err.message || "Your code could not be accepted.";
     if (err.status >= 500) return "The judge is having trouble right now. Please try again shortly.";
@@ -100,6 +101,7 @@ function getSubmitErrorMessage(err: unknown): string {
     if (err.status === 401) return "Your session has expired. Please sign in again.";
     if (err.status === 404) return "This problem could not be found.";
     if (err.status === 423) return "Your round is locked. Raise your hand for an invigilator.";
+    if (err.status === 403) return "The round has ended. Submissions are closed.";
     if (err.status === 400)
       return "There was a problem with your submission. Please check your code and try again.";
     if (err.status >= 500) return "Something went wrong on our end. Please try again shortly.";
@@ -166,6 +168,8 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   const [proctor, setProctor] = useState<ProctorStatus | undefined>(undefined);
 
   const savedBuffers = useMemo(() => readSavedBuffers(), []);
+  const timeUp = useTimeReached(finaleState === "LIVE" ? finaleEndsAt : null);
+  const roundOver = finaleState === "ENDED" || (finaleState === "LIVE" && timeUp);
 
   useEffect(() => {
     if (cooldownLeft <= 0) return;
@@ -519,7 +523,12 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   }
 
   return (
-    <FocusGuard weekId={problem?.weekId ?? null} counting={finaleState === "LIVE"} proctor={proctor}>
+    <FocusGuard
+      weekId={problem?.weekId ?? null}
+      counting={finaleState === "LIVE" && !timeUp}
+      required={!roundOver}
+      proctor={proctor}
+    >
     <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
         <Link
@@ -545,11 +554,18 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
         </div>
 
         <div className="flex items-center gap-3 font-mono text-[11px] text-[#8B93A7]">
-          {finaleState === "LIVE" && finaleEndsAt !== null && <FinaleTimer endsAt={finaleEndsAt} />}
+          {!roundOver && finaleState === "LIVE" && finaleEndsAt !== null && <FinaleTimer endsAt={finaleEndsAt} />}
           {finaleState === "PAUSED" && (
             <span className="text-[#D9A404]">Scoring paused</span>
           )}
-          {finaleState === "ENDED" && <span className="text-[#8B93A7]">Contest ended</span>}
+          {roundOver && (
+            <span
+              data-testid="workspace-round-ended"
+              className="rounded border border-[#D9A404]/40 bg-[#D9A404]/10 px-2 py-0.5 font-semibold text-[#D9A404]"
+            >
+              Round ended
+            </span>
+          )}
           {problem && (
             <span className="hidden items-center gap-3 sm:flex">
               <span>{problem.timeLimitMs} ms</span>
@@ -561,6 +577,24 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
           )}
         </div>
       </header>
+
+      {roundOver && (
+        <div
+          role="status"
+          className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[#D9A404]/30 bg-[#D9A404]/10 px-4 py-2.5"
+        >
+          <p className="font-sans text-sm text-[#F4F1EA]">
+            <span className="font-semibold">The contest has ended.</span>{" "}
+            <span className="text-[#8B93A7]">Submissions are closed. Your code stays here to read.</span>
+          </p>
+          <Link
+            href="/events/finale/contest#standings"
+            className="rounded-md bg-[#D9A404] px-3 py-1.5 font-sans text-xs font-semibold text-[#06070B] transition-opacity hover:opacity-90"
+          >
+            See final standings
+          </Link>
+        </div>
+      )}
 
       <div className="flex h-10 shrink-0 items-center gap-1 border-b border-[#1a1c24] bg-[#0d0f14] px-2 md:hidden">
         {(
@@ -678,6 +712,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
               loadRequest={loadRequest}
               cooldownLeft={cooldownLeft}
               banned={isBanned}
+              closedLabel={roundOver ? "Round ended" : undefined}
               onRun={handleRun}
               onSubmit={handleSubmit}
             />

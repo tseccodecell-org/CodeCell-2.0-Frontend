@@ -23,6 +23,7 @@ import type {
   WeekProblem,
 } from "@/lib/api-client";
 import { FinaleCountdown } from "./FinaleLobby";
+import { useTimeReached } from "@/lib/finale-clock";
 import FinaleStandingsTable, { CONTEST_COLORS as C, formatContestTime } from "./FinaleStandings";
 import FocusGuard from "./FocusGuard";
 
@@ -56,23 +57,6 @@ function useTab(initial: Tab): [Tab, (tab: Tab) => void] {
   };
 
   return [tab, choose];
-}
-
-function useTimeReached(target: string | undefined): boolean {
-  const [reached, setReached] = useState(() => target !== undefined && Date.parse(target) <= Date.now());
-
-  useEffect(() => {
-    if (target === undefined) {
-      setReached(false);
-      return;
-    }
-    const check = () => setReached(Date.parse(target) <= Date.now());
-    check();
-    const timer = setInterval(check, 1000);
-    return () => clearInterval(timer);
-  }, [target]);
-
-  return reached;
 }
 
 function StatusPill({ state }: { state: FinaleStatusResponse["state"] }) {
@@ -148,12 +132,13 @@ function ContestClock({
 
   if (status.state === "ENDED") {
     return (
-      <div className="text-left sm:text-right">
+      <div data-testid="finale-ended" className="text-left sm:text-right">
         <p className="font-sans text-xs" style={{ color: C.muted }}>
-          Time remaining
+          Submissions closed
         </p>
-        <p className="mt-1 font-mono text-3xl font-semibold tabular-nums" style={{ color: C.faint }}>
-          0:00:00
+        <p className="mt-1 flex items-center gap-2 font-sans text-2xl font-semibold sm:justify-end" style={{ color: C.text }}>
+          <Flag size={20} style={{ color: C.gold }} />
+          Contest ended
         </p>
       </div>
     );
@@ -272,6 +257,7 @@ function ProblemsPanel({
   standings,
   you,
   onOpenProblem,
+  ended,
 }: {
   waiting: boolean;
   status: FinaleStatusResponse;
@@ -279,6 +265,7 @@ function ProblemsPanel({
   standings: FinaleStandings | null;
   you: FinaleStandingsRow | null;
   onOpenProblem: (id: string) => void;
+  ended: boolean;
 }) {
   const startReached = useTimeReached(status.scheduledStartAt);
 
@@ -406,7 +393,7 @@ function ProblemsPanel({
                     className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-3 py-1.5 font-sans text-xs font-medium transition-colors group-hover:border-[#D9A404] group-hover:text-[#D9A404] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
                     style={{ borderColor: C.border, color: C.text }}
                   >
-                    {mine === "solved" ? "Open" : "Solve"}
+                    {ended ? "View" : mine === "solved" ? "Open" : "Solve"}
                     <ChevronRight size={14} />
                   </button>
                 </td>
@@ -551,6 +538,7 @@ export default function FinaleContestView({
   onRefreshStandings,
   currentUserId,
   onOpenProblem,
+  onRoundOver,
 }: {
   status: FinaleStatusResponse;
   endsAt: number | null;
@@ -561,7 +549,17 @@ export default function FinaleContestView({
   onRefreshStandings: () => void;
   currentUserId?: string | number;
   onOpenProblem: (id: string) => void;
+  onRoundOver?: () => void;
 }) {
+  const timeUp = useTimeReached(status.state === "LIVE" ? endsAt : null);
+  const shown: FinaleStatusResponse =
+    status.state === "LIVE" && timeUp ? { ...status, state: "ENDED", remainingSeconds: 0 } : status;
+  const ended = shown.state === "ENDED";
+
+  useEffect(() => {
+    if (timeUp && status.state === "LIVE") onRoundOver?.();
+  }, [timeUp, status.state, onRoundOver]);
+
   const [tab, setTab] = useTab(status.state === "ENDED" ? "standings" : "problems");
   const waiting = status.state === "DRAFT";
   const you =
@@ -570,7 +568,7 @@ export default function FinaleContestView({
       : standings?.rows.find((row) => String(row.userId) === String(currentUserId)) ?? null;
 
   return (
-    <FocusGuard weekId={status.weekId} counting={status.state === "LIVE"} proctor={status.proctor}>
+    <FocusGuard weekId={status.weekId} counting={status.state === "LIVE" && !timeUp} required={!ended} proctor={status.proctor}>
     <div className="min-h-screen bg-[#0A0C10] text-[#E7E9EE]">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:px-8 md:py-10">
         <Link
@@ -591,13 +589,13 @@ export default function FinaleContestView({
               <h1 className="font-sans text-xl font-semibold md:text-2xl" style={{ color: C.text }}>
                 {CONTEST_TITLE}
               </h1>
-              <StatusPill state={status.state} />
+              <StatusPill state={shown.state} />
             </div>
             <p className="mt-1.5 font-sans text-sm" style={{ color: C.muted }}>
               Offline round, 2 hours, individual
             </p>
           </div>
-          <ContestClock status={status} endsAt={endsAt} />
+          <ContestClock status={shown} endsAt={endsAt} />
         </header>
 
         {status.state === "PAUSED" && (
@@ -610,14 +608,32 @@ export default function FinaleContestView({
             Scoring is paused and the clock is stopped. Keep working: you can still run and submit, but nothing submitted now scores.
           </div>
         )}
-        {status.state === "ENDED" && (
+        {ended && (
           <div
             role="status"
-            className="mt-4 flex items-start gap-3 rounded-xl border px-5 py-3.5 font-sans text-sm"
-            style={{ borderColor: C.border, background: C.panel, color: C.text }}
+            className="mt-4 flex flex-col gap-4 rounded-xl border px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+            style={{ borderColor: `${C.gold}55`, background: `${C.gold}0F` }}
           >
-            <Flag size={18} className="mt-0.5 shrink-0" style={{ color: C.gold }} />
-            The round has ended. These are the final standings.
+            <div className="flex items-start gap-3">
+              <Flag size={20} className="mt-0.5 shrink-0" style={{ color: C.gold }} />
+              <div>
+                <p className="font-sans text-sm font-semibold" style={{ color: C.text }}>
+                  The contest has ended
+                </p>
+                <p className="mt-0.5 font-sans text-sm" style={{ color: C.muted }}>
+                  Submissions are closed and nothing more is scored. The standings are final.
+                </p>
+              </div>
+            </div>
+            {tab !== "standings" && (
+              <button
+                onClick={() => setTab("standings")}
+                className="shrink-0 cursor-pointer rounded-lg px-4 py-2 font-sans text-sm font-semibold text-[#0A0C10] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
+                style={{ background: C.gold }}
+              >
+                See final standings
+              </button>
+            )}
           </div>
         )}
 
@@ -642,6 +658,7 @@ export default function FinaleContestView({
               standings={standings}
               you={you}
               onOpenProblem={onOpenProblem}
+              ended={ended}
             />
           )}
           {tab === "standings" && (

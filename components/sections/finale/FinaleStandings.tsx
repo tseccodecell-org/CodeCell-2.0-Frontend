@@ -2,11 +2,22 @@
 
 import type { FinaleStandings, FinaleStandingsCell, FinaleStandingsProblem } from "@/lib/api-client";
 
-const GOLD = "#D9A404";
-const FLAG = "#E2574C";
-const INK = "#06070B";
-const MUTED = "#8B93A7";
-const PANEL = "#0B0E15";
+export const CONTEST_COLORS = {
+  panel: "#10131A",
+  raised: "#151923",
+  border: "#1F2430",
+  text: "#E7E9EE",
+  muted: "#8C93A3",
+  faint: "#5B6272",
+  gold: "#D9A404",
+  green: "#4ADE80",
+  greenFill: "rgba(34, 197, 94, 0.14)",
+  greenFirst: "rgba(34, 197, 94, 0.32)",
+  red: "#F87171",
+  amber: "#F59E0B",
+};
+
+const C = CONTEST_COLORS;
 
 export function formatContestTime(seconds: number): string {
   const total = Math.max(0, Math.floor(seconds));
@@ -17,7 +28,7 @@ export function formatContestTime(seconds: number): string {
   return hours > 0 ? `${hours}:${pad(minutes)}:${pad(secs)}` : `${minutes}:${pad(secs)}`;
 }
 
-function firstSolveTimes(standings: FinaleStandings): Map<string, number> {
+export function firstSolveTimes(standings: FinaleStandings): Map<string, number> {
   const first = new Map<string, number>();
   for (const row of standings.rows) {
     for (const cell of row.cells) {
@@ -48,87 +59,49 @@ function describeCell(problem: FinaleStandingsProblem, cell: FinaleStandingsCell
   return `Problem ${problem.label} not attempted`;
 }
 
-function WrongTries({ count, onGold }: { count: number; onGold?: boolean }) {
-  return (
-    <span className="font-mono text-[10px] tabular-nums leading-none" style={{ color: onGold ? INK : FLAG }}>
-      {"−"}
-      {count}
-    </span>
-  );
-}
-
-function JudgingRing() {
-  return (
-    <span
-      className="inline-block h-2.5 w-2.5 animate-pulse rounded-full border motion-reduce:animate-none"
-      style={{ borderColor: GOLD }}
-    />
-  );
-}
-
 function ScoreCell({ cell, first }: { cell: FinaleStandingsCell; first: boolean }) {
   if (cell.solved) {
     return (
       <div
-        className="relative mx-auto flex h-12 w-[4.75rem] flex-col items-center justify-center rounded-[3px]"
-        style={
-          first
-            ? { background: GOLD, color: INK }
-            : { boxShadow: `inset 0 0 0 1px ${GOLD}59`, color: GOLD }
-        }
+        className="flex h-full min-h-[3.25rem] flex-col items-center justify-center"
+        style={{ background: first ? C.greenFirst : C.greenFill }}
       >
-        <span className="font-mono text-sm font-semibold tabular-nums leading-none">{cell.points}</span>
-        <span
-          className="mt-1.5 font-mono text-[10px] tabular-nums leading-none"
-          style={{ color: first ? INK : MUTED, opacity: first ? 0.7 : 1 }}
-        >
-          {formatContestTime(cell.solvedAtSeconds ?? 0)}
+        <span className="font-mono text-[13px] font-semibold tabular-nums leading-none" style={{ color: C.green }}>
+          {cell.points}
         </span>
+        <span className="mt-1 font-mono text-[11px] tabular-nums leading-none" style={{ color: C.muted }}>
+          {formatContestTime(cell.solvedAtSeconds ?? 0)}
+          {cell.wrongAttempts > 0 && (
+            <span style={{ color: C.red }}>
+              {" "}
+              {"−"}
+              {cell.wrongAttempts}
+            </span>
+          )}
+        </span>
+      </div>
+    );
+  }
+
+  if (cell.wrongAttempts > 0 || cell.pending) {
+    return (
+      <div className="flex h-full min-h-[3.25rem] flex-col items-center justify-center gap-1">
         {cell.wrongAttempts > 0 && (
-          <span className="absolute right-1.5 top-1">
-            <WrongTries count={cell.wrongAttempts} onGold={first} />
+          <span className="font-mono text-[13px] font-semibold tabular-nums leading-none" style={{ color: C.red }}>
+            {"−"}
+            {cell.wrongAttempts}
+          </span>
+        )}
+        {cell.pending && (
+          <span className="font-sans text-[10px] leading-none" style={{ color: C.amber }}>
+            judging
           </span>
         )}
       </div>
     );
   }
 
-  if (cell.pending || cell.wrongAttempts > 0) {
-    return (
-      <div className="mx-auto flex h-12 w-[4.75rem] items-center justify-center gap-2">
-        {cell.wrongAttempts > 0 && <WrongTries count={cell.wrongAttempts} />}
-        {cell.pending && <JudgingRing />}
-      </div>
-    );
-  }
-
-  return <div className="mx-auto h-12 w-[4.75rem]" />;
-}
-
-function Legend() {
-  return (
-    <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 font-sans text-xs text-[#8B93A7]">
-      <span className="flex items-center gap-2">
-        <span className="inline-block h-3.5 w-5 rounded-[2px]" style={{ background: GOLD }} />
-        First to solve
-      </span>
-      <span className="flex items-center gap-2">
-        <span
-          className="inline-block h-3.5 w-5 rounded-[2px]"
-          style={{ boxShadow: `inset 0 0 0 1px ${GOLD}59` }}
-        />
-        Solved, with the contest time of the accept
-      </span>
-      <span className="flex items-center gap-2">
-        <WrongTries count={2} />
-        Wrong tries before the accept
-      </span>
-      <span className="flex items-center gap-2">
-        <JudgingRing />
-        Being judged
-      </span>
-    </div>
-  );
+  return <div className="min-h-[3.25rem]" />;
 }
 
 export default function FinaleStandingsTable({
@@ -140,98 +113,112 @@ export default function FinaleStandingsTable({
 }) {
   if (standings === null) {
     return (
-      <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-5 py-6 font-sans text-sm text-[#8B93A7]">
+      <div className="rounded-xl border px-5 py-10 text-center font-sans text-sm" style={{ borderColor: C.border, background: C.panel, color: C.muted }}>
         Loading the standings.
-      </p>
+      </div>
     );
   }
 
   if (standings.rows.length === 0) {
     return (
-      <p className="mt-4 border border-[#14161e] bg-[#0B0E15] px-5 py-6 font-sans text-sm text-[#8B93A7]">
+      <div className="rounded-xl border px-5 py-10 text-center font-sans text-sm" style={{ borderColor: C.border, background: C.panel, color: C.muted }}>
         No seats have been granted yet.
-      </p>
+      </div>
     );
   }
 
   const first = firstSolveTimes(standings);
   const you = currentUserId === undefined ? null : String(currentUserId);
+  const headCell = "px-3 py-2.5 font-sans text-xs font-medium";
 
   return (
-    <>
-      <div className="mt-4 overflow-x-auto border border-[#14161e]" style={{ background: PANEL }}>
-        <table className="w-full border-collapse">
+    <div className="overflow-hidden rounded-xl border" style={{ borderColor: C.border, background: C.panel }}>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-max border-collapse">
           <caption className="sr-only">Live standings</caption>
+          <colgroup>
+            <col style={{ width: "4rem" }} />
+            <col />
+            <col style={{ width: "5.5rem" }} />
+            <col style={{ width: "6.5rem" }} />
+            {standings.problems.map((problem) => (
+              <col key={problem.id} style={{ width: "5.75rem" }} />
+            ))}
+          </colgroup>
           <thead>
-            <tr className="border-b border-[#14161e]">
-              <th
-                scope="col"
-                className="sticky left-0 z-10 w-14 px-4 py-3 text-left font-sans text-xs font-medium text-[#8B93A7]"
-                style={{ background: PANEL }}
-              >
+            <tr style={{ background: C.raised, color: C.muted }}>
+              <th scope="col" className={`${headCell} sticky left-0 z-10 text-center`} style={{ background: C.raised }}>
                 Rank
               </th>
-              <th
-                scope="col"
-                className="sticky left-14 z-10 min-w-[8rem] px-3 py-3 sm:min-w-[10rem] text-left font-sans text-xs font-medium text-[#8B93A7]"
-                style={{ background: PANEL }}
-              >
+              <th scope="col" className={`${headCell} sticky left-16 z-10 min-w-[9rem] text-left`} style={{ background: C.raised }}>
                 Participant
+              </th>
+              <th scope="col" className={`${headCell} text-center`}>
+                Score
+              </th>
+              <th scope="col" className={`${headCell} text-center`}>
+                Penalty
               </th>
               {standings.problems.map((problem) => (
                 <th
                   key={problem.id}
                   scope="col"
                   title={problem.title ? `${problem.label}. ${problem.title}` : undefined}
-                  className="px-1 py-3 text-center"
+                  className="border-l px-2 py-2 text-center"
+                  style={{ borderColor: C.border }}
                 >
-                  <span className="block font-mono text-sm font-semibold text-[#F4F1EA]">{problem.label}</span>
-                  <span className="mt-0.5 block font-mono text-[10px] tabular-nums text-[#5A5850]">
+                  <span className="block font-sans text-sm font-semibold" style={{ color: C.text }}>
+                    {problem.label}
+                  </span>
+                  <span className="block font-mono text-[10px] tabular-nums" style={{ color: C.faint }}>
                     {problem.points}
                   </span>
                 </th>
               ))}
-              <th scope="col" className="px-4 py-3 text-right font-sans text-xs font-medium text-[#8B93A7]">
-                Score
-              </th>
-              <th scope="col" className="px-4 py-3 text-right font-sans text-xs font-medium text-[#8B93A7]">
-                Penalty
-              </th>
             </tr>
           </thead>
           <tbody>
             {standings.rows.map((row) => {
               const isYou = you !== null && String(row.userId) === you;
+              const rowBg = isYou ? "#1A1810" : C.panel;
               return (
                 <tr
                   key={row.userId}
                   data-testid={isYou ? "standings-you" : undefined}
-                  className="border-b border-[#14161e] last:border-b-0"
+                  className="border-t"
+                  style={{ borderColor: C.border, background: rowBg }}
                 >
                   <td
-                    className="sticky left-0 z-10 px-4 py-2 font-mono text-sm tabular-nums text-[#F4F1EA]"
-                    style={{ background: PANEL, boxShadow: isYou ? `inset 2px 0 0 ${GOLD}` : undefined }}
+                    className="sticky left-0 z-10 px-3 text-center font-mono text-sm tabular-nums"
+                    style={{
+                      background: rowBg,
+                      color: C.text,
+                      boxShadow: isYou ? `inset 3px 0 0 ${C.gold}` : undefined,
+                    }}
                   >
                     {row.rank}
                   </td>
                   <th
                     scope="row"
-                    className="sticky left-14 z-10 max-w-[9rem] px-3 py-2 text-left font-normal sm:max-w-[14rem]"
-                    style={{ background: PANEL }}
+                    className="sticky left-16 z-10 max-w-[11rem] px-3 py-2 text-left font-normal sm:max-w-none"
+                    style={{ background: rowBg }}
                   >
-                    <span
-                      className="block truncate font-sans text-sm"
-                      style={{ color: isYou ? GOLD : "#F4F1EA" }}
-                    >
+                    <span className="block truncate font-sans text-sm font-medium" style={{ color: isYou ? C.gold : C.text }}>
                       {row.name}
                       {isYou && <span className="sr-only"> (you)</span>}
                     </span>
                     {row.username && row.username !== row.name && (
-                      <span className="block truncate font-mono text-[11px] text-[#5A5850]">
+                      <span className="block truncate font-sans text-xs" style={{ color: C.faint }}>
                         @{row.username}
                       </span>
                     )}
                   </th>
+                  <td className="px-3 text-center font-mono text-sm font-semibold tabular-nums" style={{ color: C.text }}>
+                    {row.score}
+                  </td>
+                  <td className="px-3 text-center font-mono text-sm tabular-nums" style={{ color: C.muted }}>
+                    {row.solved > 0 ? formatContestTime(row.penaltySeconds) : "0:00"}
+                  </td>
                   {standings.problems.map((problem) => {
                     const cell =
                       row.cells.find((c) => c.problemId === problem.id) ??
@@ -241,29 +228,44 @@ export default function FinaleStandingsTable({
                       cell.solvedAtSeconds !== undefined &&
                       first.get(problem.id) === cell.solvedAtSeconds;
                     return (
-                      <td key={problem.id} className="px-1 py-1.5" aria-label={describeCell(problem, cell, isFirst)}>
+                      <td
+                        key={problem.id}
+                        className="border-l p-0"
+                        style={{ borderColor: C.border }}
+                        aria-label={describeCell(problem, cell, isFirst)}
+                      >
                         <ScoreCell cell={cell} first={isFirst} />
                       </td>
                     );
                   })}
-                  <td className="px-4 py-2 text-right font-mono text-base font-semibold tabular-nums text-[#F4F1EA]">
-                    {row.score}
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono text-sm tabular-nums text-[#8B93A7]">
-                    {row.solved > 0 ? formatContestTime(row.penaltySeconds) : ""}
-                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-
-      <Legend />
-      <p className="mt-3 max-w-2xl font-sans text-xs leading-relaxed text-[#5A5850]">
-        Ranked by score. Equal scores are split by penalty, the contest time of the last accepted
-        solve, and paused time never counts. Refreshes every 20 seconds.
-      </p>
-    </>
+      <div
+        className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-4 py-3 font-sans text-xs"
+        style={{ borderColor: C.border, color: C.muted }}
+      >
+        <span className="flex items-center gap-2">
+          <span className="inline-block h-3 w-4 rounded-sm" style={{ background: C.greenFirst }} />
+          First to solve
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="inline-block h-3 w-4 rounded-sm" style={{ background: C.greenFill }} />
+          Accepted, with the time of the accept
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="font-mono font-semibold" style={{ color: C.red }}>
+            {"−"}2
+          </span>
+          Wrong tries
+        </span>
+        <span className="ml-auto" style={{ color: C.faint }}>
+          Ranked by score, then penalty: the contest time of the last accepted solve.
+        </span>
+      </div>
+    </div>
   );
 }

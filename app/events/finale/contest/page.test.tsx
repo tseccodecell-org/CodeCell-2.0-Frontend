@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import FinaleContestPage from "./page";
 import {
   getCurrentFinale,
@@ -62,6 +62,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks();
+  window.history.replaceState(null, "", "/");
 });
 
 describe("finale contest page", () => {
@@ -74,8 +75,8 @@ describe("finale contest page", () => {
 
     render(<FinaleContestPage />);
 
-    expect(await screen.findByText("The round hasn't started")).toBeVisible();
-    expect(screen.getByText("Problems locked")).toBeVisible();
+    expect(await screen.findByText("Not started")).toBeVisible();
+    expect(screen.getByText(/Problems locked/)).toBeVisible();
     expect(screen.getByTestId("finale-start-countdown")).toBeVisible();
     expect(screen.queryByText(problem.title)).not.toBeInTheDocument();
     expect(mockedGetFinaleProblems).not.toHaveBeenCalled();
@@ -86,7 +87,7 @@ describe("finale contest page", () => {
 
     render(<FinaleContestPage />);
 
-    expect(await screen.findByText("The round is live")).toBeVisible();
+    expect(await screen.findByText("Live")).toBeVisible();
     expect(await screen.findByText(problem.title)).toBeVisible();
     expect(screen.getByTestId("finale-timer")).toBeVisible();
     expect(screen.queryByTestId("finale-start-countdown")).not.toBeInTheDocument();
@@ -139,14 +140,16 @@ describe("finale contest page", () => {
 
     render(<FinaleContestPage />);
 
-    expect(await screen.findByText("The round has ended")).toBeVisible();
+    expect(await screen.findByText("The round has ended. These are the final standings.")).toBeVisible();
     expect(screen.queryByTestId("finale-timer")).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /Standings/ })).toHaveAttribute("aria-selected", "true");
   });
 
   it("keeps the round instructions on the page", async () => {
     mockedGetCurrentFinale.mockResolvedValue({ ...baseStatus, state: "LIVE" });
 
     render(<FinaleContestPage />);
+    fireEvent.click(await screen.findByRole("tab", { name: /Rules/ }));
 
     expect(await screen.findByText("How the round works")).toBeVisible();
     expect(screen.getByText(/Ties break on total time/)).toBeVisible();
@@ -166,6 +169,7 @@ describe("finale contest page", () => {
     ]);
 
     render(<FinaleContestPage />);
+    fireEvent.click(await screen.findByRole("tab", { name: /Templates/ }));
 
     expect(await screen.findByText("Fast C++")).toBeVisible();
     expect(screen.getByText("int main(){}")).toBeInTheDocument();
@@ -205,6 +209,7 @@ describe("finale contest page", () => {
     });
 
     render(<FinaleContestPage />);
+    fireEvent.click(await screen.findByRole("tab", { name: /Standings/ }));
 
     expect(await screen.findByText("Asha Menon")).toBeVisible();
     expect(screen.getByText("Rohit Nair")).toBeVisible();

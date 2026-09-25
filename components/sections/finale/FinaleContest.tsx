@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Lock, TriangleAlert, RefreshCw, LogIn } from "lucide-react";
+import { Lock, TriangleAlert, RefreshCw, LogIn } from "lucide-react";
 
 import {
   getCurrentFinale,
@@ -17,21 +17,12 @@ import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/
 import type { FinaleStandings } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
 import { estimateRoundEnd } from "@/lib/finale-clock";
-import { FinaleCountdown } from "./FinaleLobby";
-import FinaleStandingsTable from "./FinaleStandings";
+import FinaleContestView from "./FinaleContestView";
 
 const FINALE_STATUS_REFRESH_MS = 15000;
 const BOARD_REFRESH_MS = 20000;
 
 const GOLD = "#D9A404";
-
-const CONTEST_INSTRUCTIONS = [
-  "The round runs for two hours from the moment an organiser starts it. The timer above is the one that counts.",
-  "Open a problem to get the statement, your editor and the judge you have used all season. You can move between problems freely.",
-  "Run as often as you like. Submitting is what scores, and only your accepted solutions count toward your standing.",
-  "If scoring is paused, keep working. You can still run and submit, and anything submitted while paused is not scored until scoring resumes.",
-  "Ties break on total time to your last accepted solve, the same rule the weekly boards use.",
-];
 
 type LoadState =
   | { kind: "loading" }
@@ -57,6 +48,8 @@ export default function FinaleContest() {
   const [problems, setProblems] = useState<WeekProblem[]>([]);
   const [templates, setTemplates] = useState<TemplateResponse[]>([]);
   const [standings, setStandings] = useState<FinaleStandings | null>(null);
+  const [standingsUpdatedAt, setStandingsUpdatedAt] = useState<number | null>(null);
+  const [standingsRequest, setStandingsRequest] = useState(0);
   const { user } = useAuth();
 
   const load = useCallback(async (silent = false) => {
@@ -140,7 +133,9 @@ export default function FinaleContest() {
     const readStandings = () => {
       getFinaleStandings(weekId)
         .then((next) => {
-          if (!cancelled) setStandings(next);
+          if (cancelled) return;
+          setStandings(next);
+          setStandingsUpdatedAt(Date.now());
         })
         .catch(() => {});
     };
@@ -152,7 +147,7 @@ export default function FinaleContest() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [weekId, roundState]);
+  }, [weekId, roundState, standingsRequest]);
 
   useEffect(() => {
     if (weekId === null || roundState === null || roundState === "DRAFT") return;
@@ -266,156 +261,17 @@ export default function FinaleContest() {
       </Shell>
     );
   }
-  const labels = new Map((standings?.problems ?? []).map((p) => [p.id, p.label]));
-  const endsAt = state.endsAt !== null ? new Date(state.endsAt).toISOString() : undefined;
-
-  const heading = waiting
-    ? "The round hasn't started"
-    : status.state === "PAUSED"
-      ? "Scoring paused"
-      : status.state === "ENDED"
-        ? "The round has ended"
-        : "The round is live";
-
   return (
-    <div className="min-h-screen bg-[#06070B] text-[#F4F1EA]">
-      <div className="mx-auto max-w-6xl px-6 py-12 md:px-10 md:py-16">
-        <Link
-          href="/events/finale/templates"
-          className="inline-flex items-center gap-2 font-mono text-xs text-[#8B93A7] transition-colors hover:text-[#D9A404]"
-        >
-          <ChevronLeft size={14} />
-          Back to your templates
-        </Link>
-
-        <header className="mt-10 flex flex-wrap items-end justify-between gap-6 border-b border-[#14161e] pb-8">
-          <h1 className="font-sans text-3xl font-bold md:text-4xl">{heading}</h1>
-
-          {waiting ? (
-            <div className="flex flex-col items-start gap-2 sm:items-end">
-              <span className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#5A5850]">
-                <Lock size={13} />
-                Problems locked
-              </span>
-              {status.scheduledStartAt && (
-                <span data-testid="finale-start-countdown" className="font-mono text-2xl" style={{ color: GOLD }}>
-                  <FinaleCountdown target={status.scheduledStartAt} />
-                </span>
-              )}
-            </div>
-          ) : (
-            endsAt && (
-              <span data-testid="finale-timer" className="font-mono text-2xl" style={{ color: GOLD }}>
-                <FinaleCountdown target={endsAt} />
-              </span>
-            )
-          )}
-        </header>
-
-        <section className="mt-12">
-          <h2 className="font-sans text-xl font-semibold">Problems</h2>
-          {waiting ? (
-            <div className="relative mt-4 overflow-hidden border border-[#22262f] bg-[#0B0E15]">
-              <div aria-hidden className="select-none blur-sm">
-                {["Problem one", "Problem two", "Problem three"].map((name) => (
-                  <div
-                    key={name}
-                    className="flex items-center justify-between border-b border-[#14161e] px-5 py-4 last:border-b-0"
-                  >
-                    <span className="font-sans text-sm text-[#F4F1EA]">{name}</span>
-                    <span className="font-mono text-[11px] uppercase tracking-wide text-[#8B93A7]">
-                      000 pts
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#06070B]/70 px-6 text-center">
-                <Lock size={22} style={{ color: GOLD }} />
-                <p className="font-sans text-sm text-[#F4F1EA]">Sealed until the round starts</p>
-                <p className="font-sans text-xs text-[#8B93A7]">
-                  They unlock the moment an organiser begins. This page updates on its own.
-                </p>
-              </div>
-            </div>
-          ) : problems.length === 0 ? (
-            <p className="mt-4 border border-[#22262f] bg-[#0B0E15] px-5 py-6 font-sans text-sm text-[#8B93A7]">
-              No problems have been published for this round yet.
-            </p>
-          ) : (
-            <div className="mt-4 grid gap-2 md:grid-cols-2">
-              {problems.map((problem) => (
-                <button
-                  key={problem.id}
-                  onClick={() => router.push(`/events/finale/workspace/${problem.id}`)}
-                  className="flex items-center justify-between gap-4 rounded-lg border border-[#22262f] bg-[#0d0f14] px-5 py-4 text-left font-sans text-sm text-[#F4F1EA] transition-colors hover:border-[#D9A404]/50 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D9A404]"
-                >
-                  <span className="flex min-w-0 items-center gap-3">
-                    {labels.get(problem.id) && (
-                      <span className="w-5 shrink-0 font-mono text-sm font-semibold" style={{ color: GOLD }}>
-                        {labels.get(problem.id)}
-                      </span>
-                    )}
-                    <span className="truncate">{problem.title}</span>
-                  </span>
-                  <span className="font-mono text-[11px] uppercase tracking-wide text-[#8B93A7]">
-                    {problem.difficulty} &middot; {problem.base_points} pts
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="mt-14">
-          <h2 className="font-sans text-xl font-semibold">Live standings</h2>
-          <FinaleStandingsTable standings={standings} currentUserId={user?.id} />
-        </section>
-
-        <div className="mt-14 grid gap-12 lg:grid-cols-2">
-        <section>
-          <h2 className="font-sans text-xl font-semibold">How the round works</h2>
-          <ul className="mt-4 space-y-3 border border-[#14161e] bg-[#0B0E15] p-6">
-            {CONTEST_INSTRUCTIONS.map((line) => (
-              <li key={line} className="flex gap-3">
-                <span className="mt-2 h-1 w-1 shrink-0 rounded-full" style={{ background: GOLD }} />
-                <span className="font-sans text-sm leading-relaxed text-[#8B93A7]">{line}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="font-sans text-xl font-semibold">Templates you brought</h2>
-          <p className="mt-2 font-sans text-sm text-[#8B93A7]">
-            Reference only. Open a problem to write code.
-          </p>
-          {templates.length === 0 ? (
-            <p className="mt-4 border border-[#22262f] bg-[#0B0E15] px-5 py-6 font-sans text-sm text-[#8B93A7]">
-              You saved no templates before the round.
-            </p>
-          ) : (
-            <div className="mt-4 flex flex-col gap-3">
-              {templates.map((template) => (
-                <details
-                  key={template.id}
-                  className="border border-[#14161e] bg-[#0B0E15] [&_summary]:cursor-pointer"
-                >
-                  <summary className="flex items-center justify-between px-5 py-3 font-sans text-sm text-[#F4F1EA]">
-                    {template.name}
-                    <span className="font-mono text-[11px] uppercase tracking-wide text-[#8B93A7]">
-                      {template.language}
-                    </span>
-                  </summary>
-                  <pre className="overflow-x-auto border-t border-[#14161e] px-5 py-4 font-mono text-xs leading-relaxed text-[#8B93A7]">
-                    {template.sourceCode}
-                  </pre>
-                </details>
-              ))}
-            </div>
-          )}
-        </section>
-        </div>
-      </div>
-    </div>
+    <FinaleContestView
+      status={status}
+      endsAt={state.endsAt}
+      problems={problems}
+      templates={templates}
+      standings={standings}
+      standingsUpdatedAt={standingsUpdatedAt}
+      onRefreshStandings={() => setStandingsRequest((n) => n + 1)}
+      currentUserId={user?.id}
+      onOpenProblem={(id) => router.push(`/events/finale/workspace/${id}`)}
+    />
   );
 }

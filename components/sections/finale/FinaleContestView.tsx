@@ -24,6 +24,7 @@ import type {
 } from "@/lib/api-client";
 import { FinaleCountdown } from "./FinaleLobby";
 import FinaleStandingsTable, { CONTEST_COLORS as C, formatContestTime } from "./FinaleStandings";
+import FocusGuard from "./FocusGuard";
 
 const CONTEST_TITLE = "CodeCell Grand Finale";
 
@@ -569,6 +570,7 @@ export default function FinaleContestView({
       : standings?.rows.find((row) => String(row.userId) === String(currentUserId)) ?? null;
 
   return (
+    <FocusGuard weekId={status.weekId} counting={status.state === "LIVE"}>
     <div className="min-h-screen bg-[#0A0C10] text-[#E7E9EE]">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:px-8 md:py-10">
         <Link
@@ -656,5 +658,6 @@ export default function FinaleContestView({
         </div>
       </div>
     </div>
+    </FocusGuard>
   );
 }

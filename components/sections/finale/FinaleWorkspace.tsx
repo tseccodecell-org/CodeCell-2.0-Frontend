@@ -26,6 +26,7 @@ import type { SubmissionState, Language } from "@/lib/types/submission";
 import type { FinaleState } from "@/lib/schemas/finale";
 import { toSubmissionStatus, isTerminalStatus } from "@/lib/schemas/submission";
 import { FINALE_BUFFERS_KEY } from "./FinaleLobby";
+import FocusGuard from "./FocusGuard";
 
 const POLL_INTERVAL_MS = 1000;
 const RUN_POLL_INTERVAL_MS = 2000;
@@ -514,6 +515,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   }
 
   return (
+    <FocusGuard weekId={problem?.weekId ?? null} counting={finaleState === "LIVE"}>
     <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
         <Link
@@ -699,5 +701,6 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
         </div>
       </div>
     </div>
+    </FocusGuard>
   );
 }

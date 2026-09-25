@@ -7,7 +7,6 @@ import { Playfair_Display } from "next/font/google";
 
 import { getInternshipEligibility, getCurrentFinale, ApiError, LOGIN_URL } from "@/lib/api-client";
 import { QUALIFYING_SEATS, WHATSAPP_GROUP_URL } from "./finale-config";
-import type { SeasonStanding } from "./useSeasonStanding";
 
 const playfair = Playfair_Display({ subsets: ["latin"] });
 
@@ -100,24 +99,16 @@ export function useSeatState(): SeatState {
   return seat;
 }
 
-export default function SeatGate({
-  seat,
-  standing,
-  gates,
-}: {
-  seat: SeatState;
-  standing: SeasonStanding;
-  gates: ActionGates;
-}) {
-  if (seat === "signed-out" || standing.sealed) {
+export default function SeatGate({ seat, gates }: { seat: SeatState; gates: ActionGates }) {
+  if (seat === "signed-out") {
     return (
       <div className="border border-[#14161e] bg-[#0B0E15] p-7 md:p-9">
         <h2 className={`${playfair.className} text-2xl text-[#F4F1EA] md:text-3xl`}>
-          Sign in to see where you stand
+          Sign in to check your seat
         </h2>
         <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-[#8B93A7]">
           The finale seats go to the top {QUALIFYING_SEATS} of the season. Sign in and this page
-          will show you your place on the board.
+          will tell you whether one of them is yours.
         </p>
         <button
           onClick={() => (window.location.href = LOGIN_URL)}
@@ -130,42 +121,20 @@ export default function SeatGate({
     );
   }
 
-  if (standing.pending || seat === "loading") {
+  if (seat === "loading") {
     return (
       <div className="border border-[#14161e] bg-[#0B0E15] p-7">
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#5A5850]">
-          Checking the board
+          Checking your seat
         </p>
       </div>
     );
   }
 
-  // the board decides what we say; an organiser's grant decides only what opens
-  const inTheTwenty = standing.qualified;
-  const open = seat === "invited";
-
-  // a finalist sees both actions, locked until an organiser opens them. someone
-  // outside the twenty is not shown a door that will not open for them
   const action = (href: string, label: string, gateOpen: boolean) =>
-    open && gateOpen ? (
-      <OpenAction href={href} label={label} />
-    ) : (
-      <LockedAction label={label} />
-    );
+    gateOpen ? <OpenAction href={href} label={label} /> : <LockedAction label={label} />;
 
-  const actions = (
-    <div className="mt-7 flex flex-wrap gap-3">
-      {inTheTwenty && (
-        <>
-          {action("/events/finale/templates", "Load your templates", gates.templates)}
-          {action("/events/finale/internship", "Apply for the internship", gates.internship)}
-          {action("/events/finale/contest", "Enter contest", gates.entry)}
-        </>
-      )}
-    </div>
-  );
-
-  if (inTheTwenty) {
+  if (seat === "invited") {
     return (
       <div className="border bg-[#0B0E15] p-7 md:p-9" style={{ borderColor: GOLD }}>
         <p className="font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: GOLD }}>
@@ -193,13 +162,11 @@ export default function SeatGate({
           Everything about the day is announced there. Join it now so you do not miss anything.
         </p>
 
-        {!open && (
-          <p className="mt-5 font-sans text-xs text-[#8B93A7]">
-            The buttons below open once the organisers confirm your seat.
-          </p>
-        )}
-
-        {actions}
+        <div className="mt-7 flex flex-wrap gap-3">
+          {action("/events/finale/templates", "Load your templates", gates.templates)}
+          {action("/events/finale/internship", "Apply for the internship", gates.internship)}
+          {action("/events/finale/contest", "Enter contest", gates.entry)}
+        </div>
       </div>
     );
   }
@@ -213,16 +180,12 @@ export default function SeatGate({
         You finished outside the top {QUALIFYING_SEATS}
       </h2>
       <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-[#8B93A7]">
-        The offline round takes the top {QUALIFYING_SEATS}, and this season you landed just outside
-        it. That is a narrow margin, not a verdict. Six weeks of solving is real work and it
-        counted.
+        The offline round takes the top {QUALIFYING_SEATS}, and this season a seat did not come your
+        way. That is not a verdict. Six weeks of solving is real work and it counted.
       </p>
       <p className="mt-3 max-w-xl font-sans text-sm leading-relaxed text-[#8B93A7]">
-        Your season recap is still yours to read, and the next season starts level for everyone.
-        We hope to see you back on the board.
+        The next season starts level for everyone. We hope to see you back on the board.
       </p>
-
-      {actions}
     </div>
   );
 }

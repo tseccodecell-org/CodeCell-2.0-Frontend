@@ -4,12 +4,10 @@ import Link from "next/link";
 import { ChevronLeft, ArrowRight } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 import WeekTimer from "@/components/layout/WeekTimer";
-import StandingStrip from "@/components/sections/weekly-challenges/finale/StandingStrip";
 import SeatGate, {
   useSeatState,
   useActionGates,
 } from "@/components/sections/weekly-challenges/finale/SeatGate";
-import { useSeasonStanding } from "@/components/sections/weekly-challenges/finale/useSeasonStanding";
 import {
   FINALE_DATE_SHORT,
   FINALE_FACTS,
@@ -34,8 +32,6 @@ function SectionHead({ eyebrow, title }: { eyebrow: string; title: string }) {
 }
 
 export default function FinalePage() {
-  // Read once, so your standing and the apply button always agree.
-  const state = useSeasonStanding();
   const seat = useSeatState();
   const gates = useActionGates();
 
@@ -66,11 +62,7 @@ export default function FinalePage() {
 
         </header>
 
-        <StandingStrip state={state} />
-
-        <div className="mt-6">
-          <SeatGate seat={seat} standing={state} gates={gates} />
-        </div>
+        <SeatGate seat={seat} gates={gates} />
 
         <nav className="flex flex-wrap gap-3 mt-8" aria-label="On this page">
           <a

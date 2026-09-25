@@ -29,6 +29,7 @@ import {
   finaleBoardSchema,
   finaleStandingsSchema,
   finaleStatusSchema,
+  proctorStatusSchema,
   templateSchema,
   templateListSchema,
 } from "./schemas/finale";
@@ -46,6 +47,7 @@ export type {
 } from "./schemas/submission";
 export type {
   FinaleBoardEntry,
+  ProctorStatus,
   FinaleStandings,
   FinaleStandingsCell,
   FinaleStandingsProblem,
@@ -78,6 +80,7 @@ import type {
   FinaleBoardEntry,
   FinaleStandings,
   FinaleStatusResponse,
+  ProctorStatus,
   TemplateResponse,
 } from "./schemas/finale";
 import type { WrappedResponse, WrappedInsightResponse } from "./schemas/wrapped";
@@ -315,6 +318,12 @@ export function getCurrentFinale(): Promise<FinaleStatusResponse> {
 
 export function getFinaleBoard(weekId: string): Promise<FinaleBoardEntry[]> {
   return proxyGet(`/api/finales/${weekId}/board`, finaleBoardSchema);
+}
+
+export type ProctorEventKind = "TAB_SWITCH" | "FULLSCREEN_EXIT";
+
+export function reportProctorEvent(weekId: string, kind: ProctorEventKind): Promise<ProctorStatus> {
+  return proxyMutate("POST", `/api/finales/${weekId}/proctor-events`, { kind }, proctorStatusSchema);
 }
 
 export function getFinaleStandings(weekId: string): Promise<FinaleStandings> {

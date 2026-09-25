@@ -6,6 +6,15 @@ export const finaleAccessModeSchema = z.enum(["OPEN", "RESTRICTED"]);
 export type FinaleState = z.infer<typeof finaleStateSchema>;
 export type FinaleAccessMode = z.infer<typeof finaleAccessModeSchema>;
 
+export const proctorStatusSchema = z.object({
+  strikes: z.number().int(),
+  strikeLimit: z.number().int(),
+  locked: z.boolean(),
+  lockReason: z.string().optional(),
+});
+
+export type ProctorStatus = z.infer<typeof proctorStatusSchema>;
+
 export const finaleStatusSchema = z.object({
   weekId: z.string(),
   state: finaleStateSchema,
@@ -18,6 +27,7 @@ export const finaleStatusSchema = z.object({
   templatesOpen: z.boolean().default(false),
   internshipOpen: z.boolean().default(false),
   scheduledStartAt: z.string().optional(),
+  proctor: proctorStatusSchema.optional(),
 });
 
 export type FinaleStatusResponse = z.infer<typeof finaleStatusSchema>;

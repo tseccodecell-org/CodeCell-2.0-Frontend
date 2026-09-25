@@ -1,6 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import FocusGuard from "./FocusGuard";
+import { reportProctorEvent } from "@/lib/api-client";
+
+vi.mock("@/lib/api-client", () => ({
+  reportProctorEvent: vi.fn(),
+}));
+
+const mockedReport = reportProctorEvent as unknown as ReturnType<typeof vi.fn>;
 
 let fullscreenElement: Element | null = null;
 let visibility: DocumentVisibilityState = "visible";
@@ -23,20 +30,21 @@ function switchTab() {
   });
 }
 
+async function enterFullscreen() {
+  fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
+  await act(async () => {});
+}
+
 beforeEach(() => {
+  vi.clearAllMocks();
   fullscreenElement = null;
   visibility = "visible";
-  window.localStorage.clear();
   Object.defineProperty(document, "fullscreenEnabled", { configurable: true, get: () => true });
   Object.defineProperty(document, "fullscreenElement", { configurable: true, get: () => fullscreenElement });
   Object.defineProperty(document, "visibilityState", { configurable: true, get: () => visibility });
   document.documentElement.requestFullscreen = vi.fn(async () => {
     setFullscreen(true);
   });
-});
-
-afterEach(() => {
-  vi.useRealTimers();
 });
 
 describe("finale focus guard", () => {
@@ -48,74 +56,112 @@ describe("finale focus guard", () => {
     );
 
     expect(screen.getByText("This round runs in full screen")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
-    await act(async () => {});
+    await enterFullscreen();
 
     expect(document.documentElement.requestFullscreen).toHaveBeenCalled();
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 
-  it("counts leaving full screen during the round and asks them back", async () => {
+  it("reports leaving full screen and shows the strike the server counted", async () => {
+    mockedReport.mockResolvedValue({ strikes: 2, strikeLimit: 3, locked: false });
     render(
       <FocusGuard weekId="wk" counting>
         <p>contest</p>
       </FocusGuard>
     );
-    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
-    await act(async () => {});
+    await enterFullscreen();
 
     setFullscreen(false);
+    await act(async () => {});
 
+    expect(mockedReport).toHaveBeenCalledWith("wk", "FULLSCREEN_EXIT");
     expect(screen.getByText("You left full screen")).toBeInTheDocument();
-    expect(screen.getByTestId("focus-strikes")).toHaveTextContent("1 time");
+    expect(screen.getByTestId("focus-strikes")).toHaveTextContent("Strike 2 of 3");
     expect(screen.getByRole("button", { name: "Return to full screen" })).toBeInTheDocument();
   });
 
-  it("counts a tab switch that also drops full screen as one slip", async () => {
+  it("reports a tab switch", async () => {
+    mockedReport.mockResolvedValue({ strikes: 1, strikeLimit: 3, locked: false });
     render(
       <FocusGuard weekId="wk" counting>
         <p>contest</p>
       </FocusGuard>
     );
-    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
-    await act(async () => {});
+    await enterFullscreen();
 
     switchTab();
-    setFullscreen(false);
+    await act(async () => {});
 
-    expect(screen.getByTestId("focus-strikes")).toHaveTextContent("1 time");
+    expect(mockedReport).toHaveBeenCalledWith("wk", "TAB_SWITCH");
+    expect(screen.getByText("You switched away from the contest")).toBeInTheDocument();
   });
 
-  it("does not count anything before the round is live", async () => {
+  it("locks the screen when the server says the strike limit was reached", async () => {
+    mockedReport.mockResolvedValue({
+      strikes: 3,
+      strikeLimit: 3,
+      locked: true,
+      lockReason: "Left the contest screen 3 times",
+    });
+    render(
+      <FocusGuard weekId="wk" counting>
+        <p>contest</p>
+      </FocusGuard>
+    );
+    await enterFullscreen();
+
+    switchTab();
+    await act(async () => {});
+
+    expect(screen.getByText("Your round is locked")).toBeInTheDocument();
+    expect(screen.getByTestId("focus-lock-reason")).toHaveTextContent("Left the contest screen 3 times");
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("clears the lock when a status poll says an invigilator unlocked them", () => {
+    const { rerender } = render(
+      <FocusGuard weekId="wk" counting proctor={{ strikes: 3, strikeLimit: 3, locked: true, lockReason: "Phone" }}>
+        <p>contest</p>
+      </FocusGuard>
+    );
+    expect(screen.getByText("Your round is locked")).toBeInTheDocument();
+
+    fullscreenElement = document.documentElement;
+    rerender(
+      <FocusGuard weekId="wk" counting proctor={{ strikes: 0, strikeLimit: 3, locked: false }}>
+        <p>contest</p>
+      </FocusGuard>
+    );
+
+    expect(screen.queryByText("Your round is locked")).not.toBeInTheDocument();
+  });
+
+  it("does not report anything before the round is live", async () => {
     render(
       <FocusGuard weekId="wk" counting={false}>
         <p>contest</p>
       </FocusGuard>
     );
-    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
-    await act(async () => {});
+    await enterFullscreen();
 
     switchTab();
 
-    expect(screen.queryByTestId("focus-strikes")).not.toBeInTheDocument();
+    expect(mockedReport).not.toHaveBeenCalled();
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 
-  it("keeps the count when the page is opened again", async () => {
-    window.localStorage.setItem("codecell_finale_strikes_wk", "2");
-    fullscreenElement = document.documentElement;
-
+  it("still counts on screen when the report cannot reach the server", async () => {
+    mockedReport.mockRejectedValue(new Error("offline"));
     render(
-      <FocusGuard weekId="wk" counting>
+      <FocusGuard weekId="wk" counting proctor={{ strikes: 0, strikeLimit: 3, locked: false }}>
         <p>contest</p>
       </FocusGuard>
     );
-    vi.useFakeTimers();
-    vi.advanceTimersByTime(5000);
-    switchTab();
+    await enterFullscreen();
 
-    expect(screen.getByTestId("focus-strikes")).toHaveTextContent("3 times");
-    fireEvent.click(screen.getByRole("button", { name: "Back to the contest" }));
-    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    switchTab();
+    await act(async () => {});
+
+    expect(screen.getByTestId("focus-strikes")).toHaveTextContent("Strike 1 of 3");
   });
 });

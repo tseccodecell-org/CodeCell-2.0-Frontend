@@ -17,7 +17,7 @@ import {
   listTemplates,
   ApiError,
 } from "@/lib/api-client";
-import type { TemplateResponse } from "@/lib/api-client";
+import type { ProctorStatus, TemplateResponse } from "@/lib/api-client";
 import { estimateRoundEnd } from "@/lib/finale-clock";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -87,6 +87,7 @@ function getCooldownSeconds(err: { code?: string; message: string }): number {
 function getRunErrorMessage(err: unknown): string {
   if (isApiError(err)) {
     if (err.code === "VALIDATION_ERROR" || err.code === "PROBLEM_NOT_FOUND") return err.message;
+    if (err.status === 423) return "Your round is locked. Raise your hand for an invigilator.";
     if (err.status === 429) return err.message;
     if (err.status === 400) return err.message || "Your code could not be accepted.";
     if (err.status >= 500) return "The judge is having trouble right now. Please try again shortly.";
@@ -98,6 +99,7 @@ function getSubmitErrorMessage(err: unknown): string {
   if (isApiError(err)) {
     if (err.status === 401) return "Your session has expired. Please sign in again.";
     if (err.status === 404) return "This problem could not be found.";
+    if (err.status === 423) return "Your round is locked. Raise your hand for an invigilator.";
     if (err.status === 400)
       return "There was a problem with your submission. Please check your code and try again.";
     if (err.status >= 500) return "Something went wrong on our end. Please try again shortly.";
@@ -161,6 +163,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
 
   const [finaleState, setFinaleState] = useState<FinaleState | null>(null);
   const [finaleEndsAt, setFinaleEndsAt] = useState<number | null>(null);
+  const [proctor, setProctor] = useState<ProctorStatus | undefined>(undefined);
 
   const savedBuffers = useMemo(() => readSavedBuffers(), []);
 
@@ -200,6 +203,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
           if (cancelled) return;
           const receivedAt = Date.now();
           setFinaleState(status.state);
+          setProctor(status.proctor);
           setFinaleEndsAt((previousEnd) =>
             status.state === "LIVE"
               ? estimateRoundEnd(status.remainingSeconds, sentAt, receivedAt, previousEnd)
@@ -515,7 +519,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   }
 
   return (
-    <FocusGuard weekId={problem?.weekId ?? null} counting={finaleState === "LIVE"}>
+    <FocusGuard weekId={problem?.weekId ?? null} counting={finaleState === "LIVE"} proctor={proctor}>
     <div className="flex h-full flex-col overflow-hidden bg-[#06070B]">
       <header className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[#1a1c24] bg-[#0d0f14] px-3">
         <Link

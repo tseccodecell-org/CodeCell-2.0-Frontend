@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { GET as leaderboardGET } from "@/app/api/leaderboard/[...slug]/route";
 import { GET as weeksGET } from "@/app/api/weeks/[...slug]/route";
-import { GET as finalesGET } from "@/app/api/finales/[...slug]/route";
+import { GET as finalesGET, POST as finalesPOST } from "@/app/api/finales/[...slug]/route";
 import {
   GET as templatesGET,
   POST as templatesPOST,
@@ -189,6 +189,26 @@ describe("weeks proxy route", () => {
 });
 
 describe("finales proxy route", () => {
+  it("forwards a proctoring report with its body and the session cookie", async () => {
+    fetchMock().mockResolvedValueOnce(upstream({ success: true, data: { strikes: 1, strikeLimit: 3, locked: false } }));
+
+    const req = new NextRequest(
+      new Request("http://localhost/api/finales/wk-1/proctor-events", {
+        method: "POST",
+        headers: { cookie: "jwt_token=abc123", "content-type": "application/json" },
+        body: JSON.stringify({ kind: "TAB_SWITCH" }),
+      })
+    );
+    const res = await finalesPOST(req, { params: Promise.resolve({ slug: ["wk-1", "proctor-events"] }) });
+
+    const [url, init] = fetchMock().mock.calls[0];
+    expect(url).toBe(`${API_BASE}/api/finales/wk-1/proctor-events`);
+    expect(init.method).toBe("POST");
+    expect(init.body).toBe(JSON.stringify({ kind: "TAB_SWITCH" }));
+    expect(init.headers.Cookie).toBe("jwt_token=abc123");
+    expect(res.status).toBe(200);
+  });
+
   it("prefixes the backend path with /finales", async () => {
     fetchMock().mockResolvedValueOnce(upstream(finaleStatusFixture));
 

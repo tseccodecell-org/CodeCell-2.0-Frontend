@@ -92,6 +92,44 @@ describe("finale contest page", () => {
     expect(screen.queryByTestId("finale-start-countdown")).not.toBeInTheDocument();
   });
 
+  it("never winds the clock back when status answers arrive late", async () => {
+    vi.useFakeTimers();
+    try {
+      const roundEndsAt = Date.now() + 3600 * 1000;
+      const delays = [2000, 7000];
+      let calls = 0;
+      mockedGetCurrentFinale.mockImplementation(() => {
+        const remainingSeconds = Math.round((roundEndsAt - Date.now()) / 1000);
+        const delay = delays[calls++ % delays.length];
+        return new Promise((resolve) =>
+          setTimeout(() => resolve({ ...baseStatus, state: "LIVE", remainingSeconds }), delay)
+        );
+      });
+
+      render(<FinaleContestPage />);
+      await vi.advanceTimersByTimeAsync(2000);
+      for (let i = 0; i < 10; i++) await vi.advanceTimersByTimeAsync(0);
+
+      const secondsShown = () => {
+        const [h, m, s] = (screen.getByTestId("finale-timer").textContent ?? "").split(":").map(Number);
+        return h * 3600 + m * 60 + s;
+      };
+
+      let previous = secondsShown();
+      for (let tick = 0; tick < 90; tick++) {
+        await vi.advanceTimersByTimeAsync(1000);
+        const shown = secondsShown();
+        expect(shown).toBeLessThanOrEqual(previous);
+        previous = shown;
+      }
+
+      const trueRemaining = Math.floor((roundEndsAt - Date.now()) / 1000);
+      expect(Math.abs(previous - trueRemaining)).toBeLessThanOrEqual(5);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("drops the timer once the round has ended", async () => {
     mockedGetCurrentFinale.mockResolvedValue({
       ...baseStatus,

@@ -16,6 +16,7 @@ import {
 import type { FinaleStatusResponse, WeekProblem, TemplateResponse } from "@/lib/api-client";
 import type { FinaleBoardEntry } from "@/lib/api-client";
 import { useAuth } from "@/hooks/useAuth";
+import { estimateRoundEnd } from "@/lib/finale-clock";
 import { FinaleCountdown } from "./FinaleLobby";
 
 const FINALE_STATUS_REFRESH_MS = 15000;
@@ -33,7 +34,7 @@ const CONTEST_INSTRUCTIONS = [
 
 type LoadState =
   | { kind: "loading" }
-  | { kind: "ready"; status: FinaleStatusResponse }
+  | { kind: "ready"; status: FinaleStatusResponse; endsAt: number | null }
   | { kind: "unauthenticated" }
   | { kind: "forbidden" }
   | { kind: "not-found" }
@@ -49,10 +50,6 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function endsAtFromRemaining(remainingSeconds: number): string {
-  return new Date(Date.now() + remainingSeconds * 1000).toISOString();
-}
-
 export default function FinaleContest() {
   const router = useRouter();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
@@ -65,8 +62,17 @@ export default function FinaleContest() {
     if (!silent) setState({ kind: "loading" });
 
     try {
+      const sentAt = Date.now();
       const status = await getCurrentFinale();
-      setState({ kind: "ready", status });
+      const receivedAt = Date.now();
+      setState((prev) => {
+        const previousEnd = prev.kind === "ready" ? prev.endsAt : null;
+        const endsAt =
+          status.state === "LIVE"
+            ? estimateRoundEnd(status.remainingSeconds, sentAt, receivedAt, previousEnd)
+            : null;
+        return { kind: "ready", status, endsAt };
+      });
     } catch (err) {
       if (silent) return;
       if (err instanceof ApiError) {
@@ -256,7 +262,7 @@ export default function FinaleContest() {
       </Shell>
     );
   }
-  const endsAt = status.state === "LIVE" ? endsAtFromRemaining(status.remainingSeconds) : undefined;
+  const endsAt = state.endsAt !== null ? new Date(state.endsAt).toISOString() : undefined;
 
   const heading = waiting
     ? "The round hasn't started"

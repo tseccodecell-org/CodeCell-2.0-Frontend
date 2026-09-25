@@ -18,6 +18,7 @@ import {
   ApiError,
 } from "@/lib/api-client";
 import type { TemplateResponse } from "@/lib/api-client";
+import { estimateRoundEnd } from "@/lib/finale-clock";
 import { useAuth } from "@/hooks/useAuth";
 
 import type { ProblemDetail } from "@/lib/types/problem";
@@ -119,18 +120,15 @@ function formatRemaining(seconds: number): string {
   return `${minutes}:${String(secs).padStart(2, "0")} left`;
 }
 
-function FinaleTimer({ initialRemainingSeconds }: { initialRemainingSeconds: number }) {
-  const [remaining, setRemaining] = useState(initialRemainingSeconds);
+function FinaleTimer({ endsAt }: { endsAt: number }) {
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    setRemaining(initialRemainingSeconds);
-  }, [initialRemainingSeconds]);
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  useEffect(() => {
-    if (remaining <= 0) return;
-    const timer = setTimeout(() => setRemaining((s) => Math.max(0, s - 1)), 1000);
-    return () => clearTimeout(timer);
-  }, [remaining]);
+  const remaining = Math.max(0, Math.ceil((endsAt - now) / 1000));
 
   return (
     <span data-testid="finale-timer" className="font-mono text-[11px] text-[#D9A404]">
@@ -161,7 +159,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
   const [cooldownLeft, setCooldownLeft] = useState(0);
 
   const [finaleState, setFinaleState] = useState<FinaleState | null>(null);
-  const [finaleRemainingSeconds, setFinaleRemainingSeconds] = useState<number | null>(null);
+  const [finaleEndsAt, setFinaleEndsAt] = useState<number | null>(null);
 
   const savedBuffers = useMemo(() => readSavedBuffers(), []);
 
@@ -195,11 +193,17 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
     let cancelled = false;
 
     const refresh = () => {
+      const sentAt = Date.now();
       getFinaleStatus(weekId)
         .then((status) => {
           if (cancelled) return;
+          const receivedAt = Date.now();
           setFinaleState(status.state);
-          setFinaleRemainingSeconds(status.remainingSeconds);
+          setFinaleEndsAt((previousEnd) =>
+            status.state === "LIVE"
+              ? estimateRoundEnd(status.remainingSeconds, sentAt, receivedAt, previousEnd)
+              : null
+          );
         })
         .catch((err) => {
           if (cancelled) return;
@@ -535,9 +539,7 @@ export default function FinaleWorkspace({ problemId }: { problemId: string }) {
         </div>
 
         <div className="flex items-center gap-3 font-mono text-[11px] text-[#8B93A7]">
-          {finaleState === "LIVE" && finaleRemainingSeconds !== null && (
-            <FinaleTimer initialRemainingSeconds={finaleRemainingSeconds} />
-          )}
+          {finaleState === "LIVE" && finaleEndsAt !== null && <FinaleTimer endsAt={finaleEndsAt} />}
           {finaleState === "PAUSED" && (
             <span className="text-[#D9A404]">Scoring paused</span>
           )}
